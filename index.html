@@ -76,7 +76,6 @@ button{font-family:inherit;cursor:pointer}
 .hero{background:linear-gradient(135deg,var(--rd) 0%,var(--r) 50%,#e53935 100%);border-radius:24px;padding:32px 24px;color:#fff;text-align:center;margin-bottom:20px;position:relative;overflow:hidden;box-shadow:0 10px 30px rgba(183,28,28,0.4);transition:var(--ease)}
 .hero:hover{transform:translateY(-5px);box-shadow:0 15px 35px rgba(183,28,28,0.5)}
 .hero::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='30' cy='30' r='20' fill='%23ffffff' fill-opacity='.05'/%3E%3C/svg%3E") repeat;pointer-events:none}
-/* NEW: User Images */
 .hero-img{width:100%;max-width:350px;border-radius:16px;margin-bottom:16px;box-shadow:0 8px 24px rgba(0,0,0,0.3);transition:var(--ease);border:3px solid rgba(255,255,255,0.2);display:inline-block;}
 .hero-img:hover{transform:scale(1.03) rotate(-1deg);border-color:rgba(255,255,255,0.5)}
 
@@ -630,7 +629,7 @@ details[open] summary{color:var(--r);border-bottom:1px solid var(--rbd)}
 <div class="blog-list" id="blog-list">
     <div style="text-align:center;padding:20px;color:var(--tx4);font-size:14px;font-weight:600;">লোড হচ্ছে...</div>
 </div>
-<div style="text-align:center;padding:12px;opacity:0.4;font-size:11px;font-weight:700;" class="admin-trigger" id="admin-trig">App Version: 11.2 (Click to Login)</div>
+<div style="text-align:center;padding:12px;opacity:0.4;font-size:11px;font-weight:700;" class="admin-trigger" id="admin-trig">App Version: 11.3 (Click to Login)</div>
 </div></div>
 
 </div><!-- /app -->
@@ -711,7 +710,7 @@ function tryGPS(ok, fail) {
             var raw = Object.values(d.address || {}).join(' '), dist = mD(raw);
             if(dist) ok(dist); else fail();
         }).catch(fail);
-    }, function(){ fail(); }, {timeout:5000});
+    }, function(){ fail(); }, {timeout:10000, enableHighAccuracy:true});
 }
 
 function tryIP(ok, fail) {
@@ -725,7 +724,6 @@ function tryIP(ok, fail) {
     }
     function nope() { if(!done) { done = true; fail(); } }
 
-    // HTTPS supported free geo tracker
     fetch('https://get.geojs.io/v1/ip/geo.json')
     .then(r => r.json())
     .then(d => got((d.city || '') + ' ' + (d.region || '')))
@@ -734,44 +732,39 @@ function tryIP(ok, fail) {
     setTimeout(() => { if(!done){ done = true; fail(); } }, 6000);
 }
 
-// 1. AUTO-START TRACKING WHEN PAGE LOADS
+// 1. CHECK CACHE ON LOAD (DO NOT RUN BACKGROUND IP TRACKER ANYMORE)
 window.addEventListener('load', function() {
     var sd='', st=0;
     try { sd=localStorage.getItem('sbs_d')||''; st=parseInt(localStorage.getItem('sbs_t')||'0'); } catch(x){}
     
     if(sd && (Date.now()-st)<1800000) {
-        // We already have location saved
+        // Already have location saved from a recent visit
         document.getElementById('pop').classList.add('off');
         ldN(sd);
-    } else {
-        // Automatically start the tracking process silently!
-        // We try IP first because GPS will block the screen with a permission popup.
-        tryIP(function(d) {
-            // IP found the location silently! Hide popup.
-            document.getElementById('pop').classList.add('off');
-            ldN(d);
-        }, function() {
-            // Silent IP tracking failed, just wait for user to click "ঠিক আছে"
-        });
     }
+    // No else block here. We leave the popup on screen so the user can click the button.
 });
 
 // 2. WHEN USER CLICKS "ঠিক আছে, দেখুন"
 document.getElementById('pok').addEventListener('click', function() {
     this.disabled = true;
     this.textContent = '\u09B6\u09A8\u09BE\u0995\u09CD\u09A4 \u0995\u09B0\u09BE \u09B9\u099A\u09CD\u099B\u09C7...';
+    document.getElementById('pdm').textContent = '📍 লোকেশান পারমিশন দিন...';
     
-    // First try GPS
+    // First try GPS (Browser will explicitly ask for permission here!)
     tryGPS(function(d){
-        document.getElementById('pop').classList.add('off'); ldN(d);
+        document.getElementById('pop').classList.add('off'); 
+        ldN(d);
     }, function(){
-        // If GPS fails, try IP again
+        // If GPS fails (user denies permission or timeout), try IP as backup
         tryIP(function(d){
-            document.getElementById('pop').classList.add('off'); ldN(d);
+            document.getElementById('pop').classList.add('off'); 
+            ldN(d);
         }, function(){
-            // If EVERYTHING fails, don't ask them to select. Just default to Jhenaidah!
+            // If everything fails, show the manual selection dropdown
+            document.getElementById('pdm').textContent = '';
             document.getElementById('pop').classList.add('off');
-            ldN('Jhenaidah');
+            sman();
         });
     });
 });
