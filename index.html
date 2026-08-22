@@ -46,10 +46,9 @@ button{font-family:inherit;cursor:pointer}
 
 /* ═══ HEADER ═══ */
 #hdr{position:fixed;top:40px;left:0;right:0;height:64px;background:linear-gradient(135deg, rgba(183,28,28,0.95) 0%, rgba(211,47,47,0.95) 100%);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;padding:0 16px;z-index:990;box-shadow:0 4px 20px rgba(183,28,28,.4)}
-.h-logo{display:flex;align-items:center;gap:12px;flex:1}
-.h-txt{color:#fff;text-align: center; width: 100%;}
-.h-txt h1{font-size:26px;font-weight:800;letter-spacing:.3px;line-height:1.2;font-family:'Impact', sans-serif;}
-.h-txt p{font-size:10px;opacity:.9;letter-spacing:.5px;text-transform:uppercase;font-family:'Poppins', sans-serif;}
+.h-txt{color:#fff;}
+.h-txt h1{font-family:'Impact', sans-serif;font-size:25px;letter-spacing:1px;font-weight:bold;white-space:nowrap;}
+.h-txt p{font-size:11px;opacity:.9;margin-top:2px;font-family:'Poppins', sans-serif;}
 
 /* ═══ BOTTOM NAV ═══ */
 #bnav{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-around;align-items:center;padding:8px 4px env(safe-area-inset-bottom,12px);background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid rgba(0,0,0,0.05);border-radius:24px 24px 0 0;z-index:990;box-shadow:0 -4px 24px rgba(0,0,0,.08)}
@@ -345,12 +344,20 @@ details[open] summary{color:var(--r);border-bottom:1px solid var(--rbd)}
 <div class="t-dtag" id="tdt">📍<span id="tdn"></span> ✕</div>
 </div></div>
 
-<!-- HEADER -->
+<!-- HEADER (With Top Right Profile Icon) -->
 <header id="hdr">
-  <div class="h-logo" style="justify-content: center; width: 100%; text-align: center;">
-    <div class="h-txt" style="text-align: center;">
-      <h1 style="font-family: Impact, sans-serif; font-size: 28px; letter-spacing: 1px; font-weight: bold; white-space: nowrap;">SPONDON BLOOD SOCIETY</h1>
-      <p style="font-size: 13px;">Jhenaidah Textile Engineering College</p>
+  <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+    <div style="width: 40px;"></div>
+    
+    <div class="h-txt" style="text-align: center; flex: 1;">
+      <h1 style="font-family: Impact, sans-serif; font-size: 25px; letter-spacing: 1px; font-weight: bold; white-space: nowrap;">SPONDON BLOOD SOCIETY</h1>
+      <p style="font-size: 11px; margin-top: 2px;">Jhenaidah Textile Engineering College</p>
+    </div>
+
+    <div style="width: 40px; text-align: right;">
+      <button onclick="go('donor-profile')" style="background: rgba(255,255,255,0.25); border: 1px solid rgba(255,255,255,0.5); border-radius: 50%; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.1);" title="প্রোফাইল আপডেট" onmouseover="this.style.background='rgba(255,255,255,0.4)'" onmouseout="this.style.background='rgba(255,255,255,0.25)'">
+        <svg viewBox="0 0 24 24" style="width: 22px; height: 22px; fill: #fff;"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+      </button>
     </div>
   </div>
 </header>
@@ -510,7 +517,7 @@ details[open] summary{color:var(--r);border-bottom:1px solid var(--rbd)}
 <div id="cffs">
 <div class="fh"><span class="fi">🩺</span><div class="ft">Donation Confirmation</div><div class="fs">স্পন্দন ব্লাড সোসাইটি, ঝিনাইদহ</div></div>
 <div class="fb">
-<p class="fd">রক্তদানের আপডেট দিন। আগামী ৪ মাস আর কোনো অনুরোধ পাঠানো হবে না।</p>
+<p class="fd">রক্তদানের আপডেট দিন। আগামী ৪ মাস আর কোনো অনুরোধ পাঠানো হবে না。</p>
 <form id="cff"><input type="hidden" name="formType" value="donationConfirmation">
 <div class="ig"><label>আপনার ইমেইল এড্রেস *</label><input type="email" name="donorEmail" required autocomplete="email" placeholder="যে ইমেইলে আমাদের মেইল পেয়েছেন"></div>
 <div class="ig"><label>রক্তদানের স্ট্যাটাস *</label><select name="donationStatus" id="cfst" required><option value="">স্ট্যাটাস নির্বাচন করুন</option><option value="Donated">✅ হ্যাঁ, রক্ত দিয়েছি</option><option value="Not Needed">🙏 রোগীর আর রক্ত লাগেনি</option><option value="Failed">😔 কোনো কারণে দিতে পারিনি</option></select></div>
@@ -578,6 +585,7 @@ details[open] summary{color:var(--r);border-bottom:1px solid var(--rbd)}
   </form>
 </div>
 </div>
+
 <!-- ABOUT & GUIDELINES -->
 <div class="page" id="p-about">
 <div class="ac">
@@ -599,6 +607,7 @@ details[open] summary{color:var(--r);border-bottom:1px solid var(--rbd)}
 <div class="cc"><div class="ccn">মোহাম্মদ নয়ন চৌধুরী</div><small class="ccr">দায়িত্বপ্রাপ্ত সদস্য</small><a href="tel:01947662428" class="ccb">📞 01947662428</a></div>
 </div>
 </div></div>
+
 <!-- ACTIVITIES PAGE -->
 <div class="page" id="p-activities">
 <div class="ac">
@@ -619,7 +628,7 @@ details[open] summary{color:var(--r);border-bottom:1px solid var(--rbd)}
     <div style="text-align:center;padding:20px;color:var(--tx4);font-size:14px;font-weight:600;">লোড হচ্ছে...</div>
 </div>
 <!-- Admin trigger (Clicking text 3 times opens login) -->
-<div style="text-align:center;padding:12px;opacity:0.4;font-size:11px;font-weight:700;" class="admin-trigger" id="admin-trig">App Version: 11.5 (Click to Login)</div>
+<div style="text-align:center;padding:12px;opacity:0.4;font-size:11px;font-weight:700;" class="admin-trigger" id="admin-trig">App Version: 11.6 (Click to Login)</div>
 </div></div>
 
 </div><!-- /app -->
