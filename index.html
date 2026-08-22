@@ -1,384 +1,1101 @@
-const SPREADSHEET_ID = "1uG7vkf9eFeJpxnxXlwyTmo_DGIDYMQlypJeB7BgpPZs";
-const FOLDER_ID = "19Aq2OdJfKYPuYxlXWFv0uhsTE3MkWDdZ";
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="স্পন্দন ব্লাড সোসাইটি — ঝিনাইদহ টেক্সটাইল ইঞ্জিনিয়ারিং কলেজ। রক্তদান করুন, জীবন বাঁচান।">
+<meta name="theme-color" content="#b71c1c">
+<title>স্পন্দন ব্লাড সোসাইটি | Spondon Blood Society</title>
+<!-- NEW: Modern Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --r:#d32f2f;--rd:#b71c1c;--rl:#ef5350;--rbg:#fff5f5;--rbd:#ffcdd2;
+  --gn:#2e7d32;--gnd:#1b5e20;--gnl:#43a047;--gnbg:#f1f8e9;--gnbd:#c8e6c9;
+  --bl:#1877f2;--li:#0a66c2;--gm:#ea4335;
+  --g1:#f8f9fa;--g2:#f1f3f4;--gb:#dadce0;
+  --tx:#202124;--tx2:#3c4043;--tx3:#5f6368;--tx4:#9aa0a6;
+  --shadow:0 8px 24px rgba(0,0,0,.08);
+  --shadow-hover:0 14px 28px rgba(211,47,47,.2);
+  --radius:20px;
+  --ease:0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{font-family:'Anek Bangla','Poppins',sans-serif;background:#f4f7f6;color:var(--tx);min-height:100vh;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer}
 
-function doPost(e) {
-  try {
-    let action = e.parameter.action || e.parameter.formType;
-    if (action === 'addDonor' || action === 'donorRegistration') return handleAddDonor(e);
-    else if (action === 'addRequest' || action === 'bloodRequest') return handleAddRequest(e);
-    else if (action === 'secureMatch') return handleSecureMatch(e);
-    else if (action === 'confirmDonation' || action === 'donationConfirmation') return handleConfirmDonation(e);
-    else if (action === 'adminLogin') return handleAdminLogin(e);
-    else if (action === 'addBlog') return handleAddBlog(e);
-    else if (action === 'deleteBlog') return handleDeleteBlog(e);
-    else if (action === 'togglePinBlog') return handleTogglePinBlog(e);
-    else if (action === 'requestOtp') return handleRequestOtp(e);
-    else if (action === 'verifyOtp') return handleVerifyOtp(e);
-    else if (action === 'updateProfile') return handleUpdateProfile(e);
+/* ═══ TICKER ═══ */
+#ticker{position:fixed;top:0;left:0;right:0;height:40px;background:var(--rbg);border-bottom:2px solid var(--rbd);display:flex;align-items:center;z-index:1000;box-shadow: 0 2px 10px rgba(211,47,47,0.1);}
+.t-badge{background:linear-gradient(135deg,var(--r),var(--rd));color:#fff;padding:0 14px;height:100%;display:flex;align-items:center;font-weight:700;font-size:12.5px;border-radius:0 14px 14px 0;white-space:nowrap;gap:5px;letter-spacing:.2px;flex-shrink:0}
+.t-dot{animation:blink 1.2s step-end infinite}
+.t-track{flex:1;overflow:hidden;height:100%;display:flex;align-items:center;position:relative}
+.t-sk{width:55%;height:10px;border-radius:6px;margin-left:14px;background:linear-gradient(90deg,#ffcdd2 25%,#ffebee 50%,#ffcdd2 75%);background-size:200%;animation:shimmer 1.4s infinite}
+.t-msg{display:none;padding-left:100%;font-weight:700;font-size:14px;white-space:nowrap;will-change:transform;animation:scroll linear infinite;color:var(--rd);letter-spacing:.1px}
+.t-msg.on{display:inline-block}
+.t-msg:hover{animation-play-state:paused}
+.t-man{display:none;position:absolute;inset:0;background:var(--rbg);align-items:center;padding:0 10px;gap:6px;z-index:4}
+.t-man.show{display:flex}
+.t-man .lbl{font-size:11px;color:var(--rd);font-weight:700;white-space:nowrap;flex-shrink:0}
+.t-man select{flex:1;border:1.5px solid var(--r);border-radius:7px;padding:4px 7px;font-size:12px;font-family:inherit;background:#fff;-webkit-appearance:none;color:var(--tx);min-width:0}
+.t-man button{background:linear-gradient(135deg,var(--r),var(--rd));color:#fff;border:none;padding:5px 11px;border-radius:7px;font-size:12px;font-weight:700;white-space:nowrap;flex-shrink:0}
+.t-dtag{display:none;position:absolute;right:6px;top:50%;transform:translateY(-50%);background:rgba(211,47,47,.85);color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:12px;cursor:pointer;white-space:nowrap;z-index:3;transition:var(--ease)}
+.t-dtag:hover{background:var(--rd)}
+.t-dtag.show{display:block}
+
+/* ═══ HEADER ═══ */
+#hdr{position:fixed;top:40px;left:0;right:0;height:64px;background:linear-gradient(135deg, rgba(183,28,28,0.95) 0%, rgba(211,47,47,0.95) 100%);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;padding:0 16px;z-index:990;box-shadow:0 4px 20px rgba(183,28,28,.4)}
+.h-logo{display:flex;align-items:center;gap:12px;flex:1}
+.h-ico{width:42px;height:42px;background:rgba(255,255,255,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;border:2px solid rgba(255,255,255,.4);animation:pulse 2s ease-in-out infinite;flex-shrink:0}
+.h-txt{color:#fff}
+.h-txt h1{font-size:16px;font-weight:800;letter-spacing:.3px;line-height:1.2;font-family:'Poppins', sans-serif;}
+.h-txt p{font-size:10px;opacity:.9;letter-spacing:.5px;text-transform:uppercase;font-family:'Poppins', sans-serif;}
+.h-btn{background:#fff;color:var(--r);border:none;padding:8px 16px;border-radius:24px;font-size:13px;font-weight:700;font-family:inherit;letter-spacing:.2px;animation:epulse 2s ease-in-out infinite;transition:var(--ease);box-shadow: 0 4px 10px rgba(0,0,0,0.1)}
+.h-btn:hover{transform:translateY(-2px);box-shadow: 0 6px 15px rgba(255,255,255,0.4)}
+
+/* ═══ BOTTOM NAV ═══ */
+#bnav{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-around;align-items:center;padding:8px 4px env(safe-area-inset-bottom,12px);background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid rgba(0,0,0,0.05);border-radius:24px 24px 0 0;z-index:990;box-shadow:0 -4px 24px rgba(0,0,0,.08)}
+.ni{-webkit-tap-highlight-color:transparent;color:var(--tx4);display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;font-weight:700;width:18%;padding:4px 0;border:none;background:none;font-family:inherit;transition:all var(--ease);letter-spacing:.2px;cursor:pointer}
+.ni svg{width:24px;height:24px;fill:var(--tx4);transition:all var(--ease)}
+.ni:hover{color:var(--tx2);transform:translateY(-2px)}
+.ni.on{color:var(--r);transform:translateY(-4px)}
+.ni.on svg{fill:var(--r);filter:drop-shadow(0 4px 6px rgba(211,47,47,0.3))}
+.nfab{background:linear-gradient(135deg,var(--r),var(--rd));width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:4px solid #fff;margin-top:-35px;box-shadow:0 6px 20px rgba(211,47,47,.5);cursor:pointer;flex-shrink:0;transition:all var(--ease)}
+.nfab:hover{transform:translateY(-5px) scale(1.05);box-shadow:0 10px 25px rgba(211,47,47,.6)}
+.nfab:active{transform:scale(.95)}
+.nfab svg{fill:#fff;width:28px;height:28px;animation: heartbeat 2s infinite;}
+.nfl{font-size:11px;color:var(--r);font-weight:800;text-align:center;margin-top:4px}
+
+/* ═══ MAIN ═══ */
+#app{padding-top:115px;padding-bottom:90px;min-height:100vh}
+.page{display:none;padding:0 16px;animation:fadeInUp .4s cubic-bezier(0.165, 0.84, 0.44, 1)}
+.page.on{display:block}
+
+/* ═══ HERO ═══ */
+.hero{background:linear-gradient(135deg,var(--rd) 0%,var(--r) 50%,#e53935 100%);border-radius:24px;padding:32px 24px;color:#fff;text-align:center;margin-bottom:20px;position:relative;overflow:hidden;box-shadow:0 10px 30px rgba(183,28,28,0.4);transition:var(--ease)}
+.hero:hover{transform:translateY(-5px);box-shadow:0 15px 35px rgba(183,28,28,0.5)}
+.hero::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='30' cy='30' r='20' fill='%23ffffff' fill-opacity='.05'/%3E%3C/svg%3E") repeat;pointer-events:none}
+.hero-img{width:100%;max-width:350px;border-radius:16px;margin-bottom:16px;box-shadow:0 8px 24px rgba(0,0,0,0.3);transition:var(--ease);border:3px solid rgba(255,255,255,0.2);display:inline-block;}
+.hero-img:hover{transform:scale(1.03) rotate(-1deg);border-color:rgba(255,255,255,0.5)}
+.hero h2{font-size:26px;font-weight:800;letter-spacing:.5px;margin-bottom:8px;position:relative;font-family:'Poppins', sans-serif;}
+.hero p{font-size:14.5px;opacity:.9;line-height:1.6;margin-bottom:24px;position:relative;font-weight:500;}
+
+/* ═══ QUICK ACTIONS ═══ */
+.qg{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}
+.qa{background:#fff;border-radius:20px;padding:20px 16px;border:1px solid rgba(0,0,0,0.04);text-align:center;box-shadow:var(--shadow);-webkit-tap-highlight-color:transparent;width:100%;font-family:inherit;transition:all var(--ease);position:relative;overflow:hidden;z-index:1}
+.qa::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(211,47,47,0.05),transparent);z-index:-1;opacity:0;transition:var(--ease)}
+.qa:hover{transform:translateY(-6px);box-shadow:var(--shadow-hover);border-color:var(--rbd)}
+.qa:hover::after{opacity:1}
+.qa:active{transform:scale(.95)}
+.qa-i{font-size:38px;display:block;margin-bottom:12px;transition:var(--ease)}
+.qa:hover .qa-i{transform:scale(1.15) rotate(5deg)}
+.qa-t{font-size:14.5px;font-weight:800;color:var(--tx);margin-bottom:6px}
+.qa-d{font-size:12px;color:var(--tx3);line-height:1.5;font-weight:500}
+.qa.pri{background:linear-gradient(135deg,var(--r),var(--rd));border:none}
+.qa.pri .qa-t,.qa.pri .qa-d{color:#fff}
+.qa.pri:hover{box-shadow:0 12px 28px rgba(183,28,28,0.4)}
+
+/* ═══ STATS ═══ */
+.sc{background:#fff;border-radius:24px;padding:22px;border:1px solid rgba(0,0,0,0.04);border-top:5px solid var(--r);margin-bottom:20px;box-shadow:var(--shadow);transition:var(--ease)}
+.sc:hover{box-shadow:var(--shadow-hover)}
+.sc-t{text-align:center;color:var(--rd);font-weight:800;font-size:18px;margin-bottom:18px;padding-bottom:12px;border-bottom:2px dashed var(--rbd)}
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.sb{background:var(--g1);border:1px solid #e8eaed;padding:16px 12px;border-radius:16px;text-align:center;transition:var(--ease)}
+.sb:hover{background:#fff;box-shadow:0 6px 16px rgba(0,0,0,0.06);transform:translateY(-3px)}
+.sb.r{background:var(--rbg);border-color:var(--rbd)}
+.sb.r:hover{background:#fff;box-shadow:0 6px 16px rgba(211,47,47,0.1)}
+.sl{font-size:12px;color:var(--tx3);font-weight:700;display:block;margin-bottom:6px}
+.sn{font-size:30px;color:var(--r);font-weight:800;display:block;line-height:1;font-family:'Poppins', sans-serif;}
+.bg4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;background:var(--g1);padding:10px;border-radius:16px;border:1px solid rgba(0,0,0,0.04)}
+.bgc{font-size:13px;text-align:center;color:var(--tx2);font-weight:700;background:#fff;padding:10px 4px;border-radius:12px;border:1px solid rgba(0,0,0,0.05);transition:var(--ease);font-family:'Poppins', sans-serif;}
+.bgc:hover{transform:translateY(-3px);box-shadow:0 4px 12px rgba(211,47,47,0.15);border-color:var(--rbd)}
+.bgc span{color:var(--r);display:block;font-size:18px;font-weight:800;margin-top:4px}
+.skr{border-radius:8px;background:linear-gradient(90deg,#eee 25%,#f5f5f5 50%,#eee 75%);background-size:200%;animation:shimmer 1.3s infinite}
+.skh{height:30px;margin:6px auto;width:55%}
+.skl{height:13px;width:75%;margin:0 auto 8px}
+.skb{height:20px;width:65%;margin:6px auto}
+.su{text-align:center;font-size:12px;color:var(--tx4);margin-top:14px;font-weight:500;}
+
+/* ═══ INFO SECTION ═══ */
+.isec{background:transparent;border:none;box-shadow:none;margin-bottom:24px;overflow:visible;}
+.isec-h{text-align:center;font-size:20px;font-weight:800;color:var(--rd);margin-bottom:16px;background:none;border:none;font-family:'Poppins',sans-serif;}
+.ii-g{display:grid;grid-template-columns:1fr;gap:16px;}
+@media(min-width:480px){.ii-g{grid-template-columns:1fr 1fr;}}
+.ii{background:#fff;border-radius:20px;padding:20px 16px;border:1px solid rgba(0,0,0,0.05);box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;text-align:center;transition:all var(--ease);position:relative;overflow:hidden;}
+.ii::before{content:'';position:absolute;top:0;left:0;width:100%;height:5px;background:linear-gradient(90deg,var(--r),var(--rd));}
+.ii:hover{transform:translateY(-5px);box-shadow:var(--shadow-hover);}
+.ii-i{font-size:38px;margin-bottom:14px;transition:var(--ease)}
+.ii:hover .ii-i{transform:scale(1.15) rotate(5deg)}
+.ii h5{font-size:16px;font-weight:800;color:var(--tx);margin-bottom:8px;font-family:'Poppins',sans-serif;}
+.ii p{font-size:13.5px;color:var(--tx3);line-height:1.6;font-weight:600;}
+
+/* ═══ FORMS ═══ */
+.fc{background:#fff;border-radius:24px;border:1px solid rgba(0,0,0,0.05);border-top:5px solid var(--r);box-shadow:var(--shadow);overflow:hidden;margin-bottom:20px}
+.fc.gt{border-top-color:var(--gn)}
+.fh{text-align:center;padding:28px 24px 20px;background:linear-gradient(180deg,var(--rbg) 0%,#fff 100%);border-bottom:1px solid rgba(0,0,0,0.03)}
+.fh.gh{background:linear-gradient(180deg,var(--gnbg) 0%,#fff 100%)}
+.fi{font-size:46px;display:block;animation:pulse 2s ease-in-out infinite;margin-bottom:10px}
+.ft{font-size:22px;font-weight:800;color:var(--r);letter-spacing:.3px;margin-bottom:6px;font-family:'Poppins', sans-serif;}
+.ft.gn{color:var(--gn)}
+.fs{font-size:13px;color:var(--tx3);font-weight:500}
+.fb{padding:22px 22px 10px}
+.ff{padding:0 22px 22px}
+.fd{background:var(--rbg);border-left:4px solid var(--rbd);color:var(--rd);padding:14px 16px;border-radius:12px;font-size:14px;margin-bottom:20px;font-weight:700;line-height:1.6;text-align:center;box-shadow:0 4px 12px rgba(211,47,47,0.05)}
+.fd.gn{background:var(--gnbg);border-left-color:var(--gnbd);color:var(--gn)}
+.ig{margin-bottom:16px}
+.ig label{display:block;margin-bottom:6px;font-weight:700;color:var(--tx2);font-size:14px}
+.ig input,.ig select,.ig textarea{width:100%;padding:12px 16px;border:2px solid var(--gb);border-radius:12px;font:14.5px/1.5 'Anek Bangla','Poppins',sans-serif;background:var(--g1);color:var(--tx);-webkit-appearance:none;appearance:none;transition:all var(--ease)}
+.ig input:hover,.ig select:hover,.ig textarea:hover{border-color:#b0b5ba}
+.ig input:focus,.ig select:focus,.ig textarea:focus{border-color:var(--r);outline:none;background:#fff;box-shadow:0 0 0 4px rgba(211,47,47,.1)}
+.ig select:disabled{opacity:.5;cursor:not-allowed}
+.ig textarea{resize:vertical;min-height:90px}
+.ig .hint{font-size:12px;color:var(--tx4);margin-top:6px;font-weight:500}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:420px){.g2{grid-template-columns:1fr}}
+.sbtn{width:100%;background:linear-gradient(135deg,var(--r),var(--rd));color:#fff;border:none;padding:16px;font-size:16px;font-weight:800;border-radius:14px;display:flex;justify-content:center;align-items:center;gap:10px;-webkit-tap-highlight-color:transparent;letter-spacing:.3px;font-family:inherit;transition:all var(--ease);box-shadow:0 6px 20px rgba(211,47,47,.4);margin-top:8px;cursor:pointer;}
+.sbtn.gn{background:linear-gradient(135deg,var(--gnl),var(--gn));box-shadow:0 6px 20px rgba(67,160,71,.4)}
+.sbtn:hover{transform:translateY(-3px);box-shadow:0 10px 25px rgba(211,47,47,.5)}
+.sbtn.gn:hover{box-shadow:0 10px 25px rgba(67,160,71,.5)}
+.sbtn:active{transform:scale(.96);opacity:.92}
+.sbtn:disabled{opacity:.65;cursor:not-allowed;transform:none}
+.spin{display:none;width:20px;height:20px;border:3px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
+.err{display:none;color:#c62828;background:#ffebee;padding:12px 16px;border-radius:10px;margin-top:12px;font-size:14px;font-weight:700;text-align:center;border:1px solid var(--rbd);animation: shake 0.5s}
+
+/* ═══ SUCCESS ═══ */
+.ok-w{display:none;padding:30px 22px}
+.ok-ic{width:86px;height:86px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;animation:popIn .6s cubic-bezier(.175,.885,.32,1.275) both;box-shadow: 0 10px 30px rgba(67,160,71,0.3)}
+.ok-ic svg{width:46px;height:46px;fill:#fff}
+.ok-t{font-size:22px;font-weight:800;text-align:center;letter-spacing:.2px;margin-bottom:8px}
+.ok-s{font-size:14px;color:var(--tx3);text-align:center;line-height:1.6;margin-bottom:20px;font-weight:500}
+.ok-i{border-radius:16px;padding:18px;box-shadow: 0 4px 15px rgba(0,0,0,0.05)}
+.ok-r{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid rgba(0,0,0,.06);font-size:14px;font-weight:600;line-height:1.6;color:var(--tx2)}
+.ok-r:last-child{border-bottom:none}
+.ok-r span:first-child{flex-shrink:0;font-size:18px}
+.wa-btn {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    background: #25D366; color: white; padding: 16px; border-radius: 14px;
+    font-weight: 800; font-size: 15px; margin-top: 20px; box-shadow: 0 6px 20px rgba(37,211,102,0.4);
+    transition: var(--ease); cursor: pointer; border: none; font-family: inherit; width: 100%;
+}
+.wa-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(37,211,102,0.5); }
+.wa-btn:active { transform: scale(0.96); }
+
+/* ═══ DONOR CARDS ═══ */
+.rs{padding:18px 20px}
+.ri{background:var(--g1);border:1px solid #e8eaed;border-radius:14px;padding:16px 18px;font-size:14.5px;color:var(--tx2);font-weight:700;line-height:1.7;margin-bottom:16px;box-shadow: inset 0 2px 4px rgba(0,0,0,0.02)}
+.dc{background:#fff;border:1px solid rgba(0,0,0,0.05);border-radius:16px;padding:16px 18px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 4px 12px rgba(60,64,67,.06);transition:var(--ease)}
+.dc:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(60,64,67,.1);border-color:var(--rbd)}
+.dn2{font-weight:800;color:var(--tx);font-size:15.5px;margin-bottom:4px;font-family:'Poppins',sans-serif;}
+.dp2{font-size:14px;color:var(--tx3);margin-bottom:8px;font-weight:600;}
+.dbg{background:linear-gradient(135deg,var(--r),var(--rd));color:#fff;padding:4px 12px;border-radius:14px;font-size:13px;font-weight:800;display:inline-block;font-family:'Poppins',sans-serif;}
+.duz{display:inline-flex;align-items:center;gap:4px;background:#e8f0fe;color:#1a73e8;padding:4px 12px;border-radius:14px;font-size:13px;font-weight:700;margin-left:6px}
+.cbt{background:linear-gradient(135deg,var(--r),var(--rd));color:#fff;padding:12px 20px;border-radius:28px;font-weight:800;font-size:14px;white-space:nowrap;flex-shrink:0;transition:var(--ease);box-shadow:0 4px 12px rgba(211,47,47,.3)}
+.cbt:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(211,47,47,.4)}
+.nd{background:var(--rbg);border:2px dashed var(--rbd);border-radius:16px;padding:26px;text-align:center;color:#c62828}
+.cs{background:linear-gradient(135deg,var(--gnbg),#e8f5e9);border:1px solid var(--gnbd);border-radius:16px;padding:20px;text-align:center;margin-top:16px;display:none;box-shadow:0 4px 15px rgba(67,160,71,0.1)}
+.cs p{font-size:14px;color:var(--gn);font-weight:700;margin-bottom:14px;line-height:1.6}
+.csb{display:inline-block;background:linear-gradient(135deg,var(--gnl),var(--gn));color:#fff;padding:14px 28px;border-radius:30px;font-weight:800;font-size:15px;box-shadow:0 6px 16px rgba(67,160,71,.35);border:none;font-family:inherit;cursor:pointer;transition:var(--ease)}
+.csb:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(67,160,71,.45)}
+.mdi{background:linear-gradient(135deg,var(--gnbg),#e8f5e9);border:1px solid var(--gnbd);border-radius:16px;padding:20px;margin-bottom:16px;box-shadow:0 4px 15px rgba(67,160,71,0.1)}
+.mdn{font-size:18px;font-weight:800;color:var(--gnd);margin-bottom:8px;font-family:'Poppins',sans-serif;}
+.mdm{font-size:14px;color:#33691e;font-weight:600;line-height:1.7}
+.stc{background:#fff;border:1px solid rgba(0,0,0,0.05);border-radius:14px;padding:16px;box-shadow:0 4px 10px rgba(0,0,0,0.02)}
+.str{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--g2);font-size:14px;font-weight:600;color:var(--tx2);line-height:1.55}
+.str:last-child{border-bottom:none}
+.adb{width:100%;background:#fff;color:var(--gn);border:2px solid var(--gnbd);padding:14px;border-radius:14px;font-weight:800;font-size:15px;margin-top:14px;font-family:inherit;transition:all var(--ease);cursor:pointer;}
+.adb:hover{background:var(--gnbg);border-color:var(--gn);transform:translateY(-2px)}
+
+/* ═══ GUIDELINES ═══ */
+.gc{background:#fff;border-radius:24px;border:1px solid rgba(0,0,0,0.05);border-top:5px solid var(--r);box-shadow:var(--shadow);margin-bottom:20px;overflow:hidden;transition:var(--ease)}
+.gc:hover{box-shadow:var(--shadow-hover)}
+.gc-h{text-align:center;padding:24px 20px 18px;background:linear-gradient(180deg,var(--rbg),#fff);border-bottom:1px solid rgba(0,0,0,0.03)}
+.gc-h h2{font-size:22px;font-weight:800;color:var(--r);font-family:'Poppins',sans-serif;}
+.gc-h p{font-size:14px;color:var(--tx3);margin-top:6px;font-weight:600}
+details{background:var(--g1);border:1px solid rgba(0,0,0,0.05);border-radius:14px;margin:0 16px 12px;transition:all .3s ease;}
+details:last-of-type{margin-bottom:20px}
+details[open]{border-color:var(--rbd);background:#fff;box-shadow:0 4px 15px rgba(211,47,47,0.08);transform:scale(1.01)}
+summary{padding:16px 18px;font-weight:700;color:var(--tx2);font-size:14.5px;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;-webkit-tap-highlight-color:transparent;user-select:none;transition:var(--ease)}
+summary:hover{color:var(--r)}
+summary::-webkit-details-marker{display:none}
+summary::after{content:'+';color:var(--r);font-size:24px;flex-shrink:0;margin-left:10px;font-weight:400;line-height:1;transition:var(--ease)}
+details[open] summary::after{content:'−';transform:rotate(180deg)}
+details[open] summary{color:var(--r);border-bottom:1px solid var(--rbd)}
+.gct{padding:16px 18px;color:var(--tx3);font-size:14px;line-height:1.75;font-weight:500;}
+.gct ul{padding-left:24px;margin-top:8px}
+.gct li{margin-bottom:8px}
+.hl{color:var(--r);font-weight:800}
+
+/* ═══ ABOUT & BLOGS ═══ */
+.ac{background:#fff;border-radius:24px;border:1px solid rgba(0,0,0,0.05);border-top:5px solid var(--r);box-shadow:var(--shadow);margin-bottom:20px;overflow:hidden;transition:var(--ease)}
+.ac:hover{box-shadow:var(--shadow-hover)}
+.ac-h{text-align:center;padding:26px 20px 20px;background:linear-gradient(135deg,var(--rbg),#fff9f9,#fff);border-bottom:2px dashed var(--rbd)}
+.ac-h h2{font-size:24px;font-weight:800;color:#c62828;margin-bottom:6px;font-family:'Poppins',sans-serif;}
+.ac-h p{color:var(--tx3);font-size:14.5px;font-weight:600}
+.st2{font-size:16px;font-weight:800;padding:16px 20px 10px;border-left:5px solid var(--r);margin-left:16px;color:var(--r);font-family:'Poppins',sans-serif;}
+.st2.blue{border-left-color:#1a73e8;color:#1a73e8}
+.ab{padding:0 20px 18px;font-size:14.5px;color:var(--tx2);line-height:1.75;font-weight:500}
+.ab ul{padding-left:24px;margin-top:10px}
+.ab li{margin-bottom:8px}
+.cg2{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:0 16px 18px}
+@media(max-width:380px){.cg2{grid-template-columns:1fr}}
+.cc{background:var(--rbg);border:1px solid var(--rbd);padding:18px 14px;border-radius:16px;text-align:center;transition:var(--ease)}
+.cc:hover{transform:translateY(-3px);box-shadow:0 6px 15px rgba(211,47,47,0.15)}
+.ccn{color:var(--rd);font-size:15px;font-weight:800;margin-bottom:4px}
+.ccr{color:var(--tx3);font-size:12.5px;display:block;margin-bottom:12px;font-weight:600}
+.ccb{display:inline-block;background:linear-gradient(135deg,var(--r),var(--rd));color:#fff;padding:10px 20px;border-radius:24px;font-size:14px;font-weight:800;box-shadow:0 4px 10px rgba(211,47,47,0.3);transition:var(--ease)}
+.ccb:hover{box-shadow:0 6px 15px rgba(211,47,47,0.4);transform:translateY(-2px)}
+.ssec{padding:20px;background:var(--g1);border-top:1px solid rgba(0,0,0,0.05);text-align:center}
+.ssec p{font-size:14px;color:var(--tx3);font-weight:600;margin-bottom:16px;line-height:1.55}
+
+/* NEW: Blog Styles */
+.blog-list { padding: 0 16px 16px; display:flex; flex-direction:column; gap:16px; }
+.bcard { background:#fff; border:1px solid rgba(0,0,0,0.05); border-radius:16px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.05); transition:var(--ease); position:relative; }
+.bcard:hover { transform:translateY(-5px); box-shadow:0 10px 25px rgba(0,0,0,0.1); }
+.bimg { width:100%; max-height:250px; object-fit:contain; background:#f5f7fa; }
+.bp { padding:18px; }
+.bt { font-size:18px; font-weight:800; color:var(--tx); margin-bottom:10px; line-height:1.4; font-family:'Poppins',sans-serif;}
+.bd { font-size:14px; color:var(--tx3); line-height:1.6; font-weight:500; }
+.bmeta { font-size:12px; color:var(--tx4); font-weight:600; margin-bottom:10px; display:flex; justify-content:space-between; }
+.bdel { position:absolute; top:12px; right:12px; background:rgba(211,47,47,0.9); color:white; border:none; padding:6px 12px; border-radius:8px; font-size:12px; font-weight:bold; cursor:pointer; z-index:10; }
+.bfb { display:block; text-align:center; background:#1877f2; color:#fff; padding:12px; border-radius:10px; text-decoration:none; font-weight:700; margin-top:14px; font-size:14px; }
+
+
+/* Admin Login & Form */
+#admin-panel { padding: 20px; background:var(--rbg); border-radius:16px; margin: 16px; border:2px dashed var(--r); display:none; }
+.admin-trigger { cursor:pointer; user-select:none; }
+
+/* ═══ POPUP ═══ */
+#pop, #admin-pop{display:flex;position:fixed;inset:0;background:rgba(32,33,36,.75);z-index:2000;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);}
+#pop.off, #admin-pop.off{display:none}
+.pop-b{background:#fff;border-radius:24px;max-width:350px;width:100%;box-shadow:0 20px 50px rgba(0,0,0,.3);overflow:hidden;animation:zoomIn .4s cubic-bezier(0.175, 0.885, 0.32, 1.275)}
+.pop-h{background:linear-gradient(135deg,var(--r),var(--rd));padding:24px;text-align:center}
+.pop-h .pi{font-size:42px;margin-bottom:10px;animation:pulse 2s infinite}
+.pop-h h3{color:#fff;font-size:18px;font-weight:800;margin:0 0 4px;font-family:'Poppins',sans-serif;}
+.pop-h p{color:rgba(255,255,255,.9);font-size:13px;margin:0;font-weight:500}
+.pop-bd{padding:20px 22px}
+.rbox{background:#fafafa;border-radius:14px;padding:14px 16px;margin-bottom:18px;border:1px solid rgba(0,0,0,0.05)}
+.ru{display:flex;gap:10px;font-size:13.5px;color:var(--tx2);font-weight:600;line-height:1.55;padding:6px 0;border-bottom:1px solid rgba(0,0,0,0.04)}
+.ru:last-child{border-bottom:none}
+.pcta{font-size:13.5px;color:var(--tx3);font-weight:600;text-align:center;margin-bottom:16px;line-height:1.6}
+.pok{width:100%;background:linear-gradient(135deg,var(--r),var(--rd));color:#fff;border:none;padding:15px;border-radius:14px;font-size:15.5px;font-weight:800;font-family:inherit;box-shadow:0 6px 20px rgba(211,47,47,.4);transition:var(--ease);cursor:pointer;}
+.pok:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(211,47,47,.5)}
+.pok:active{opacity:.9;transform:scale(0.96)}
+.pdm{text-align:center;font-size:13px;color:var(--tx4);margin-top:12px;min-height:20px;font-weight:600}
+
+/* ═══ ANIMATIONS ═══ */
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+@keyframes scroll{0%{transform:translate3d(0,0,0)}100%{transform:translate3d(-100%,0,0)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+@keyframes heartbeat{0%,100%{transform:scale(1)}15%{transform:scale(1.15)}30%{transform:scale(1)}45%{transform:scale(1.08)}60%{transform:scale(1)}}
+@keyframes popIn{0%{opacity:0;transform:scale(.5)}100%{opacity:1;transform:scale(1)}}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
+@keyframes zoomIn{from{opacity:0;transform:scale(0.85)}to{opacity:1;transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+@keyframes epulse{0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,.6)}50%{box-shadow:0 0 0 8px rgba(255,255,255,0)}}
+/* ═══ ANIMATIONS & UTILS ═══ */
+.animate-on-scroll { opacity: 0; transform: translateY(30px); transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1); will-change: transform, opacity; }
+.animate-on-scroll.show { opacity: 1; transform: translateY(0); }
+.top-act-grid { display: grid; grid-template-columns: 1fr; gap: 16px; margin-bottom: 24px; }
+@media(min-width: 600px) { .top-act-grid { grid-template-columns: 1fr 1fr; } }
+.section-title { font-size: 22px; font-weight: 800; color: var(--rd); text-align: center; margin: 32px 0 16px; font-family: 'Poppins', sans-serif; }
+</style>
+</head>
+<body>
+
+<!-- LOCATION POPUP -->
+<div id="pop">
+<div class="pop-b">
+<div class="pop-h"><div class="pi">🩸</div><h3>স্পন্দন ব্লাড সোসাইটি</h3><p>ঝিনাইদহ টেক্সটাইল ইঞ্জিনিয়ারিং কলেজ</p></div>
+<div class="pop-bd">
+<div class="rbox">
+<div class="ru"><span>❤️</span><span>একটি রক্তদান একটি প্রাণ বাঁচাতে পারে।</span></div>
+<div class="ru"><span>🚫</span><span>রক্ত বিক্রয় সম্পূর্ণ নিষিদ্ধ। সব সেবা বিনামূল্যে।</span></div>
+<div class="ru"><span>📋</span><span>সঠিক তথ্য দিয়ে রেজিস্ট্রেশন করুন।</span></div>
+<div class="ru"><span>📍</span><span>আপনার জেলার জরুরি রক্তের চাহিদা দেখাতে লোকেশন ব্যবহার হবে।</span></div>
+</div>
+<p class="pcta">আসুন রক্তদানে এগিয়ে আসি! আপনার জেলায় কারো রক্তের প্রয়োজন আছে কিনা দেখুন।</p>
+<button class="pok" id="pok">ঠিক আছে, দেখুন 🩸</button>
+<div class="pdm" id="pdm"></div>
+</div></div></div>
+
+<!-- ADMIN LOGIN POPUP -->
+<div id="admin-pop" class="off">
+<div class="pop-b">
+<div class="pop-h"><div class="pi">🔒</div><h3>এডমিন লগইন</h3><p>শুধুমাত্র অথোরাইজড সদস্যদের জন্য</p></div>
+<div class="pop-bd">
+<form id="admin-form">
+  <div class="ig"><label>Email</label><input type="email" id="admin-email" required placeholder="admin@gmail.com"></div>
+  <div class="ig"><label>Secret PIN</label><input type="password" id="admin-pin" required placeholder="****"></div>
+  <button type="button" class="pok" id="admin-login-btn">লগইন করুন</button>
+  <button type="button" class="pcta" style="background:none;border:none;width:100%;margin-top:10px;cursor:pointer" onclick="document.getElementById('admin-pop').classList.add('off')">বাতিল</button>
+  <div class="err" id="admin-err"></div>
+</form>
+</div></div></div>
+
+<!-- TICKER -->
+<div id="ticker">
+<div class="t-badge"><span class="t-dot">🚨</span>ইমার্জেন্সি</div>
+<div class="t-track">
+<div class="t-sk" id="tsk"></div>
+<div class="t-msg" id="tmsg"></div>
+<div class="t-man" id="tman">
+<span class="lbl">জেলা বেছে নিন:</span>
+<select id="mds"><option value="">বেছে নিন</option></select>
+<button id="mdb">দেখুন</button>
+</div>
+<div class="t-dtag" id="tdt">📍<span id="tdn"></span> ✕</div>
+</div></div>
+
+<!-- HEADER -->
+<header id="hdr">
+  <div class="h-logo" style="justify-content: center; width: 100%; text-align: center;">
+    <div class="h-txt" style="text-align: center;">
+      <h1 style="font-family: Impact, sans-serif; font-size: 28px; letter-spacing: 1px; font-weight: bold; white-space: nowrap;">SPONDON BLOOD SOCIETY</h1>
+      <p style="font-size: 13px;">Jhenaidah Textile Engineering College</p>
+    </div>
+  </div>
+</header>
+
+<!-- APP -->
+<div id="app">
+
+<!-- HOME -->
+<div class="page on" id="p-home">
+<div class="hero">
+<img src="home-banner.png" alt="Spondon Group" class="hero-img" id="hero-img1" onerror="this.style.display='none'" style="max-width:100%; border-radius:16px; margin-bottom:16px; width:100%;">
+<h2 style="font-weight: bold; font-size: 24px;">Making a Difference Through Donation</h2>
+<p style="font-family: 'Hind Siliguri', sans-serif;">স্বেচ্ছায় রক্তদান করুন — একটি জীবন বাঁচান।<br>ঝিনাইদহ টেক্সটাইল ইঞ্জিনিয়ারিং কলেজের অরাজনৈতিক স্বেচ্ছাসেবী সংগঠন।</p>
+</div>
+
+<div class="qg">
+<button class="qa pri" onclick="go('donor-reg')"><span class="qa-i">💉</span><div class="qa-t">ডোনার রেজিস্ট্রেশন</div><div class="qa-d">স্বেচ্ছাসেবী রক্তদাতা হিসেবে নিবন্ধন করুন</div></button>
+<button class="qa" onclick="go('blood-request')"><span class="qa-i">🆘</span><div class="qa-t">রক্তের আবেদন</div><div class="qa-d" style="color:#ffcdd2">জরুরি রক্তের জন্য ডোনার খুঁজুন</div></button>
+</div>
+
+<div class="sc">
+<div class="sc-t">🩸 রক্তদান পরিসংখ্যান</div>
+<div id="stsk">
+<div class="sg"><div class="sb r"><div class="skr skl"></div><div class="skr skh"></div></div><div class="sb"><div class="skr skl"></div><div class="skr skh"></div></div></div>
+<div class="sg" style="margin-bottom:12px"><div class="sb"><div class="skr skl"></div><div class="skr skh"></div></div><div class="sb r"><div class="skr skl"></div><div class="skr skh"></div></div></div>
+<div class="bg4"><div class="bgc">A+<div class="skr skb"></div></div><div class="bgc">B+<div class="skr skb"></div></div><div class="bgc">O+<div class="skr skb"></div></div><div class="bgc">AB+<div class="skr skb"></div></div><div class="bgc">A-<div class="skr skb"></div></div><div class="bgc">B-<div class="skr skb"></div></div><div class="bgc">O-<div class="skr skb"></div></div><div class="bgc">AB-<div class="skr skb"></div></div></div>
+</div>
+<div id="stdt" hidden>
+<div class="sg"><div class="sb r"><span class="sl">মোট রক্তদান</span><span class="sn" id="s-td">০</span></div><div class="sb"><span class="sl">প্রস্তুত ডোনার</span><span class="sn" id="s-ad">০</span></div></div>
+<div class="sg" style="margin-bottom:12px"><div class="sb"><span class="sl">আজকের নতুন ডোনার</span><span class="sn" id="s-nd">০</span></div><div class="sb r"><span class="sl">অপেক্ষমান রিকোয়েস্ট</span><span class="sn" id="s-pr">০</span></div></div>
+<div style="font-size:13px;font-weight:700;color:#5f6368;margin-bottom:10px">রক্তের গ্রুপ অনুযায়ী প্রস্তুত ডোনার:</div>
+<div class="bg4" id="s-bg"></div>
+<div class="su" id="s-up"></div>
+</div>
+</div>
+<div class="isec animate-on-scroll">
+<div class="section-title">আমাদের টপ কার্যক্রম</div>
+<div class="top-act-grid" id="top-activities">
+<!-- Top activities will load here -->
+<div style="text-align:center; color:var(--tx4); font-size:14px; grid-column: 1/-1;">লোড হচ্ছে...</div>
+</div>
+</div>
+<div class="isec">
+<div class="isec-h">📋 কীভাবে কাজ করে?</div>
+<div class="ii-g">
+<div class="ii"><span class="ii-i">1️⃣</span><h5>ডোনার রেজিস্ট্রেশন</h5><p>নাম, ফোন, ইমেইল, জেলা, রক্তের গ্রুপ দিয়ে রেজিস্ট্রেশন করুন।</p></div>
+<div class="ii"><span class="ii-i">2️⃣</span><h5>রক্তের আবেদন</h5><p>রোগীর তথ্য দিন। আপনার জেলার ম্যাচিং ডোনারের তালিকা পাবেন।</p></div>
+<div class="ii"><span class="ii-i">3️⃣</span><h5>ম্যাচ কনফার্ম ও অটো ইমেইল</h5><p>ডোনার রাজি হলে তার নম্বর দিন। স্বয়ংক্রিয়ভাবে রোগীর তথ্য ইমেইলে যাবে।</p></div>
+<div class="ii"><span class="ii-i">4️⃣</span><h5>স্ট্যাটাস আপডেট</h5><p>রক্তদান সম্পন্ন হলে আপডেট দিন। ১২০ দিন আর কোনো অনুরোধ আসবে ঘন ঘন।</p></div>
+</div>
+</div>
+</div>
+
+<!-- DONOR REG -->
+<div class="page" id="p-donor-reg">
+<img src="donor-banner.png" alt="Donor Registration" class="hero-img" style="max-width:100%; border-radius:16px; margin-bottom:16px; width:100%;">
+<div class="fc">
+<div id="drfs">
+<div class="fh"><span class="fi">🩸</span><div class="ft">Donor Registration</div><div class="fs">স্পন্দন ব্লাড সোসাইটি, ঝিনাইদহ টেক্সটাইল ইঞ্জিনিয়ারিং কলেজ</div></div>
+<div class="fb">
+<p class="fd">আপনার এক ব্যাগ রক্ত বাঁচাতে পারে একটি মুমূর্ষু রোগীর প্রাণ।</p>
+<form id="drf"><input type="hidden" name="formType" value="donorRegistration">
+<div class="ig"><label>সম্পূর্ণ নাম *</label><input type="text" name="name" required autocomplete="name" placeholder="আপনার পূর্ণ নাম লিখুন"></div>
+<div class="g2">
+<div class="ig"><label>মোবাইল নাম্বার *</label><input type="tel" name="phone" required autocomplete="tel" placeholder="01XXXXXXXXX"></div>
+<div class="ig"><label>ইমেইল এড্রেস *</label><input type="email" name="email" required autocomplete="email" placeholder="email@gmail.com"></div>
+</div>
+<div class="g2">
+<div class="ig"><label>বর্তমান জেলা *</label><select name="district" id="dd" required><option value="">নির্বাচন করুন</option></select></div>
+<div class="ig"><label>উপজেলা *</label><select name="upazilla" id="du" required disabled><option value="">আগে জেলা নির্বাচন করুন</option></select><div class="hint" id="uh">জেলা নির্বাচন করলে উপজেলা দেখাবে</div></div>
+</div>
+<!-- FIXED: Changed name="bloodGroup" to name="bg" -->
+<div class="ig"><label>রক্তের গ্রুপ *</label><select name="bg" required><option value="">নির্বাচন করুন</option><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>AB+</option><option>AB-</option><option>O+</option><option>O-</option></select></div>
+<div class="ig"><label>সর্বশেষ রক্তদানের তারিখ <span style="color:#9aa0a6;font-size:12px">(না থাকলে খালি)</span></label><input type="date" name="lastDate"></div>
+</form></div>
+<div class="ff"><button type="button" class="sbtn" id="drb"><span id="drt">রেজিস্ট্রেশন করুন 💚</span><div class="spin" id="drs"></div></button><div class="err" id="dre"></div></div>
+</div>
+<div class="ok-w" id="drok">
+<div class="ok-ic" style="background:linear-gradient(135deg,#43a047,#1b5e20)"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+<div class="ok-t" style="color:#1b5e20">🎉 অভিনন্দন! রেজিস্ট্রেশন সম্পন্ন!</div>
+<div class="ok-s">আপনি স্বেচ্ছাসেবী রক্তদাতা হিসেবে নিবন্ধিত হয়েছেন।</div>
+<div class="ok-i" style="background:linear-gradient(135deg,#f1f8e9,#e8f5e9);border:1px solid #c8e6c9">
+<div class="ok-r"><span>✅</span><span>আপনার তথ্য ডাটাবেসে সংরক্ষিত হয়েছে।</span></div>
+<div class="ok-r"><span>📍</span><span>আপনার জেলা ও উপজেলা সেভ — নিকটস্থ রোগীর সাথে ম্যাচ হবে।</span></div>
+<div class="ok-r"><span>📧</span><span>রোগীর প্রয়োজনে আপনাকে ইমেইল ও ফোনে যোগাযোগ করা হবে।</span></div>
+<div class="ok-r"><span>💉</span><span>রক্তদানের পর আপডেট দিলে ১২০ দিন আর কোনো অনুরোধ পাঠানো হবে বাহির হবে না।</span></div>
+</div>
+
+</div></div></div>
+
+<!-- BLOOD REQUEST -->
+<div class="page" id="p-blood-request">
+<img src="request-banner.png" alt="Blood Request" class="hero-img" style="max-width:100%; border-radius:16px; margin-bottom:16px; width:100%;">
+<div class="fc">
+<div id="brfs">
+<div class="fh"><span class="fi" style="animation:heartbeat 1.5s ease-in-out infinite">🆘</span><div class="ft">Blood Request</div><div class="fs" style="color:#d32f2f;font-weight:700">জরুরি রক্তের প্রয়োজনে ফর্মটি পূরণ করুন</div></div>
+<div class="fb">
+<p class="fd">মুমূর্ষু রোগীর জীবন বাঁচাতে সঠিক ও সম্পূর্ণ তথ্য দিন।</p>
+<form id="brf"><input type="hidden" name="formType" value="bloodRequest"><input type="hidden" id="rfd" name="prescriptionFile" value="">
+<div class="ig"><label>রোগীর সম্পূর্ণ নাম *</label><input type="text" name="patientName" required placeholder="রোগীর পূর্ণ নাম লিখুন"></div>
+<div class="ig"><label>আপনার মোবাইল নাম্বার *</label><input type="tel" name="phone" required autocomplete="tel" placeholder="01XXXXXXXXX"></div>
+<div class="g2">
+<!-- FIXED: Changed name="bloodGroup" to name="bg" -->
+<div class="ig"><label>রক্তের গ্রুপ *</label><select name="bg" required><option value="">নির্বাচন করুন</option><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>AB+</option><option>AB-</option><option>O+</option><option>O-</option></select></div>
+<div class="ig"><label>পরিমাণ (ব্যাগ) *</label><input type="number" name="units" min="1" max="10" required placeholder="১–১০"></div>
+</div>
+<div class="ig"><label>যে জেলায় রক্ত লাগবে *</label><select name="district" id="brd" required><option value="">নির্বাচন করুন</option></select></div>
+<div class="ig"><label>আপনার ইমেইল *</label><input type="email" name="email" required autocomplete="email" placeholder="email@gmail.com"></div>
+<div class="ig"><label>হাসপাতালের নাম ও ঠিকানা *</label><input type="text" name="hospital" required placeholder="হাসপাতাল, ওয়ার্ড/কেবিন নম্বর সহ"></div>
+<div class="ig"><label>রোগীর সমস্যা *</label><textarea name="problem" required placeholder="রোগীর অবস্থা সংক্ষেপে লিখুন"></textarea></div>
+<div class="ig"><label>প্রেসক্রিপশন <span style="color:#9aa0a6;font-size:12px">(ঐচ্ছিক — সর্বোচ্চ ৫, ১০MB)</span></label><input type="file" id="rfi" accept=".pdf,image/*"></div>
+<div class="ig"><label>রক্তদানের তারিখ ও সময় *</label><input type="datetime-local" name="dateTime" required></div>
+</form></div>
+<div class="ff"><button type="button" class="sbtn" id="brb"><span id="brt">ডোনার খুঁজুন 🔍</span><div class="spin" id="brs"></div></button><div class="err" id="bre"></div></div>
+</div>
+<div id="brr" style="display:none">
+<div class="fh" style="background:#f8f9fa"><span class="fi">🔍</span><div class="ft">ডোনার অনুসন্ধানের ফলাফল</div></div>
+<div class="rs"><div class="ri" id="bri"></div><div id="brdl"></div>
+<div class="cs" id="brcs"><p>✅ কোনো ডোনার রাজি হলে নিচের বাটনে ক্লিক করে ম্যাচ কনফার্ম করুন।</p><button class="csb" onclick="go('match-secured')">🤝 ডোনার কনফার্ম করুন</button></div>
+</div></div></div></div>
+
+<!-- MATCH SECURED (HIDDEN FROM NORMAL NAV) -->
+<div class="page" id="p-match-secured">
+<div class="fc gt">
+<div id="msfs">
+<div class="fh gh"><span class="fi">🤝</span><div class="ft gn">Match Secured</div><div class="fs">স্পন্দন ব্লাড সোসাইটি, ঝিনাইদহ টেক্সটাইল ইঞ্জিনিয়ারিং কলেজ</div></div>
+<div class="fb">
+<p class="fd gn">ডোনারের নাম্বার দিন। রোগীর বিস্তারিত তথ্য ডোনারের ইমেইলে পাঠানো হবে।</p>
+<form id="msf"><input type="hidden" name="action" value="secureMatch">
+<div class="ig"><label>আপনার নাম্বার (Blood Request-এ দেওয়া) *</label><input type="tel" name="reqPhone" id="ms_req_p" required autocomplete="tel" placeholder="01XXXXXXXXX"></div>
+<div class="ig"><label>সম্মতি দেওয়া ডোনারের নাম্বার *</label><input type="tel" name="donorPhone" id="msdp" required placeholder="01XXXXXXXXX"></div>
+</form></div>
+<div class="ff"><button type="button" class="sbtn gn" id="msb"><span id="mst">কনফার্ম ও ইমেইল পাঠান 📧</span><div class="spin" id="mss"></div></button><div class="err" id="mse"></div></div>
+</div>
+<div class="ok-w" id="msok">
+<div class="ok-ic" style="background:linear-gradient(135deg,#43a047,#1b5e20)"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+<div class="ok-t" style="color:#1b5e20">🎉 সফলভাবে ম্যাচ কনফার্ম!</div>
+<div class="ok-s">ডোনার ও রোগীর স্বজন উভয়কে অসংখ্য ধন্যবাদ।</div>
+<div class="mdi"><div class="mdn">🩸 ডোনার: <span id="msdn"></span></div><div class="mdm">ডোনারকে সফলভাবে নিশ্চিত করা হয়েছে।<br>রোগীর সম্পূর্ণ তথ্য তার ইমেইলে পাঠানো হয়েছে।</div></div>
+
+<!-- WhatsApp Click to Chat Button -->
+<button class="wa-btn" id="wa-btn-1" style="width:100%; margin-bottom: 20px;">
+    <svg style="width:24px;height:24px;fill:white" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+    ডোনারকে WhatsApp এ মেসেজ দিন
+</button>
+
+<div class="stc">
+<div class="str"><span>📧</span><span>ডোনারের ইমেইলে রোগীর সকল তথ্য পাঠানো হয়েছে</span></div>
+<div class="str"><span>📋</span><span>Request_DB-তে স্ট্যাটাস "Assigned" করা হয়েছে</span></div>
+<div class="str"><span>⏰</span><span>২৪ ও ৪৮ ঘণ্টা পরে স্বয়ংক্রিয় রিমাইন্ডার পাঠানো হবে</span></div>
+<div class="str"><span>➕</span><span>আরেকজন ডোনার যোগ করতে নিচের বাটনে ক্লিক করুন</span></div>
+</div>
+
+<button class="adb" id="msab">➕ আরেকজন ডোনার যুক্ত করুন</button>
+</div></div></div>
+
+<!-- CONFIRMATION (HIDDEN FROM NORMAL NAV) -->
+<div class="page" id="p-confirm">
+<div class="fc" style="border-top-color:#c62828">
+<div id="cffs">
+<div class="fh"><span class="fi">🩺</span><div class="ft">Donation Confirmation</div><div class="fs">স্পন্দন ব্লাড সোসাইটি, ঝিনাইদহ</div></div>
+<div class="fb">
+<p class="fd">রক্তদানের আপডেট দিন। আগামী ৪ মাস আর কোনো অনুরোধ পাঠানো হবে না।</p>
+<form id="cff"><input type="hidden" name="formType" value="donationConfirmation">
+<div class="ig"><label>আপনার ইমেইল এড্রেস *</label><input type="email" name="donorEmail" required autocomplete="email" placeholder="যে ইমেইলে আমাদের মেইল পেয়েছেন"></div>
+<div class="ig"><label>রক্তদানের স্ট্যাটাস *</label><select name="donationStatus" id="cfst" required><option value="">স্ট্যাটাস নির্বাচন করুন</option><option value="Donated">✅ হ্যাঁ, রক্ত দিয়েছি</option><option value="Not Needed">🙏 রোগীর আর রক্ত লাগেনি</option><option value="Failed">😔 কোনো কারণে দিতে পারিনি</option></select></div>
+<div class="ig" id="cfdr" hidden><label>রক্তদানের তারিখ *</label><input type="date" name="donationDate"></div>
+</form></div>
+<div class="ff"><button type="button" class="sbtn" id="cfb" style="background:linear-gradient(135deg,#c62828,#b71c1c)"><span id="cft">স্ট্যাটাস আপডেট করুন ✅</span><div class="spin" id="cfs"></div></button><div class="err" id="cfe"></div></div>
+</div>
+<div class="ok-w" id="cfok">
+<div class="ok-ic" style="background:linear-gradient(135deg,#ef5350,#b71c1c)"><svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></div>
+<div class="ok-t" style="color:#c62828">❤️ স্ট্যাটাস সফলভাবে আপডেট!</div>
+<div class="ok-s">স্পন্দন ব্লাড সোসাইটির পক্ষ থেকে আপনাকে অসংখ্য ধন্যবাদ।</div>
+
+<!-- WhatsApp Click to Chat Button -->
+<button class="wa-btn" id="wa-btn-2" style="width:100%; margin-bottom: 20px;" onclick="window.open('https://wa.me/?text='+encodeURIComponent('আলহামদুলিল্লাহ, আমি স্পন্দন ব্লাড সোসাইটির মাধ্যমে সফলভাবে রক্তদান সম্পন্ন করেছি। রক্তদানে এগিয়ে আসুন, জীবন বাঁচান! 🩸❤️'), '_blank')">
+    <svg style="width:24px;height:24px;fill:white" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+    স্ট্যাটাস WhatsApp এ শেয়ার করুন
+</button>
+
+<div class="ok-i" style="background:linear-gradient(135deg,#fff5f5,#fff);border:1px solid #ffcdd2">
+<div class="ok-r"><span>✅</span><span>আপনার রক্তদানের তথ্য সফলভাবে আপডেট হয়েছে।</span></div>
+<div class="ok-r"><span>😴</span><span>পরবর্তী ১২০ দিন আর কোনো রিকোয়েস্ট পাঠানো হবে না।</span></div>
+<div class="ok-r"><span>🏥</span><span>রোগী ও তার পরিবারের পক্ষ থেকে গভীর কৃতজ্ঞতা।</span></div>
+<div class="ok-r"><span>🩸</span><span>আপনার এই মহৎ কাজ সমাজের জন্য অনুপ্রেরণা।</span></div>
+</div>
+
+</div></div></div>
+
+<!-- DONOR PROFILE PAGE -->
+<div class="page" id="p-donor-profile">
+<div class="ac" id="dp-step1">
+  <div class="ac-h"><h2>ডোনার প্রোফাইল</h2><p>নিজে প্রোফাইল আপডেট করুন</p></div>
+  <form id="dp-form1">
+    <div class="ig">
+      <label>আপনার রেজিস্ট্রিকৃত ইমেইল দিন *</label>
+      <input type="email" id="dp-email" required placeholder="example@gmail.com">
+    </div>
+    <div class="err" id="dp-err1"></div>
+    <button type="submit" class="pok" id="dp-b1">OTP পাঠান</button>
+  </form>
+</div>
+<div class="ac" id="dp-step2" style="display:none;">
+  <div class="ac-h"><h2>OTP ভেরিফিকেশন</h2><p>আপনার ইমেইলে প্রেরিত ৪-ডিজিটের পিনটি দিন</p></div>
+  <form id="dp-form2">
+    <div class="ig">
+      <label>পিন কোড (OTP) *</label>
+      <input type="text" id="dp-otp" required placeholder="1234">
+    </div>
+    <div class="err" id="dp-err2"></div>
+    <button type="submit" class="pok" id="dp-b2">ভেরিফাই করুন</button>
+  </form>
+</div>
+<div class="ac" id="dp-step3" style="display:none;">
+  <div class="ac-h"><h2>প্রোফাইল এডিট করুন</h2><p>আপনার নতুন তথ্য দিয়ে সেভ করুন</p></div>
+  <form id="dp-form3">
+    <div class="ig"><label>আপনার নাম *</label><input type="text" id="dp-name" required></div>
+    <div class="ig"><label>মোবাইল নাম্বার *</label><input type="tel" id="dp-phone" required></div>
+    <div class="ig"><label>বর্তমান জেলা *</label><select id="dp-district" required><option value="">নির্বাচন করুন</option><option value="ঢাকা">ঢাকা</option><option value="চট্টগ্রাম">চট্টগ্রাম</option><option value="রাজশাহী">রাজশাহী</option><option value="খুলনা">খুলনা</option><option value="বরিশাল">বরিশাল</option><option value="সিলেট">সিলেট</option><option value="রংপুর">রংপুর</option><option value="ময়মনসিংহ">ময়মনসিংহ</option><option value="ঝিনাইদহ">ঝিনাইদহ</option></select></div>
+    <div class="ig"><label>উপজেলা/এলাকা *</label><input type="text" id="dp-upazilla" required></div>
+    <div class="ig"><label>রক্তের গ্রুপ *</label><select id="dp-bg" required><option value="">নির্বাচন করুন</option><option value="A+">A+</option><option value="A-">A-</option><option value="B+">B+</option><option value="B-">B-</option><option value="AB+">AB+</option><option value="AB-">AB-</option><option value="O+">O+</option><option value="O-">O-</option></select></div>
+    <div class="ig"><label>শেষ কবে রক্ত দিয়েছেন? (যদি দেন)</label><input type="date" id="dp-lastdate"></div>
     
-    return ContentService.createTextOutput(JSON.stringify({status: 'Error', message: 'Invalid action'})).setMimeType(ContentService.MimeType.JSON);
-  } catch (error) {
-    return ContentService.createTextOutput(JSON.stringify({status: 'Error', message: error.toString()})).setMimeType(ContentService.MimeType.JSON);
-  }
+    <div class="err" id="dp-err3"></div>
+    <div class="okm" id="dp-ok3" style="display:none;">প্রোফাইল সফলভাবে আপডেট হয়েছে! ✅</div>
+    <button type="submit" class="pok" id="dp-b3">পরিবর্তন সেভ করুন</button>
+  </form>
+</div>
+</div>
+<!-- ABOUT & GUIDELINES -->
+<div class="page" id="p-about">
+<div class="ac">
+<div class="ac-h"><h2>পরিচিতি ও গাইডলাইন 🩸</h2><p>স্পন্দন ব্লাড সোসাইটি এবং রক্তদানের গাইডলাইন</p></div>
+<div class="st2">আমাদের লক্ষ্য ও পরিচয়</div>
+<div class="ab">স্পন্দন ব্লাড সোসাইটি একটি সম্পূর্ণ <b>অরাজনৈতিক স্বেচ্ছাসেবী সংগঠন</b>।<ul><li>মুমূর্ষু রোগীর জন্য বিনামূল্যে নিরাপদ রক্তের ব্যবস্থা করা।</li><li>রক্ত দেওয়া বা নেওয়ার জন্য <b>অর্থ লেনদেন সম্পূর্ণ নিষেধ</b>।</li><li>ডোনারদের তথ্য শুধুমাত্র জরুরি প্রয়োজনে ব্যবহৃত।</li><li>আমরা স্বেচ্ছা রক্তদানে উৎসাহিত করি।</li></ul></div>
+<div class="st2">রক্তদানের গাইডলাইন 🩸</div>
+<div class="gc" style="padding:0; margin-top:10px;">
+<details><summary>রক্তদানের প্রাথমিক যোগ্যতা কী?</summary><div class="gct"><ul><li><span class="hl">বয়স:</span> ১৮ থেকে ৬০ বছর।</li><li><span class="hl">ওজন:</span> পুরুষ ন্যূনতম ৫০ কেজি, নারী ন্যূনতম ৪৫ কেজি।</li><li><span class="hl">শারীরিক অবস্থা:</span> সম্পূর্ণ সুস্থ, কোনো দীর্ঘমেয়াদী রোগ নেই।</li><li><span class="hl">হিমোগ্লোবিন:</span> পুরুষ ১২.৫ g/dL, নারী ১২ g/dL।</li></ul></div></details>
+<details><summary>কতদিন পরপর রক্ত দেওয়া যায়?</summary><div class="gct">পুরুষ প্রতি <span class="hl">৩ মাস (৯০ দিন)</span> এবং নারী প্রতি <span class="hl">৪ মাস (১২০ দিন)</span> অন্তর।<br>আমাদের সিস্টেমে <span class="hl">সর্বজনীন ১২০ দিন</span> গণনা করা হয়।</div></details>
+<details><summary>রক্তদানের পূর্বে প্রস্তুতি কী?</summary><div class="gct"><ul><li><span class="hl">৬–৮ ঘণ্টা</span> ঘুম নিশ্চিত করুন।</li><li>অন্তত ২ ঘণ্টা আগে পুষ্টিকর খাবার খান। <span class="hl">খালি পেটে নয়।</span></li><li>প্রচুর পানি পান করুন।</li><li>ভারী ব্যায়াম এড়িয়ে চলুন।</li></ul></div></details>
+<details><summary>কোন অবস্থায় রক্ত দেওয়া নিষেধ?</summary><div class="gct"><ul><li>জ্বর, সর্দি, কাশি বা ডায়রিয়া।</li><li>অ্যান্টিবায়োটিক গ্রহণকালীন।</li><li>গত ৬ মাসে বড় অস্ত্রোপচার বা ট্যাটু।</li><li>গর্ভাবস্থায়, স্তন্যপান ও মাসিক চলাকালীন।</li><li>অনিয়ন্ত্রিত ডায়াবেটিস বা উচ্চ রক্তচাপ।</li></ul></div></details>
+<details><summary>রোগীর জন্য রক্ত নেওয়ার সতর্কতা</summary><div class="gct"><ul><li><span class="hl">ক্রসম্যাচিং</span> পরীক্ষা বাধ্যতামূলক।</li><li>৫টি ভাইরাসের <span class="hl">স্ক্রিনিং টেস্ট</span>: HIV, HBV, HCV, Syphilis, Malaria।</li><li>লাইসেন্সপ্রাপ্ত ব্লাড ব্যাংক থেকে সংগ্রহ করুন।</li></ul></div></details>
+<details><summary>রক্তদানের পর কী করবেন?</summary><div class="gct"><ul><li>১০-১৫ মিনিট বিশ্রাম নিন।</li><li>প্রচুর পানি পান করুন।</li><li>সেদিন ভারী কাজ এড়িয়ে চলুন।</li><li>স্বাভাবিক পুষ্টিকর খাবার খান।</li></ul></div></details>
+</div>
+<div class="st2">জরুরি যোগাযোগ</div>
+<div class="cg2">
+<div class="cc"><div class="ccn">মোহাম্মদ জয়নাল আবেদীন</div><small class="ccr">দায়িত্বপ্রাপ্ত সদস্য</small><a href="tel:01995047930" class="ccb">📞 01995047930</a></div>
+<div class="cc"><div class="ccn">মোহাম্মদ নয়ন চৌধুরী</div><small class="ccr">দায়িত্বপ্রাপ্ত সদস্য</small><a href="tel:01947662428" class="ccb">📞 01947662428</a></div>
+</div>
+</div></div>
+<!-- ACTIVITIES PAGE -->
+<div class="page" id="p-activities">
+<div class="ac">
+<div class="ac-h"><h2>আমাদের কার্যক্রম 🚀</h2><p>স্পন্দন ব্লাড সোসাইটির সর্বশেষ খবর ও কার্যক্রম</p></div>
+<img src="activity-banner.jpg" alt="Blood Donation" style="width:100%; border-bottom:1px solid rgba(0,0,0,0.05); margin-bottom: 20px; border-radius: 12px;" onerror="this.style.display='none'">
+<div id="admin-panel">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;"><h4 style="color:var(--rd);font-size:16px;margin:0;">📝 নতুন পোস্ট যুক্ত করুন</h4><button onclick="sessionStorage.clear();location.reload()" style="background:#444;color:#fff;border:none;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;box-shadow:0 2px 5px rgba(0,0,0,0.2);">লগ আউট</button></div>
+    <form id="add-blog-form">
+        <div class="ig"><label>টাইটেল (Title) *</label><input type="text" id="bl-t" required placeholder="পোস্টের শিরোনাম"></div>
+        <div class="ig"><label>বিস্তারিত (Description) *</label><textarea id="bl-d" required placeholder="বিস্তারিত লিখুন..."></textarea></div>
+        <div class="ig"><label>ছবির লিংক (Google Drive Link)</label><input type="url" id="bl-i" placeholder="https://drive.google.com/file/d/..."></div>
+        <div class="ig"><label>ফেসবুক পোস্ট লিংক (ঐচ্ছিক)</label><input type="url" id="bl-fb" placeholder="https://facebook.com/..."></div>
+        <button type="button" class="pok" id="bl-btn" style="padding:12px;font-size:14px;box-shadow:none;">পোস্ট করুন 🚀</button>
+        <div class="err" id="bl-err"></div>
+    </form>
+</div>
+<div class="blog-list" id="blog-list">
+    <div style="text-align:center;padding:20px;color:var(--tx4);font-size:14px;font-weight:600;">লোড হচ্ছে...</div>
+</div>
+<!-- Admin trigger (Clicking text 3 times opens login) -->
+<div style="text-align:center;padding:12px;opacity:0.4;font-size:11px;font-weight:700;" class="admin-trigger" id="admin-trig">App Version: 11.2 (Click to Login)</div>
+</div></div>
+
+</div><!-- /app -->
+
+<!-- BOTTOM NAV -->
+<nav id="bnav">
+<button class="ni on" id="n-home" onclick="go('home')"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>হোম</button>
+<button class="ni" id="n-donor-reg" onclick="go('donor-reg')"><svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>রেজিস্ট্রেশন</button>
+<div style="display:flex;flex-direction:column;align-items:center"><div class="nfab" onclick="go('blood-request')"><svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></div><span class="nfl">রক্তের আবেদন</span></div>
+<button class="ni" id="n-activities" onclick="go('activities')"><svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12zM10 9h8v2h-8zm0 3h4v2h-4zm0-6h8v2h-8z"/></svg>কার্যক্রম</button>
+<button class="ni" id="n-about" onclick="go('about')"><svg viewBox="0 0 24 24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></svg>পরিচিতি</button>
+</nav>
+
+<script>
+'use strict';
+var S='https://script.google.com/macros/s/AKfycbx4J6C6Pq9E_eejG4notfouWl1JEn_ccbTXPW2bgKun_rhumvuTzdGY-JIuyHLr3FOa/exec';
+// Full district array
+var BD=['Bagerhat','Bandarban','Barguna','Barishal','Bhola','Bogura','Brahmanbaria','Chandpur','Chapainawabganj','Chattogram','Chuadanga','Cumilla',"Cox's Bazar",'Dhaka','Dinajpur','Faridpur','Feni','Gaibandha','Gazipur','Gopalganj','Habiganj','Jamalpur','Jashore','Jhalokati','Jhenaidah','Joypurhat','Khagrachari','Khulna','Kishoreganj','Kurigram','Kushtia','Lakshmipur','Lalmonirhat','Madaripur','Magura','Manikganj','Meherpur','Moulvibazar','Munshiganj','Mymensingh','Naogaon','Narail','Narayanganj','Narsingdi','Natore','Netrokona','Nilphamari','Noakhali','Pabna','Panchagarh','Patuakhali','Pirojpur','Rajbari','Rajshahi','Rangamati','Rangpur','Satkhira','Shariatpur','Sherpur','Sirajganj','Sunamganj','Sylhet','Tangail','Thakurgaon'];
+var UZ={"Bagerhat":["Bagerhat Sadar","Chitalmari","Fakirhat","Kachua","Mollahat","Mongla","Morrelganj","Rampal","Sarankhola"],"Bandarban":["Alikadam","Bandarban Sadar","Lama","Naikhongchhari","Rowangchhari","Ruma","Thanchi"],"Barguna":["Amtali","Bamna","Barguna Sadar","Betagi","Patharghata","Taltali"],"Barishal":["Agailjhara","Babuganj","Bakerganj","Banaripara","Gaurnadi","Hizla","Barishal Sadar","Mehendiganj","Muladi","Wazirpur"],"Bhola":["Bhola Sadar","Burhanuddin","Char Fasson","Daulatkhan","Lalmohan","Manpura","Tazumuddin"],"Bogura":["Adamdighi","Bogura Sadar","Dhunot","Dupchanchia","Gabtali","Kahaloo","Nandigram","Shajahanpur","Sherpur","Shibganj","Sonatala"],"Brahmanbaria":["Akhaura","Ashuganj","Bancharampur","Bijoynagar","Brahmanbaria Sadar","Kasba","Nabinagar","Nasirnagar","Sarail"],"Chandpur":["Chandpur Sadar","Faridganj","Haimchar","Haziganj","Kachua","Matlab Dakshin","Matlab Uttar","Shahrasti"],"Chapainawabganj":["Bholahat","Chapainawabganj Sadar","Gomastapur","Nachole","Shibganj"],"Chattogram":["Anwara","Banshkhali","Boalkhali","Chandanaish","Fatikchhari","Hathazari","Karnaphuli","Lohagara","Mirsharai","Patiya","Rangunia","Raozan","Sandwip","Satkania","Sitakunda","Chattogram Sadar"],"Chuadanga":["Alamdanga","Chuadanga Sadar","Damurhuda","Jibannagar"],"Cumilla":["Barura","Brahmanpara","Burichang","Chandina","Chauddagram","Cumilla Sadar North","Cumilla Sadar South","Daudkandi","Debidwar","Homna","Laksam","Lalmai","Meghna","Monohorgonj","Muradnagar","Nangalkot","Titas"],"Cox's Bazar":["Chakaria","Cox's Bazar Sadar","Kutubdia","Maheshkhali","Pekua","Ramu","Teknaf","Ukhia"],"Dhaka":["Dhamrai","Dohar","Keraniganj","Nawabganj","Savar","Dhaka Sadar"],"Dinajpur":["Birampur","Birganj","Biral","Bochaganj","Chirirbandar","Dinajpur Sadar","Fulbari","Ghoraghat","Hakimpur","Kaharole","Khansama","Nawabganj","Parbatipur"],"Faridpur":["Alfadanga","Bhanga","Boalmari","Charbhadrasan","Faridpur Sadar","Madhukhali","Nagarkanda","Sadarpur","Saltha"],"Feni":["Chhagalnaiya","Daganbhuiyan","Feni Sadar","Fulgazi","Parshuram","Sonagazi"],"Gaibandha":["Fulchhari","Gaibandha Sadar","Gobindaganj","Palashbari","Sadullapur","Saghata","Sundarganj"],"Gazipur":["Gazipur Sadar","Kaliakair","Kaliganj","Kapasia","Sreepur"],"Gopalganj":["Gopalganj Sadar","Kashiani","Kotalipara","Muksudpur","Tungipara"],"Habiganj":["Ajmiriganj","Baniachong","Bahubal","Chunarughat","Habiganj Sadar","Lakhai","Madhabpur","Nabiganj","Shayestaganj"],"Jamalpur":["Bakshiganj","Dewanganj","Islampur","Jamalpur Sadar","Madarganj","Melandaha","Sarishabari"],"Jashore":["Abhaynagar","Bagherpara","Chaugachha","Jhikargachha","Keshabpur","Jashore Sadar","Manirampur","Sharsha"],"Jhalokati":["Jhalokati Sadar","Kathalia","Nalchity","Rajapur"],"Jhenaidah":["Harinakunda","Jhenaidah Sadar","Kaliganj","Kotchandpur","Maheshpur","Shailkupa"],"Joypurhat":["Akkelpur","Joypurhat Sadar","Kalai","Khetlal","Panchbibi"],"Khagrachari":["Dighinala","Guimara","Khagrachhari Sadar","Lakshmichhari","Mahalchhari","Manikchhari","Matiranga","Panchhari","Ramgarh"],"Khulna":["Batiaghata","Dacope","Dumuria","Dighalia","Koyra","Paikgachha","Phultala","Rupsa","Terokhada","Khulna Sadar"],"Kishoreganj":["Austagram","Bajitpur","Bhairab","Hossainpur","Itna","Karimganj","Katiadi","Kishoreganj Sadar","Kuliarchar","Mithamain","Nikli","Pakundia","Tarail"],"Kurigram":["Bhurungamari","Char Rajibpur","Chilmari","Kurigram Sadar","Nageshwari","Phulbari","Rajarhat","Rajibpur","Rowmari","Ulipur"],"Kushtia":["Bheramara","Daulatpur","Khoksa","Kumarkhali","Kushtia Sadar","Mirpur"],"Lakshmipur":["Kamalnagar","Lakshmipur Sadar","Ramganj","Ramgati","Roypur"],"Lalmonirhat":["Aditmari","Hatibandha","Kaliganj","Lalmonirhat Sadar","Patgram"],"Madaripur":["Kalkini","Madaripur Sadar","Rajoir","Shibchar"],"Magura":["Magura Sadar","Mohammadpur","Shalikha","Sreepur"],"Manikganj":["Daulatpur","Ghior","Harirampur","Manikganj Sadar","Saturia","Shivalaya","Singair"],"Meherpur":["Gangni","Meherpur Sadar","Mujibnagar"],"Moulvibazar":["Barlekha","Juri","Kamalganj","Kulaura","Moulvibazar Sadar","Rajnagar","Sreemangal"],"Munshiganj":["Gazaria","Lohajang","Munshiganj Sadar","Sirajdikhan","Sreenagar","Tongibari"],"Mymensingh":["Bhaluka","Dhobaura","Fulbaria","Gaffargaon","Gauripur","Haluaghat","Ishwarganj","Mymensingh Sadar","Muktagachha","Nandail","Phulpur","Tarakanda","Trishal"],"Naogaon":["Atrai","Badalgachhi","Dhamoirhat","Mahadebpur","Manda","Naogaon Sadar","Niamatpur","Patnitala","Porsha","Raninagar","Sapahar"],"Narail":["Kalia","Lohagara","Narail Sadar"],"Narayanganj":["Araihazar","Bandar","Narayanganj Sadar","Rupganj","Sonargaon"],"Narsingdi":["Belabo","Monohardi","Narsingdi Sadar","Palash","Raipura","Shibpur"],"Natore":["Bagatipara","Baraigram","Gurudaspur","Lalpur","Natore Sadar","Singra"],"Netrokona":["Atpara","Barhatta","Durgapur","Kalmakanda","Kendua","Khaliajuri","Madan","Mohanganj","Netrokona Sadar","Purbadhala"],"Nilphamari":["Dimla","Domar","Jaldhaka","Kishoreganj","Nilphamari Sadar","Saidpur"],"Noakhali":["Begumganj","Chatkhil","Companiganj","Hatiya","Kabirhat","Noakhali Sadar","Senbagh","Sonaimuri","Subarnachar"],"Pabna":["Atgharia","Bera","Bhangura","Chatmohar","Faridpur","Ishwardi","Pabna Sadar","Santhia","Sujanagar"],"Panchagarh":["Atwari","Boda","Debiganj","Panchagarh Sadar","Tetulia"],"Patuakhali":["Bauphal","Dashmina","Dumki","Galachipa","Kalapara","Mirzaganj","Patuakhali Sadar","Rangabali"],"Pirojpur":["Bhandaria","Kawkhali","Mathbaria","Nazirpur","Nesarabad","Pirojpur Sadar","Zianagar"],"Rajbari":["Baliakandi","Goalandaghat","Kalukhali","Pangsha","Rajbari Sadar"],"Rajshahi":["Bagha","Bagmara","Charghat","Durgapur","Godagari","Mohanpur","Paba","Puthia","Rajshahi Sadar","Tanore"],"Rangamati":["Bagaichhari","Barkal","Belaichhari","Juraichhari","Kaptai","Kawkhali","Langadu","Naniarchar","Rajasthali","Rangamati Sadar"],"Rangpur":["Badarganj","Gangachara","Kaunia","Mithapukur","Pirgachha","Pirganj","Rangpur Sadar","Taraganj"],"Satkhira":["Assasuni","Debhata","Kalaroa","Kaliganj","Satkhira Sadar","Shyamnagar","Tala"],"Shariatpur":["Bhedarganj","Damudya","Gosairhat","Naria","Shariatpur Sadar","Zanjira"],"Sherpur":["Jhenaigati","Nakla","Nalitabari","Sherpur Sadar","Sreebardi"],"Sirajganj":["Belkuchi","Chauhali","Kamarkhanda","Kazipur","Raiganj","Shahjadpur","Sirajganj Sadar","Tarash","Ullahpara"],"Sunamganj":["Bishwamvarpur","Chhatak","Derai","Dharampasha","Dowarabazar","Jagannathpur","Jamalganj","Sulla","Sunamganj Sadar","Tahirpur"],"Sylhet":["Balaganj","Beanibazar","Bishwanath","Companiganj","Fenchuganj","Golapganj","Gowainghat","Jaintiapur","Kanaighat","Osmani Nagar","South Surma","Sylhet Sadar","Zakiganj"],"Tangail":["Basail","Bhuapur","Delduar","Dhanbari","Ghatail","Gopalpur","Kalihati","Madhupur","Mirzapur","Nagarpur","Sakhipur","Tangail Sadar"],"Thakurgaon":["Baliadangi","Haripur","Pirganj","Ranisankail","Thakurgaon Sadar"]};
+
+
+// UTILS
+function toBn(x){return String(x==null?0:x).replace(/\d/g,function(c){return'\u09E6\u09E7\u09E8\u09E9\u09EA\u09EB\u09EC\u09ED\u09EE\u09EF'.charAt(+c)});}
+function mD(s){if(!s)return'';var lo=s.toLowerCase().trim();for(var i=0;i<BD.length;i++)if(BD[i].toLowerCase()===lo)return BD[i];for(var i=0;i<BD.length;i++)if(lo.indexOf(BD[i].toLowerCase())>=0)return BD[i];for(var i=0;i<BD.length;i++)if(BD[i].toLowerCase().indexOf(lo)>=0)return BD[i];return'';}
+function sv(d){try{localStorage.setItem('sbs_d',d);localStorage.setItem('sbs_t',''+Date.now())}catch(x){}}
+function popDist(){var o='<option value="">নির্বাচন করুন</option>';for(var i=0;i<BD.length;i++)o+='<option value="'+BD[i]+'">'+BD[i]+'</option>';['mds','dd','brd'].forEach(function(id){var e=document.getElementById(id);if(e)e.innerHTML=o;});}
+popDist();
+function autoSetDist(d){if(!d)return;['dd','brd'].forEach(function(id){var e=document.getElementById(id);if(e&&e.value!==d){e.value=d;e.dispatchEvent(new Event('change'))}})}
+
+var socH='<style>.footer-sec { padding: 40px 20px 20px; background: #111111; color: #f0f0f0; text-align: center; border-top: 4px solid var(--rd); margin-top: 30px; margin-bottom: 60px; border-radius: 20px 20px 0 0; display: flex; flex-direction: column; align-items: center; } .footer-sec h4 { font-family: "Impact", sans-serif; font-size: 24px; letter-spacing: 1.5px; color: #fff; margin-bottom: 6px; font-weight: normal; } .footer-sec .f-motto { font-size: 15px; color: var(--rd); font-weight: bold; margin-bottom: 6px; font-style: italic; } .footer-sec p { font-size: 13px; color: #aaa; margin-bottom: 24px; } .soc-links { display: flex; justify-content: center; align-items: center; gap: 16px; margin-bottom: 30px; } .f-btn { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 12px; background: #fff; border: none; transition: 0.3s; text-decoration: none; } .f-btn:hover { background: #333; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.5); } .sc-fb svg { fill: #1877F2; } .sc-in svg { fill: #0A66C2; } .sc-gm svg { fill: #EA4335; } .f-btn svg { width: 24px; height: 24px; } .f-bot { width: 100%; border-top: 1px solid #333; padding-top: 20px; font-size: 12px; color: #777; }</style><div class="ssec footer-sec"><div class="f-top"><h4>SPONDON BLOOD SOCIETY</h4><div class="f-motto">"করিব রক্তদান, সচল রাখিব প্রাণের স্পন্দন"</div><p>ঝিনাইদহ টেক্সটাইল ইঞ্জিনিয়ারিং কলেজ</p></div><div class="soc-links"><a href="https://www.facebook.com/spondon.jtec" target="_blank" class="f-btn sc-fb"><svg viewBox="0 0 24 24"><path d="M22.675 0h-21.35C.597 0 0 .597 0 1.325v21.351C0 23.403.597 24 1.325 24H12.82v-9.294H9.692v-3.622h3.128V8.413c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12V24h6.116c.73 0 1.323-.597 1.323-1.324V1.325C24 .597 23.403 0 22.675 0z"/></svg></a><a href="https://www.linkedin.com/company/sktec-spondon-blood-society/" target="_blank" class="f-btn sc-in"><svg viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg></a><a href="mailto:spondonbloodsociety.jtec@gmail.com" class="f-btn sc-gm"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg></a></div><div class="f-bot">&copy; 2026 Spondon Blood Society. All rights reserved.</div></div>';
+document.querySelectorAll('.page').forEach(function(p){ p.insertAdjacentHTML('beforeend', socH); });
+
+// PAGE ROUTER with URL Param Support
+var pm={'home':'p-home','donor-reg':'p-donor-reg','donor-profile':'p-donor-profile','blood-request':'p-blood-request','match-secured':'p-match-secured','confirm-donation':'p-confirm-donation','confirm':'p-confirm','activities':'p-activities','about':'p-about'};
+var nm={'home':'n-home','donor-reg':'n-donor-reg','donor-profile':'n-donor-profile','activities':'n-activities','about':'n-about'};
+function go(n){
+  if(!pm[n]) n = "home";
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('on')});
+  document.querySelectorAll('.ni').forEach(function(b){b.classList.remove('on')});
+  var p=document.getElementById(pm[n]);if(p)p.classList.add('on');
+  if(nm[n]){var nb=document.getElementById(nm[n]);if(nb)nb.classList.add('on');}
+  window.scrollTo({top:0, behavior: 'smooth'});
 }
 
-function doGet(e) {
-  try {
-    let action = e.parameter.action;
-    let response = {};
-    if (action === 'getLiveStats') response = getLiveStats();
-    else if (action === 'getNotices') response = {status: 'Success', notices: getNotices(e.parameter.district)};
-    else if (action === 'getBlogs') response = {status: 'Success', blogs: getBlogs()};
-    else if (action === 'searchDonors') response = {status: 'Success', donors: searchDonors(e.parameter.district, e.parameter.bg)};
-    else response = {status: 'Success', message: 'API is running'};
-    return ContentService.createTextOutput(JSON.stringify(response)).setMimeType(ContentService.MimeType.JSON);
-  } catch (error) {
-    return ContentService.createTextOutput(JSON.stringify({status: 'Error', message: error.toString()})).setMimeType(ContentService.MimeType.JSON);
-  }
+// Check URL param on load
+var urlParams = new URLSearchParams(window.location.search);
+var urlParams = new URLSearchParams(window.location.search);
+var requestedPage = urlParams.get('page');
+var hashPage = window.location.hash.split('?')[0].substring(1);
+if (hashPage === 'confirm-donation') {
+    requestedPage = 'confirm-donation';
+    let emailParams = new URLSearchParams(window.location.hash.split('?')[1]);
+    let email = emailParams ? emailParams.get('email') : null;
+    if(email) setTimeout(() => {
+        let el = document.getElementById('cf-email');
+        if(el) el.value = decodeURIComponent(email);
+    }, 500);
+}
+if(requestedPage && pm[requestedPage]) {
+    go(requestedPage);
+} else {
+    go('home');
 }
 
-function handleAddDonor(e) {
-  const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('Donor_DB');
-  const ts = new Date();
-  const lastDateStr = e.parameter.lastDate;
-  let nextDateStr = "";
-  let status = "Active";
-  
-  if (lastDateStr) {
-    const lastDate = new Date(lastDateStr);
-    const nextDate = new Date(lastDate.getTime() + (120 * 24 * 60 * 60 * 1000));
-    nextDateStr = Utilities.formatDate(nextDate, Session.getScriptTimeZone(), "yyyy-MM-dd");
-    if (nextDate.getTime() > ts.getTime()) status = "Resting";
-  }
-  
-  sheet.appendRow([ts, e.parameter.name, e.parameter.phone, e.parameter.email, e.parameter.district, e.parameter.upazilla, e.parameter.bg, lastDateStr || "", nextDateStr, status]);
-  return ContentService.createTextOutput(JSON.stringify({status: 'Success'})).setMimeType(ContentService.MimeType.JSON);
-}
+// TICKER
+function hsk(){document.getElementById('tsk').style.display='none'}
+function sman(){hsk();document.getElementById('tdt').classList.remove('show');document.getElementById('tman').classList.add('show')}
+function stk(a,d){hsk();document.getElementById('tman').classList.remove('show');if(d){document.getElementById('tdn').textContent=d;document.getElementById('tdt').classList.add('show')}var m=document.getElementById('tmsg'),t=a.join('  \u{1F534}  ');m.textContent=t;m.style.animationDuration=Math.max(15,t.length*.16)+'s';m.className='t-msg on'}
+function ldN(d){autoSetDist(d);fetch(S+'?action=getNotices&district='+encodeURIComponent(d)).then(function(r){return r.json()}).then(function(j){stk(j.notices&&j.notices.length>0?j.notices:[d+' \u099C\u09C7\u09B2\u09BE\u09AF\u09BC \u098F\u0996\u09A8 \u0995\u09CB\u09A8\u09CB \u099C\u09B0\u09C1\u09B0\u09BF \u09B0\u0995\u09CD\u09A4\u09C7\u09B0 \u099A\u09BE\u09B9\u09BF\u09A6\u09BE \u09A8\u09C7\u0987\u0964 \u09B0\u0995\u09CD\u09A4\u09A6\u09BE\u09A8 \u0995\u09B0\u09C1\u09A8! \u2764\uFE0F'],d);sv(d)}).catch(function(){stk(['\u09B8\u09CD\u09AA\u09A8\u09CD\u09A6\u09A8 \u09AC\u09CD\u09B2\u09BE\u09A1 \u09B8\u09CB\u09B8\u09BE\u0987\u099F\u09BF, \u099D\u09BF\u09A8\u09BE\u0987\u09A6\u09B9\u0964'],d)})}
+document.getElementById('tdt').addEventListener('click',function(){try{localStorage.removeItem('sbs_d');localStorage.removeItem('sbs_t')}catch(x){}document.getElementById('tdt').classList.remove('show');document.getElementById('tmsg').className='t-msg';document.getElementById('tsk').style.display='block';sman()});
+document.getElementById('mdb').addEventListener('click',function(){var d=document.getElementById('mds').value;if(!d)return;document.getElementById('tman').classList.remove('show');ldN(d)});
+function tryGPS(ok,fail){if(!navigator.geolocation){fail();return}document.getElementById('pdm').textContent='\u{1F4CD} \u0986\u09AA\u09A8\u09BE\u09B0 \u0985\u09AC\u09B8\u09CD\u09A5\u09BE\u09A8 \u09B6\u09A8\u09BE\u0995\u09CD\u09A4 \u0995\u09B0\u09BE \u09B9\u099A\u09CD\u099B\u09C7...';navigator.geolocation.getCurrentPosition(function(p){document.getElementById('pdm').textContent='\u2705 GPS \u09AA\u09BE\u0993\u09AF\u09BC\u09BE \u0997\u09C7\u099B\u09C7\u0964';fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat='+p.coords.latitude+'&lon='+p.coords.longitude+'&addressdetails=1&accept-language=en',{headers:{'User-Agent':'SBS/1.0'}}).then(function(r){return r.json()}).then(function(d){var a=d.address||{},raw=Object.values(a).join(' '),dist=mD(raw);if(dist)ok(dist);else fail()}).catch(fail)},function(){fail()},{timeout:7000,maximumAge:0,enableHighAccuracy:false})}
+function tryIP(ok,fail){document.getElementById('pdm').textContent='\u{1F310} \u0985\u09A8\u09C1\u09AE\u09BE\u09A8\u09BF\u0995 \u0985\u09AC\u09B8\u09CD\u09A5\u09BE\u09A8 \u0996\u09CB\u0981\u099C\u09BE \u09B9\u099A\u09CD\u099B\u09C7...';var done=false;function got(raw){if(done)return;var d=mD(raw);if(d){done=true;ok(d)}else if(!done){done=true;fail()}}function nope(){if(!done){done=true;fail()}}fetch('https://ipapi.co/json/?nocache=true&_='+Date.now()).then(function(r){return r.json()}).then(function(d){got(d.city||d.region||'')}).catch(nope);fetch('https://ip-api.com/json/?fields=city,regionName').then(function(r){return r.json()}).then(function(d){got(d.city||d.regionName||'')}).catch(nope);setTimeout(function(){if(!done){done=true;fail()}},5000)}
+document.getElementById('pok').addEventListener('click',function(){this.disabled=true;this.textContent='\u09B6\u09A8\u09BE\u0995\u09CD\u09A4 \u0995\u09B0\u09BE \u09B9\u099A\u09CD\u099B\u09C7...';tryGPS(function(d){document.getElementById('pop').classList.add('off');ldN(d)},function(){tryIP(function(d){document.getElementById('pop').classList.add('off');ldN(d)},function(){document.getElementById('pdm').textContent='';document.getElementById('pop').classList.add('off');sman()})})});
+(function(){var sd='',st=0;try{sd=localStorage.getItem('sbs_d')||'';st=parseInt(localStorage.getItem('sbs_t')||'0')}catch(x){}if(sd&&(Date.now()-st)<1800000){document.getElementById('pop').classList.add('off');ldN(sd)}})();
 
-function handleAddRequest(e) {
-  const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('Request_DB');
-  const ts = new Date();
-  let fileUrl = "";
-  
-  if (e.parameter.prescriptionFile && e.parameter.prescriptionFile !== "") {
-    try {
-      const folder = DriveApp.getFolderById(FOLDER_ID);
-      const fileData = Utilities.base64Decode(e.parameter.prescriptionFile);
-      const blob = Utilities.newBlob(fileData, e.parameter.mimeType, e.parameter.fileName);
-      const file = folder.createFile(blob);
-      file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-      fileUrl = file.getUrl();
-    } catch(err) { fileUrl = "Error: " + err.toString(); }
-  }
-  
-  sheet.appendRow([ts, e.parameter.patientName, e.parameter.phone, e.parameter.bg, e.parameter.units, e.parameter.district, e.parameter.email || "", e.parameter.hospital, e.parameter.problem, fileUrl, e.parameter.dateTime, "Pending", "", "", 0]);
-  const matchedDonors = searchDonors(e.parameter.district, e.parameter.bg);
-  
-  return ContentService.createTextOutput(JSON.stringify({status: 'Success', fileUrl: fileUrl, matchedDonors: matchedDonors})).setMimeType(ContentService.MimeType.JSON);
-}
+// STATS
+fetch(S+'?action=getLiveStats').then(function(r){return r.json()}).then(function(d){if(d.status!=='Success')throw 0;document.getElementById('stsk').hidden=true;document.getElementById('stdt').hidden=false;document.getElementById('s-td').textContent=toBn(d.totalDonations);document.getElementById('s-ad').textContent=toBn(d.availableDonors);document.getElementById('s-nd').textContent=toBn(d.newDonorsToday);document.getElementById('s-pr').textContent=toBn(d.pendingRequests);var g=['A+','B+','O+','AB+','A-','B-','O-','AB-'],h='';for(var i=0;i<8;i++){var c=(d.bloodGroups&&d.bloodGroups[g[i]]!==undefined)?d.bloodGroups[g[i]]:0;h+='<div class="bgc">'+g[i]+'<span>'+toBn(c)+'</span></div>'}document.getElementById('s-bg').innerHTML=h;document.getElementById('s-up').textContent='\u09B8\u09B0\u09CD\u09AC\u09B6\u09C7\u09B7 \u0986\u09AA\u09A1\u09C7\u099F: '+(d.lastUpdated||'')}).catch(function(){document.getElementById('stsk').hidden=true;document.getElementById('stdt').hidden=false;document.getElementById('s-up').textContent='\u09A1\u09C7\u099F\u09BE \u09B2\u09CB\u09A1 \u09AC\u09CD\u09AF\u09B0\u09CD\u09A5\u0964 \u09B0\u09BF\u09AB\u09CD\u09B0\u09C7\u09B6 \u0995\u09B0\u09C1\u09A8\u0964'});
 
-function searchDonors(district, bg) {
-  const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('Donor_DB');
-  if (!sheet) return [];
-  const data = sheet.getDataRange().getValues();
-  let matches = [];
-  
-  for (let i = 1; i < data.length; i++) {
-    // FIXED: Added .trim() to ensure space-related typing mistakes in sheet don't cause mismatch
-    let donorBg = data[i][6] ? data[i][6].toString().trim() : "";
-    let reqBg = bg ? bg.toString().trim() : "";
-    if (data[i][9] === "Active" && data[i][4] === district && donorBg === reqBg) {
-      matches.push({name: data[i][1], phone: data[i][2], upazilla: data[i][5]});
-    }
-  }
-  return matches;
-}
+// UPAZILLA
+document.getElementById('dd').addEventListener('change',function(){var u=document.getElementById('du'),h=document.getElementById('uh'),d=this.value;if(!d){u.innerHTML='<option value="">\u0986\u0997\u09C7 \u099C\u09C7\u09B2\u09BE \u09A8\u09BF\u09B0\u09CD\u09AC\u09BE\u099A\u09A8 \u0995\u09B0\u09C1\u09A8</option>';u.disabled=true;h.style.display='block';return}var l=UZ[d]||[],s='<option value="">\u0989\u09AA\u099C\u09C7\u09B2\u09BE \u09A8\u09BF\u09B0\u09CD\u09AC\u09BE\u099A\u09A8 \u0995\u09B0\u09C1\u09A8</option>';for(var i=0;i<l.length;i++)s+='<option value="'+l[i]+'">'+l[i]+'</option>';u.innerHTML=s;u.disabled=false;h.style.display='none'});
 
-function handleSecureMatch(e) {
-  const reqPhone = e.parameter.reqPhone;
-  const donorPhone = e.parameter.donorPhone;
-  const ts = new Date();
-  const mSheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('Match_Secured_DB');
-  mSheet.appendRow([ts, reqPhone, donorPhone]);
-  
-  const dSheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('Donor_DB');
-  const dData = dSheet.getDataRange().getValues();
-  let donorName = "", donorEmail = "";
-  
-  for (let i = 1; i < dData.length; i++) {
-    if (dData[i][2] == donorPhone) { donorName = dData[i][1]; donorEmail = dData[i][3]; break; }
-  }
-  if (!donorEmail) return ContentService.createTextOutput(JSON.stringify({status: 'Error', message: 'ডোনারের ইমেইল ডাটাবেসে পাওয়া যায়নি।'})).setMimeType(ContentService.MimeType.JSON);
+// FORM HELPERS
+function setL(b,t,sp,on,txt){var bn=document.getElementById(b),tt=document.getElementById(t),s=document.getElementById(sp);bn.disabled=on;tt.textContent=on?'\u0985\u09AA\u09C7\u0995\u09CD\u09B7\u09BE \u0995\u09B0\u09C1\u09A8...':txt;s.style.display=on?'block':'none'}
+function sE(id,m){var e=document.getElementById(id);e.textContent='\u274C '+m;e.style.display='block'}
+function hE(id){document.getElementById(id).style.display='none'}
 
-  const rSheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('Request_DB');
-  const rData = rSheet.getDataRange().getValues();
-  let reqDetails = {}; let reqRow = -1;
-  
-  for (let i = rData.length - 1; i >= 1; i--) {
-    if (rData[i][2] == reqPhone && rData[i][11] === 'Pending') {
-      reqRow = i + 1;
-      reqDetails = {pName: rData[i][1], bg: rData[i][3], units: rData[i][4], hospital: rData[i][7], problem: rData[i][8], prescLink: rData[i][9], dateTime: rData[i][10]};
-      break;
-    }
-  }
-  
-  if (reqRow > -1) {
-    rSheet.getRange(reqRow, 12).setValue('Assigned');
-    rSheet.getRange(reqRow, 13).setValue(donorEmail);
-    rSheet.getRange(reqRow, 14).setValue(ts);
-  } else {
-    return ContentService.createTextOutput(JSON.stringify({status: 'Error', message: 'রিকোয়েস্ট পাওয়া যায়নি বা ইতোমধ্যে এসাইনড হয়ে গেছে।'})).setMimeType(ContentService.MimeType.JSON);
-  }
-  
-  sendMatchEmail(donorEmail, donorName, reqDetails, reqPhone);
-  return ContentService.createTextOutput(JSON.stringify({status: 'Success', donorName: donorName})).setMimeType(ContentService.MimeType.JSON);
-}
+// DONOR REG
+document.getElementById('drb').addEventListener('click',function(){var f=document.getElementById('drf');if(!f.checkValidity()){f.reportValidity();return}setL('drb','drt','drs',true,'');hE('dre');fetch(S,{method:'POST',body:new FormData(f)}).then(function(r){return r.json()}).then(function(d){if(d.status==='Success'){document.getElementById('drfs').style.display='none';document.getElementById('drok').style.display='block'}else{setL('drb','drt','drs',false,'\u09B0\u09C7\u099C\u09BF\u09B8\u09CD\u099F\u09CD\u09B0\u09C7\u09B6\u09A8 \u0995\u09B0\u09C1\u09A8 \u{1F49A}');sE('dre',d.message||'\u09A4\u09CD\u09B0\u09C1\u099F\u09BF \u09B9\u09AF\u09BC\u09C7\u099B\u09C7\u0964')}}).catch(function(){setL('drb','drt','drs',false,'\u09B0\u09C7\u099C\u09BF\u09B8\u09CD\u099F\u09CD\u09B0\u09C7\u09B6\u09A8 \u0995\u09B0\u09C1\u09A8 \u{1F49A}');sE('dre','\u0987\u09A8\u09CD\u099F\u09BE\u09B0\u09A8\u09C7\u099F \u09B8\u09AE\u09B8\u09CD\u09AF\u09BE\u0964 \u0986\u09AC\u09BE\u09B0 \u099A\u09C7\u09B7\u09CD\u099F\u09BE \u0995\u09B0\u09C1\u09A8\u0964')})});
 
-function handleConfirmDonation(e) {
-  const email = e.parameter.email;
-  const cStatus = e.parameter.status;
-  const dateStr = e.parameter.date;
-  const ts = new Date();
-  
-  const cSheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('Confirmation_DB');
-  cSheet.appendRow([ts, email, cStatus, dateStr]);
-  
-  if (cStatus === 'Donated') {
-    const dSheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('Donor_DB');
-    const dData = dSheet.getDataRange().getValues();
-    for (let i = 1; i < dData.length; i++) {
-      if (dData[i][3] == email) {
-        const donatedDate = new Date(dateStr);
-        const nextDate = new Date(donatedDate.getTime() + (120 * 24 * 60 * 60 * 1000));
-        const nextDateStr = Utilities.formatDate(nextDate, Session.getScriptTimeZone(), "yyyy-MM-dd");
-        dSheet.getRange(i + 1, 8).setValue(dateStr); 
-        dSheet.getRange(i + 1, 9).setValue(nextDateStr); 
-        dSheet.getRange(i + 1, 10).setValue('Resting');
-        break;
-      }
-    }
-  }
-  
-  const rSheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('Request_DB');
-  const rData = rSheet.getDataRange().getValues();
-  for (let i = rData.length - 1; i >= 1; i--) {
-    if (rData[i][12] == email && rData[i][11] === 'Assigned') { rSheet.getRange(i + 1, 12).setValue('Completed'); break; }
-  }
-  return ContentService.createTextOutput(JSON.stringify({status: 'Success'})).setMimeType(ContentService.MimeType.JSON);
-}
-
-function hourlyEmailReminder() {
-  const rSheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('Request_DB');
-  const rData = rSheet.getDataRange().getValues();
-  const now = new Date();
-  for (let i = 1; i < rData.length; i++) {
-    if (rData[i][11] === 'Assigned' && rData[i][13]) {
-      const assignedTime = new Date(rData[i][13]);
-      const hoursPassed = (now.getTime() - assignedTime.getTime()) / (1000 * 60 * 60);
-      const reminderCount = parseInt(rData[i][14]) || 0;
-      let shouldSend = false; let hoursText = "";
-      if (hoursPassed >= 24 && hoursPassed < 48 && reminderCount === 0) { shouldSend = true; hoursText = "২৪"; rSheet.getRange(i + 1, 15).setValue(1); }
-      else if (hoursPassed >= 48 && reminderCount === 1) { shouldSend = true; hoursText = "৪৮"; rSheet.getRange(i + 1, 15).setValue(2); }
-      if (shouldSend) sendReminderEmail(rData[i][12], rData[i][1], hoursText);
-    }
-  }
-}
-
-function dailyStatusReset() {
-  const dSheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('Donor_DB');
-  const dData = dSheet.getDataRange().getValues();
-  const now = new Date();
-  for (let i = 1; i < dData.length; i++) {
-    if (dData[i][9] === 'Resting' && dData[i][8]) {
-      const nextDate = new Date(dData[i][8]);
-      if (now.getTime() >= nextDate.getTime()) dSheet.getRange(i + 1, 10).setValue('Active');
-    }
-  }
-}
-
-const APP_URL = "https://spondon-blood-society.vercel.app";
-const FB_LINK = "https://www.facebook.com/spondon.jtec";
-
-function getEmailFooter() {
-  return "<hr style='border: 0; border-top: 1px solid #eee; margin: 30px 0 20px;'><div style='text-align: center; color: #777; font-size: 13px;'><p style='margin-bottom: 10px;'><b>Spondon Blood Society</b><br>Jhenaidah Textile Engineering College</p><a href='" + FB_LINK + "' style='display: inline-block; background: #1877F2; color: #fff; text-decoration: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; font-family: sans-serif; font-size: 14px;'><span style='font-size: 18px; vertical-align: middle; margin-right: 6px;'>f</span> আমাদের ফেসবুক পেজ ফলো করুন</a><p style='margin-top: 15px; font-size: 12px; color: #aaa;'>\"করিব রক্তদান, সচল রাখিব প্রাণের স্পন্দন\"</p></div>";
-}
-
-function sendMatchEmail(donorEmail, donorName, reqDetails, reqPhone) {
-  const confirmLink = APP_URL + "/index.html#confirm-donation?email=" + encodeURIComponent(donorEmail);
-  const prescHtml = reqDetails.prescLink ? "<p style='margin: 8px 0; font-size: 15px;'>📎 <b>প্রেসক্রিপশন:</b> <a href='" + reqDetails.prescLink + "' target='_blank' style='color: #d32f2f; text-decoration: underline;'>ডকুমেন্ট দেখুন</a></p>" : "";
-  const emailHtml = "<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eaeaea; border-radius: 10px; padding: 30px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);'><h2 style='color: #d32f2f; text-align: center; margin-top: 0;'>🚨 জরুরি রক্তদানের অনুরোধ</h2><p style='font-size: 16px; color: #333;'>শ্রদ্ধেয় <b>" + donorName + "</b>,</p><p style='font-size: 15px; color: #555; line-height: 1.6;'>স্পন্দন ব্লাড সোসাইটির মাধ্যমে একটি মুমূর্ষু রোগীর জন্য রক্তদানে সম্মত হওয়ায় আপনাকে আন্তরিক ধন্যবাদ। নিচে রোগীর বিস্তারিত তথ্য দেওয়া হলো:</p><div style='background: #f9f9f9; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 5px solid #d32f2f;'><p style='margin: 8px 0; font-size: 15px;'>🏥 <b>রোগীর নাম:</b> " + reqDetails.pName + "</p><p style='margin: 8px 0; font-size: 15px;'>🩸 <b>রক্তের গ্রুপ:</b> <span style='color:#d32f2f; font-weight:bold;'>" + reqDetails.bg + "</span> (" + reqDetails.units + " ব্যাগ)</p><p style='margin: 8px 0; font-size: 15px;'>💊 <b>সমস্যা:</b> " + reqDetails.problem + "</p><p style='margin: 8px 0; font-size: 15px;'>🏨 <b>হাসপাতাল:</b> " + reqDetails.hospital + "</p><p style='margin: 8px 0; font-size: 15px;'>⏰ <b>সময়:</b> " + reqDetails.dateTime + "</p><p style='margin: 8px 0; font-size: 15px;'>📞 <b>স্বজনের নাম্বার:</b> <a href='tel:" + reqPhone + "' style='color: #1877F2; text-decoration: none; font-weight: bold;'>" + reqPhone + "</a></p>" + prescHtml + "</div><p style='font-size: 15px; color: #333; text-align: center; margin: 30px 0 10px;'>✅ রক্তদান সম্পন্ন হলে নিচের বাটনে ক্লিক করে আমাদের জানান।</p><div style='text-align: center; margin-bottom: 30px;'><a href='" + confirmLink + "' style='display: inline-block; background: #28a745; color: white; padding: 14px 28px; text-decoration: none; font-size: 16px; font-weight: bold; border-radius: 8px; box-shadow: 0 4px 6px rgba(40,167,69,0.3);'>✅ স্ট্যাটাস আপডেট করুন</a></div>" + getEmailFooter() + "</div>";
-  MailApp.sendEmail({to: donorEmail, subject: "🩸 জরুরি রক্তদানের অনুরোধ — Spondon Blood Society", htmlBody: emailHtml});
-}
-
-function sendReminderEmail(donorEmail, patientName, hours) {
-  const confirmLink = APP_URL + "/index.html#confirm-donation?email=" + encodeURIComponent(donorEmail);
-  const emailHtml = "<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eaeaea; border-radius: 10px; padding: 30px;'><h2 style='color: #d32f2f; text-align: center; margin-top: 0;'>⏰ রক্তদান স্ট্যাটাস রিমাইন্ডার</h2><p style='font-size: 16px; color: #333;'>প্রিয় ডোনার,</p><p style='font-size: 15px; color: #555; line-height: 1.6;'>প্রায় <b>" + hours + " ঘণ্টা</b> আগে আপনাকে <b>" + patientName + "</b> রোগীর জন্য ডোনার হিসেবে নির্বাচন করা হয়েছিল।</p><p style='font-size: 15px; color: #555; line-height: 1.6;'>আপনি কি রক্তদান সম্পন্ন করেছেন? আপনি রক্ত দিয়ে থাকলে নিচের বাটনে ক্লিক করে স্ট্যাটাস আপডেট করুন। এর ফলে পরবর্তী ১২০ দিন আপনাকে আর কোনো অনুরোধ পাঠানো হবে না।</p><div style='text-align: center; margin: 30px 0;'><a href='" + confirmLink + "' style='display: inline-block; background: #28a745; color: white; padding: 14px 28px; text-decoration: none; font-size: 16px; font-weight: bold; border-radius: 8px; box-shadow: 0 4px 6px rgba(40,167,69,0.3);'>✅ স্ট্যাটাস আপডেট করুন</a></div>" + getEmailFooter() + "</div>";
-  MailApp.sendEmail({to: donorEmail, subject: "⏰ রক্তদান স্ট্যাটাস রিমাইন্ডার — Spondon Blood Society", htmlBody: emailHtml});
-}
-
-function getLiveStats() {
-  try {
-    const dSheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('Donor_DB');
-    const reqSheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('Request_DB');
-    let stats = { status: 'Success', totalDonations: dSheet.getLastRow() > 1 ? dSheet.getLastRow() - 1 : 0, availableDonors: 0, newDonorsToday: 0, pendingRequests: 0, bloodGroups: {'A+':0, 'A-':0, 'B+':0, 'B-':0, 'O+':0, 'O-':0, 'AB+':0, 'AB-':0} };
-    const dData = dSheet.getDataRange().getValues();
-    const today = new Date().toDateString();
+// BLOOD REQUEST
+document.getElementById('brb').addEventListener('click', async function(){
+    var f = document.getElementById('brf');
+    if(!f.checkValidity()){ f.reportValidity(); return; }
+    setL('brb','brt','brs',true,''); hE('bre');
     
-    for (let i = 1; i < dData.length; i++) {
-      if (dData[i][9] === 'Active') { 
-        stats.availableDonors++; 
-        // FIXED: Added .trim() to ensure manual space typing mistakes in sheet don't cause mismatch
-        let donorBg = dData[i][6] ? dData[i][6].toString().trim() : '';
-        if (stats.bloodGroups[donorBg] !== undefined) stats.bloodGroups[donorBg]++; 
-      }
-      if (dData[i][0] && new Date(dData[i][0]).toDateString() === today) stats.newDonorsToday++;
-    }
+    var fd = new FormData(f);
+    fd.delete('prescriptionFile');
+    fd.set('action', 'addRequest');
     
-    if (reqSheet) {
-      const rData = reqSheet.getDataRange().getValues();
-      for (let i = 1; i < rData.length; i++) { if (rData[i][11] === 'Pending') stats.pendingRequests++; }
-    }
-    return stats;
-  } catch(e) { return {status: 'Error', message: e.message}; }
-}
-
-function getNotices(district) {
-  try {
-    const reqSheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('Request_DB');
-    if(!reqSheet) return [];
-    const reqData = reqSheet.getDataRange().getValues();
-    let notices = [];
-    for (let i = 1; i < reqData.length; i++) {
-      if (reqData[i][11] === 'Pending') {
-        if (!district || district === reqData[i][5]) notices.push("🚨 জরুরি: " + reqData[i][7] + " এ " + reqData[i][4] + " ব্যাগ " + reqData[i][3] + " রক্ত প্রয়োজন!");
-      }
-    }
-    return notices;
-  } catch(e) { return []; }
-}
-
-function handleAdminLogin(e) { return (e.parameter.email === "admin@gmail.com" && e.parameter.pin === "1234") ? ContentService.createTextOutput(JSON.stringify({status: 'Success'})).setMimeType(ContentService.MimeType.JSON) : ContentService.createTextOutput(JSON.stringify({status: 'Error', message: 'ভুল ইমেইল বা পিন'})).setMimeType(ContentService.MimeType.JSON); }
-
-function handleAddBlog(e) {
-  if (e.parameter.email !== "admin@gmail.com" || e.parameter.pin !== "1234") return ContentService.createTextOutput(JSON.stringify({status: 'Error'})).setMimeType(ContentService.MimeType.JSON);
-  const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('Blogs');
-  sheet.appendRow([Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd MMM, yyyy"), e.parameter.title, e.parameter.desc, e.parameter.image, "Admin", e.parameter.fbLink || '', false]);
-  return ContentService.createTextOutput(JSON.stringify({status: 'Success'})).setMimeType(ContentService.MimeType.JSON);
-}
-
-function handleDeleteBlog(e) {
-  if (e.parameter.email !== "admin@gmail.com" || e.parameter.pin !== "1234") return ContentService.createTextOutput(JSON.stringify({status: 'Error'})).setMimeType(ContentService.MimeType.JSON);
-  const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('Blogs');
-  const rowId = parseInt(e.parameter.rowId);
-  if (rowId > 1) { sheet.deleteRow(rowId); return ContentService.createTextOutput(JSON.stringify({status: 'Success'})).setMimeType(ContentService.MimeType.JSON); }
-  return ContentService.createTextOutput(JSON.stringify({status: 'Error'})).setMimeType(ContentService.MimeType.JSON);
-}
-
-function getBlogs() {
-  try {
-    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('Blogs');
-    const data = sheet.getDataRange().getValues(); let blogs = [];
-    for (let i = data.length - 1; i >= 1; i--) {
-      if(!data[i][1]) continue;
-      blogs.push({ id: i + 1, date: data[i][0], title: data[i][1], desc: data[i][2], image: data[i][3], author: data[i][4], fbLink: data[i][5] || '', pinned: data[i][6] === true || data[i][6] === "TRUE" || data[i][6] === "true" });
-    }
-    return blogs;
-  } catch (e) { return []; }
-}
-
-function handleTogglePinBlog(e) {
-  if (e.parameter.email !== "admin@gmail.com" || e.parameter.pin !== "1234") return ContentService.createTextOutput(JSON.stringify({status: 'Error'})).setMimeType(ContentService.MimeType.JSON);
-  const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('Blogs');
-  const rowId = parseInt(e.parameter.rowId);
-  if (rowId > 1) { sheet.getRange(rowId, 7).setValue(e.parameter.pinState === "true"); return ContentService.createTextOutput(JSON.stringify({status: 'Success'})).setMimeType(ContentService.MimeType.JSON); }
-  return ContentService.createTextOutput(JSON.stringify({status: 'Error'})).setMimeType(ContentService.MimeType.JSON);
-}
-
-function handleRequestOtp(e) {
-  const email = e.parameter.email;
-  const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('Donor_DB');
-  const data = sheet.getDataRange().getValues();
-  let rowIndex = -1;
-  let donorName = "";
-  
-  for (let i = 1; i < data.length; i++) {
-    if (data[i][3] == email) { rowIndex = i + 1; donorName = data[i][1]; break; }
-  }
-  
-  if (rowIndex === -1) return ContentService.createTextOutput(JSON.stringify({status: 'Error', message: 'এই ইমেইলে কোনো ডোনার পাওয়া যায়নি।'})).setMimeType(ContentService.MimeType.JSON);
-  
-  const otp = Math.floor(1000 + Math.random() * 9000).toString(); // 4 digit
-  const ts = new Date();
-  
-  sheet.getRange(rowIndex, 11).setValue(otp);
-  sheet.getRange(rowIndex, 12).setValue(ts);
-  
-  const emailHtml = "<div style='font-family:Arial,sans-serif;max-width:500px;margin:auto;padding:20px;border:1px solid #ddd;border-radius:10px;'><h2 style='color:#d32f2f;text-align:center;'>লগইন পিন (OTP)</h2><p>প্রিয় <b>" + donorName + "</b>,</p><p>আপনার স্পন্দন ব্লাড সোসাইটি প্রোফাইলে প্রবেশ করার জন্য নিচের ৪-ডিজিটের পিনটি ব্যবহার করুন:</p><h1 style='text-align:center;letter-spacing:5px;color:#333;background:#f4f4f4;padding:15px;border-radius:8px;'>" + otp + "</h1><p style='color:#888;font-size:12px;text-align:center;'>এই পিনটি পরবর্তী ১০ মিনিটের জন্য কার্যকর থাকবে।</p></div>";
-  MailApp.sendEmail({to: email, subject: "আপনার প্রোফাইল লগইন পিন - Spondon Blood Society", htmlBody: emailHtml});
-  
-  return ContentService.createTextOutput(JSON.stringify({status: 'Success'})).setMimeType(ContentService.MimeType.JSON);
-}
-
-function handleVerifyOtp(e) {
-  const email = e.parameter.email;
-  const otp = e.parameter.otp;
-  const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('Donor_DB');
-  const data = sheet.getDataRange().getValues();
-  
-  for (let i = 1; i < data.length; i++) {
-    if (data[i][3] == email) {
-      const savedOtp = data[i][10];
-      const otpTs = data[i][11];
-      
-      if (savedOtp && savedOtp.toString() === otp) {
-        const now = new Date();
-        const diffMins = (now.getTime() - new Date(otpTs).getTime()) / 60000;
+    var fi = document.getElementById('rfi');
+    if(fi.files && fi.files.length > 0) {
+        var file = fi.files[0];
+        if(file.size > 10485760){ setL('brb','brt','brs',false,'ডোনার খুঁজুন 🔍'); sE('bre','ফাইল ১০MB এর বেশি।'); return; }
         
-        if (diffMins <= 10) {
-          sheet.getRange(i + 1, 11).setValue('');
-          sheet.getRange(i + 1, 12).setValue('');
-          return ContentService.createTextOutput(JSON.stringify({status: 'Success', donor: {name: data[i][1], phone: data[i][2], district: data[i][4], upazilla: data[i][5], bg: data[i][6], lastDate: data[i][7]}})).setMimeType(ContentService.MimeType.JSON);
-        } else {
-          return ContentService.createTextOutput(JSON.stringify({status: 'Error', message: 'পিনটির মেয়াদ শেষ হয়ে গেছে। আবার চেষ্টা করুন।'})).setMimeType(ContentService.MimeType.JSON);
-        }
-      } else {
-        return ContentService.createTextOutput(JSON.stringify({status: 'Error', message: 'ভুল পিন দিয়েছেন।'})).setMimeType(ContentService.MimeType.JSON);
-      }
+        var reader = new FileReader();
+        reader.onload = function() {
+            var b64 = reader.result.split(',')[1];
+            fd.set('prescriptionFile', b64);
+            fd.set('mimeType', file.type);
+            fd.set('fileName', file.name);
+            sendReq(fd);
+        };
+        reader.onerror = function() { setL('brb','brt','brs',false,'ডোনার খুঁজুন 🔍'); sE('bre','ফাইল রিড করতে সমস্যা।'); };
+        reader.readAsDataURL(file);
+    } else {
+        sendReq(fd);
     }
-  }
-  return ContentService.createTextOutput(JSON.stringify({status: 'Error', message: 'অ্যাকাউন্ট পাওয়া যায়নি।'})).setMimeType(ContentService.MimeType.JSON);
-}
-
-function handleUpdateProfile(e) {
-  const email = e.parameter.email;
-  const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('Donor_DB');
-  const data = sheet.getDataRange().getValues();
+    
+    function sendReq(formData) {
+        fetch(S, {method:'POST', body: formData})
+        .then(r => r.json())
+        .then(d => {
+            if(d.status !== 'Success') throw new Error(d.message);
+            document.getElementById('brfs').style.display='none';
+            document.getElementById('brr').style.display='block';
+            
+            var dl = document.getElementById('brdl'), intro = document.getElementById('bri'), cs = document.getElementById('brcs');
+            if(d.matchedDonors && d.matchedDonors.length){
+                intro.innerHTML = 'প্রিয় স্বজন, আপনার জন্য <b style="color:#1b5e20">' + d.matchedDonors.length + 'জন</b> প্রস্তুত ডোনার পাওয়া গেছে। এখনই কল করুন:';
+                var h = '';
+                d.matchedDonors.forEach(m => {
+                    // FIXED: Using formData.get('bg') instead of formData.get('bloodGroup')
+                    h += '<div class="dc"><div style="flex:1;min-width:0"><div class="dn2">👤 ' + m.name + '</div><div class="dp2">📞 ' + m.phone + '</div><div><span class="dbg">' + (formData.get('bg') || '') + '</span>' + (m.upazilla ? '<span class="duz">📍 ' + m.upazilla + '</span>':'') + '</div></div><a href="tel:' + m.phone + '" class="cbt">📱 কল করুন</a></div>';
+                });
+                dl.innerHTML = h;
+                cs.style.display = 'block';
+            } else {
+                intro.innerHTML = 'প্রিয় স্বজন, এই মুহূর্তে কোনো ডোনার পাওয়া যায়নি।';
+                dl.innerHTML = '<div class="nd"><div style="font-size:34px;margin-bottom:8px">😔</div><b style="font-size:15px">দুঃখিত!</b><br><span style="font-size:13px;line-height:1.7;display:block;margin-top:5px">অন্যান্য মাধ্যমে খোঁজ নিন।</span></div>';
+            }
+        }).catch(e => {
+            setL('brb','brt','brs',false,'ডোনার খুঁজুন 🔍'); sE('bre', e.message||'ইন্টারনেট সমস্যা।');
+        });
+    }
+});
+  // MATCH SECURED
+document.getElementById('msb').addEventListener('click',function(){var f=document.getElementById('msf');if(!f.checkValidity()){f.reportValidity();return}setL('msb','mst','mss',true,'');hE('mse');fetch(S,{method:'POST',body:new FormData(f)}).then(function(r){return r.json()}).then(function(d){if(d.status==='Success'){document.getElementById('msfs').style.display='none';document.getElementById('msok').style.display='block';document.getElementById('msdn').textContent=d.donorName||'';
   
-  for (let i = 1; i < data.length; i++) {
-    if (data[i][3] == email) {
-      sheet.getRange(i + 1, 2).setValue(e.parameter.name);
-      sheet.getRange(i + 1, 3).setValue(e.parameter.phone);
-      sheet.getRange(i + 1, 5).setValue(e.parameter.district);
-      sheet.getRange(i + 1, 6).setValue(e.parameter.upazilla);
-      sheet.getRange(i + 1, 7).setValue(e.parameter.bg);
-      
-      const lastDateStr = e.parameter.lastDate;
-      let nextDateStr = "";
-      let status = "Active";
-      
-      if (lastDateStr) {
-        const lastDate = new Date(lastDateStr);
-        const nextDate = new Date(lastDate.getTime() + (120 * 24 * 60 * 60 * 1000));
-        nextDateStr = Utilities.formatDate(nextDate, Session.getScriptTimeZone(), "yyyy-MM-dd");
-        if (nextDate.getTime() > new Date().getTime()) status = "Resting";
-      }
-      
-      sheet.getRange(i + 1, 8).setValue(lastDateStr || "");
-      sheet.getRange(i + 1, 9).setValue(nextDateStr);
-      sheet.getRange(i + 1, 10).setValue(status);
-      
-      return ContentService.createTextOutput(JSON.stringify({status: 'Success'})).setMimeType(ContentService.MimeType.JSON);
+  // Update WhatsApp Button Link
+  var donorP = document.getElementById('msdp').value;
+  var txt = encodeURIComponent('আসসালামু আলাইকুম, আমি স্পন্দন ব্লাড সোসাইটি থেকে যোগাযোগ করছি। আপনি আমাদের রোগীর জন্য রক্তদানে সম্মতি জানিয়েছেন। বিস্তারিত তথ্যের জন্য ইমেইল চেক করুন অথবা এখানে রিপ্লাই দিন। ধন্যবাদ!');
+  document.getElementById('wa-btn-1').onclick = function(){ window.open('https://wa.me/88'+donorP+'?text='+txt, '_blank'); };
+
+}else{setL('msb','mst','mss',false,'\u0995\u09A8\u09AB\u09BE\u09B0\u09CD\u09AE \u0993 \u0987\u09AE\u09C7\u0987\u09B2 \u09AA\u09BE\u09A0\u09BE\u09A8 \u{1F4E7}');sE('mse',d.message||'\u09A4\u09CD\u09B0\u09C1\u099F\u09BF\u0964')}}).catch(function(){setL('msb','mst','mss',false,'\u0995\u09A8\u09AB\u09BE\u09B0\u09CD\u09AE \u0993 \u0987\u09AE\u09C7\u0987\u09B2 \u09AA\u09BE\u09A0\u09BE\u09A8 \u{1F4E7}');sE('mse','\u0987\u09A8\u09CD\u099F\u09BE\u09B0\u09A8\u09C7\u099F \u09B8\u09AE\u09B8\u09CD\u09AF\u09BE\u0964')})});
+document.getElementById('msab').addEventListener('click',function(){document.getElementById('msok').style.display='none';document.getElementById('msfs').style.display='block';document.getElementById('msdp').value='';setL('msb','mst','mss',false,'\u0995\u09A8\u09AB\u09BE\u09B0\u09CD\u09AE \u0993 \u0987\u09AE\u09C7\u0987\u09B2 \u09AA\u09BE\u09A0\u09BE\u09A8 \u{1F4E7}')});
+
+// CONFIRMATION
+document.getElementById('cfst').addEventListener('change',function(){document.getElementById('cfdr').hidden=this.value!=='Donated'});
+document.getElementById('cfb').addEventListener('click',function(){var f=document.getElementById('cff');if(!f.checkValidity()){f.reportValidity();return}setL('cfb','cft','cfs',true,'');hE('cfe');fetch(S,{method:'POST',body:new FormData(f)}).then(function(r){return r.json()}).then(function(d){if(d.status==='Success'){document.getElementById('cffs').style.display='none';document.getElementById('cfok').style.display='block'}else{setL('cfb','cft','cfs',false,'\u09B8\u09CD\u099F\u09CD\u09AF\u09BE\u099F\u09BE\u09B8 \u0986\u09AA\u09A1\u09C7\u099F \u0995\u09B0\u09C1\u09A8 \u2705');sE('cfe',d.message||'\u09A4\u09CD\u09B0\u09C1\u099F\u09BF\u0964')}}).catch(function(){setL('cfb','cft','cfs',false,'\u09B8\u09CD\u099F\u09CD\u09AF\u09BE\u099F\u09BE\u09B8 \u0986\u09AA\u09A1\u09C7\u099F \u0995\u09B0\u09C1\u09A8 \u2705');sE('cfe','\u0987\u09A8\u09CD\u099F\u09BE\u09B0\u09A8\u09C7\u099F \u09B8\u09AE\u09B8\u09CD\u09AF\u09BE\u0964')})});
+
+// ADMIN & BLOG LOGIC
+var adminTrigCount = 0;
+document.getElementById('admin-trig').addEventListener('click', function() {
+    adminTrigCount++;
+    if(adminTrigCount >= 3) {
+        document.getElementById('admin-pop').classList.remove('off');
+        adminTrigCount = 0;
     }
-  }
-  return ContentService.createTextOutput(JSON.stringify({status: 'Error', message: 'অ্যাকাউন্ট পাওয়া যায়নি।'})).setMimeType(ContentService.MimeType.JSON);
+});
+
+document.getElementById('admin-login-btn').addEventListener('click', function() {
+    var e = document.getElementById('admin-email').value;
+    var p = document.getElementById('admin-pin').value;
+    if(!e || !p) return;
+    this.textContent = 'লগইন হচ্ছে...';
+    
+    var fd = new FormData();
+    fd.append('formType', 'adminLogin');
+    fd.append('email', e);
+    fd.append('pin', p);
+
+    fetch(S, {method:'POST', body: fd})
+    .then(r => r.json())
+    .then(d => {
+        if(d.status === 'Success') {
+            sessionStorage.setItem('isAdmin', 'true');
+            sessionStorage.setItem('adminEmail', e);
+            sessionStorage.setItem('adminPin', p);
+            document.getElementById('admin-pop').classList.add('off');
+            document.getElementById('cfb').addEventListener('click',function(){
+    var f=document.getElementById('cff');
+    if(!f.checkValidity()){f.reportValidity();return}
+    setL('cfb','cft','cfs',true,''); hE('cfe');
+    var fd = new FormData(f);
+    fd.set('action', 'confirmDonation');
+    fetch(S,{method:'POST',body:fd}).then(r=>r.json()).then(d=>{
+        if(d.status==='Success'){
+            document.getElementById('cffs').style.display='none';
+            document.getElementById('cfok').style.display='block';
+        } else {
+            setL('cfb','cft','cfs',false,'আপডেট করুন'); sE('cfe',d.message||'ত্রুটি।');
+        }
+    }).catch(()=>{ setL('cfb','cft','cfs',false,'আপডেট করুন'); sE('cfe','ইন্টারনেট সমস্যা।'); });
+});
+checkAdmin();
+            alert('সফলভাবে লগইন হয়েছে!');
+        } else {
+            sE('admin-err', 'ভুল ইমেইল বা পিন!');
+            this.textContent = 'লগইন করুন';
+        }
+    }).catch(err => {
+        sE('admin-err', 'নেটওয়ার্ক সমস্যা!');
+        this.textContent = 'লগইন করুন';
+    });
+});
+
+function checkAdmin() {
+    if(sessionStorage.getItem('isAdmin') === 'true') {
+        document.getElementById('admin-panel').style.display = 'block';
+    }
 }
+document.getElementById('cfb').addEventListener('click',function(){
+    var f=document.getElementById('cff');
+    if(!f.checkValidity()){f.reportValidity();return}
+    setL('cfb','cft','cfs',true,''); hE('cfe');
+    var fd = new FormData(f);
+    fd.set('action', 'confirmDonation');
+    fetch(S,{method:'POST',body:fd}).then(r=>r.json()).then(d=>{
+        if(d.status==='Success'){
+            document.getElementById('cffs').style.display='none';
+            document.getElementById('cfok').style.display='block';
+        } else {
+            setL('cfb','cft','cfs',false,'আপডেট করুন'); sE('cfe',d.message||'ত্রুটি।');
+        }
+    }).catch(()=>{ setL('cfb','cft','cfs',false,'আপডেট করুন'); sE('cfe','ইন্টারনেট সমস্যা।'); });
+});
+checkAdmin();
+
+function fixImg(url) {
+    if(!url) return '';
+    let m = url.match(/drive\.google\.com\/.*[?&]id=([^&]+)|drive\.google\.com\/file\/d\/([^/]+)/);
+    let id = m ? (m[1] || m[2]) : null;
+    if(id) {
+        return 'https://drive.google.com/thumbnail?id=' + id + '&sz=w1000';
+    }
+    return url;
+}
+window.delBlog = function(id) {
+    if(!confirm('এই পোস্টটি মুছে ফেলতে চান?')) return;
+    var fd = new FormData();
+    fd.append('formType', 'deleteBlog');
+    fd.append('email', sessionStorage.getItem('adminEmail'));
+    fd.append('pin', sessionStorage.getItem('adminPin'));
+    fd.append('rowId', id);
+    fetch(S, {method:'POST', body: fd}).then(r=>r.json()).then(res=>{
+        if(res.status==='Success'){ loadBlogs(); } else { alert('Error: ' + res.message); }
+    });
+};
+window.togglePin = function(id, curState) {
+    var newState = curState === 'true' ? 'false' : 'true';
+    if(!confirm(newState === 'true' ? 'এই পোস্টটিকে হোমপেজের টপ ৪-এ রাখতে চান?' : 'হোমপেজ থেকে এই পোস্টটি সরাতে চান?')) return;
+    var fd = new FormData();
+    fd.append('formType', 'togglePinBlog');
+    fd.append('email', sessionStorage.getItem('adminEmail'));
+    fd.append('pin', sessionStorage.getItem('adminPin'));
+    fd.append('rowId', id);
+    fd.append('pinState', newState);
+    fetch(S, {method:'POST', body: fd}).then(r=>r.json()).then(res=>{
+        if(res.status==='Success'){ loadBlogs(); } else { alert('Error: ' + res.message); }
+    });
+};
+
+function loadBlogs() {
+    fetch(S + '?action=getBlogs')
+    .then(r => r.json())
+    .then(d => {
+        var bl = document.getElementById('blog-list');
+        var ta = document.getElementById('top-activities');
+        if(!d.blogs || d.blogs.length === 0) {
+            bl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--tx4);font-size:14px;font-weight:600;">কোনো কার্যক্রম পাওয়া যায়নি।</div>';
+            if(ta) ta.innerHTML = '<div style="text-align:center;color:var(--tx4);font-size:14px;grid-column: 1/-1;">কোনো কার্যক্রম নেই।</div>';
+            return;
+        }
+        var h = '';
+        var hTop = '';
+        var isAdmin = sessionStorage.getItem('isAdmin') === 'true';
+        var pinnedCount = 0;
+        
+        d.blogs.forEach(function(b) {
+            var card = '<div class="bcard animate-on-scroll">';
+            if(isAdmin) {
+                card += '<button class="bdel" style="right:85px;background:'+(b.pinned?'#1b5e20':'#ea4335')+';" onclick="togglePin('+b.id+', \''+b.pinned+'\')">'+(b.pinned?'📌 Pinned':'📌 Pin')+'</button>';
+                card += '<button class="bdel" onclick="delBlog('+b.id+')">ডিলিট 🗑️</button>';
+            }
+            let img = fixImg(b.image);
+            if(img) card += '<img src="'+img+'" class="bimg" onerror="this.style.display=\'none\'">';
+            card += '<div class="bp">';
+            card += '<div class="bmeta"><span>📅 '+b.date+'</span><span>👤 '+b.author+'</span></div>';
+            card += '<div class="bt">'+b.title+'</div>';
+            card += '<div class="bd">'+b.desc+'</div>';
+            if(b.fbLink) card += '<a href="'+b.fbLink+'" target="_blank" class="bfb">ফেসবুকে বিস্তারিত পড়ুন 🔗</a>';
+            card += '</div></div>';
+            
+            h += card;
+            
+            if(b.pinned && pinnedCount < 4) {
+                var topCard = '<div class="bcard animate-on-scroll" style="cursor:pointer;" onclick="go(\'about\')">';
+                if(img) topCard += '<img src="'+img+'" class="bimg" style="max-height:160px" onerror="this.style.display=\'none\'">';
+                topCard += '<div class="bp" style="padding:12px;">';
+                topCard += '<div class="bt" style="font-size:15px; margin-bottom:4px;">'+b.title+'</div>';
+                topCard += '<div class="bd" style="font-size:13px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">'+b.desc+'</div>';
+                topCard += '</div></div>';
+                hTop += topCard;
+                pinnedCount++;
+            }
+        });
+        bl.innerHTML = h;
+        if(ta) ta.innerHTML = hTop || '<div style="text-align:center;color:var(--tx4);font-size:14px;grid-column: 1/-1;">কোনো টপ কার্যক্রম পিন করা নেই।</div>';
+        
+        setTimeout(initAnimations, 100);
+    }).catch(e => {
+        document.getElementById('blog-list').innerHTML = '<div style="text-align:center;padding:20px;color:red;font-size:14px;font-weight:600;">লোড করতে সমস্যা হয়েছে।</div>';
+    });
+}
+setTimeout(loadBlogs, 1000);
+
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if(entry.isIntersecting) {
+            entry.target.classList.add('show');
+            observer.unobserve(entry.target);
+        }
+    });
+}, { threshold: 0.1, rootMargin: "0px 0px -20px 0px" });
+
+function initAnimations() {
+    document.querySelectorAll('.animate-on-scroll:not(.show)').forEach(el => {
+        observer.observe(el);
+    });
+}
+window.addEventListener('DOMContentLoaded', initAnimations);
+
+
+document.getElementById('bl-btn').addEventListener('click', function() {
+    var t = document.getElementById('bl-t').value;
+    var d = document.getElementById('bl-d').value;
+    var i = document.getElementById('bl-i').value;
+    if(!t || !d) { alert('টাইটেল এবং ডেস্ক্রিপশন দিন!'); return; }
+    
+    this.textContent = 'পোস্ট হচ্ছে...';
+    var fd = new FormData();
+    var fb = document.getElementById('bl-fb').value;
+    fd.append('formType', 'addBlog');
+    fd.append('email', sessionStorage.getItem('adminEmail'));
+    fd.append('pin', sessionStorage.getItem('adminPin'));
+    fd.append('title', t);
+    fd.append('desc', d);
+    fd.append('image', i);
+    fd.append('fbLink', fb);
+
+    fetch(S, {method:'POST', body: fd})
+    .then(r => r.json())
+    .then(res => {
+        if(res.status === 'Success') {
+            alert('সফলভাবে পোস্ট হয়েছে!');
+            document.getElementById('bl-t').value = '';
+            document.getElementById('bl-d').value = '';
+            document.getElementById('bl-i').value = '';
+            document.getElementById('bl-fb').value = '';
+            this.textContent = 'পোস্ট করুন 🚀';
+            loadBlogs(); 
+        } else {
+            alert('সমস্যা: ' + res.message);
+            this.textContent = 'পোস্ট করুন 🚀';
+        }
+    }).catch(err => {
+        alert('নেটওয়ার্ক সমস্যা!');
+        this.textContent = 'পোস্ট করুন 🚀';
+    });
+});
+
+let curProfileEmail = "";
+document.getElementById('dp-form1').addEventListener('submit', function(e) {
+  e.preventDefault();
+  let b = document.getElementById('dp-b1');
+  b.textContent = "পাঠানো হচ্ছে...";
+  let email = document.getElementById('dp-email').value;
+  let fd = new FormData();
+  fd.append('formType', 'requestOtp');
+  fd.append('email', email);
+  
+  fetch(S, {method:'POST', body:fd}).then(r=>r.json()).then(d=>{
+    if(d.status === 'Success') {
+      curProfileEmail = email;
+      document.getElementById('dp-step1').style.display = 'none';
+      document.getElementById('dp-step2').style.display = 'block';
+    } else {
+      sE('dp-err1', d.message);
+    }
+    b.textContent = "OTP পাঠান";
+  }).catch(err=>{
+    sE('dp-err1', 'ইন্টারনেট সমস্যা।');
+    b.textContent = "OTP পাঠান";
+  });
+});
+document.getElementById('dp-form2').addEventListener('submit', function(e) {
+  e.preventDefault();
+  let b = document.getElementById('dp-b2');
+  b.textContent = "ভেরিফাই হচ্ছে...";
+  let otp = document.getElementById('dp-otp').value;
+  let fd = new FormData();
+  fd.append('formType', 'verifyOtp');
+  fd.append('email', curProfileEmail);
+  fd.append('otp', otp);
+  
+  fetch(S, {method:'POST', body:fd}).then(r=>r.json()).then(d=>{
+    if(d.status === 'Success') {
+      document.getElementById('dp-step2').style.display = 'none';
+      document.getElementById('dp-step3').style.display = 'block';
+      document.getElementById('dp-name').value = d.donor.name;
+      document.getElementById('dp-phone').value = d.donor.phone;
+      document.getElementById('dp-district').value = d.donor.district;
+      document.getElementById('dp-upazilla').value = d.donor.upazilla;
+      document.getElementById('dp-bg').value = d.donor.bg;
+      if(d.donor.lastDate) {
+        let ld = new Date(d.donor.lastDate);
+        if(!isNaN(ld.getTime())) {
+          document.getElementById('dp-lastdate').value = ld.toISOString().split('T')[0];
+        }
+      }
+    } else {
+      sE('dp-err2', d.message);
+    }
+    b.textContent = "ভেরিফাই করুন";
+  }).catch(err=>{
+    sE('dp-err2', 'ইন্টারনেট সমস্যা।');
+    b.textContent = "ভেরিফাই করুন";
+  });
+});
+document.getElementById('dp-form3').addEventListener('submit', function(e) {
+  e.preventDefault();
+  let b = document.getElementById('dp-b3');
+  b.textContent = "সেভ হচ্ছে...";
+  hE('dp-err3');
+  document.getElementById('dp-ok3').style.display = 'none';
+  
+  let fd = new FormData();
+  fd.append('formType', 'updateProfile');
+  fd.append('email', curProfileEmail);
+  fd.append('name', document.getElementById('dp-name').value);
+  fd.append('phone', document.getElementById('dp-phone').value);
+  fd.append('district', document.getElementById('dp-district').value);
+  fd.append('upazilla', document.getElementById('dp-upazilla').value);
+  fd.append('bg', document.getElementById('dp-bg').value);
+  fd.append('lastDate', document.getElementById('dp-lastdate').value);
+  
+  fetch(S, {method:'POST', body:fd}).then(r=>r.json()).then(d=>{
+    if(d.status === 'Success') {
+      document.getElementById('dp-ok3').style.display = 'block';
+    } else {
+      sE('dp-err3', d.message);
+    }
+    b.textContent = "পরিবর্তন সেভ করুন";
+  }).catch(err=>{
+    sE('dp-err3', 'ইন্টারনেট সমস্যা।');
+    b.textContent = "পরিবর্তন সেভ করুন";
+  });
+});
+</script>
+</body>
+</html>
