@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="description" content="à¦¸à§à¦ªà¦¨à§à¦¦à¦¨ à¦¬à§à¦²à¦¾à¦¡ à¦¸à§‹à¦¸à¦¾à¦‡à¦Ÿà¦¿ â€” à¦à¦¿à¦¨à¦¾à¦‡à¦¦à¦¹ à¦Ÿà§‡à¦•à§à¦¸à¦Ÿà¦¾à¦‡à¦² à¦‡à¦žà§à¦œà¦¿à¦¨à¦¿à¦¯à¦¼à¦¾à¦°à¦¿à¦‚ à¦•à¦²à§‡à¦œà¥¤ à¦°à¦•à§à¦¤à¦¦à¦¾à¦¨ à¦•à¦°à§à¦¨, à¦œà§€à¦¬à¦¨ à¦¬à¦¾à¦à¦šà¦¾à¦¨à¥¤">
+<meta name="description" content="স্পন্দন ব্লাড সোসাইটি ঝিনাইদহ টেক্সটাইল ইঞ্জিনিয়ারিং কলেজের একটি স্বেচ্ছাসেবী রক্তদান সংগঠন।">
 <meta name="theme-color" content="#b71c1c">
-<title>à¦¸à§à¦ªà¦¨à§à¦¦à¦¨ à¦¬à§à¦²à¦¾à¦¡ à¦¸à§‹à¦¸à¦¾à¦‡à¦Ÿà¦¿ | Spondon Blood Society</title>
+<title>স্পন্দন ব্লাড সোসাইটি | Spondon Blood Society</title>
 <!-- NEW: Modern Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -26,7 +26,7 @@ body{font-family:'Anek Bangla','Poppins',sans-serif;background:#f4f7f6;color:var
 a{color:inherit;text-decoration:none}
 button{font-family:inherit;cursor:pointer}
 
-/* â•â•â• TICKER â•â•â• */
+/* TICKER */
 #ticker{position:fixed;top:0;left:0;right:0;height:40px;background:var(--rbg);border-bottom:2px solid var(--rbd);display:flex;align-items:center;z-index:1000;box-shadow: 0 2px 10px rgba(211,47,47,0.1);}
 .t-badge{background:linear-gradient(135deg,var(--r),var(--rd));color:#fff;padding:0 14px;height:100%;display:flex;align-items:center;font-weight:700;font-size:12.5px;border-radius:0 14px 14px 0;white-space:nowrap;gap:5px;letter-spacing:.2px;flex-shrink:0}
 .t-dot{animation:blink 1.2s step-end infinite}
@@ -44,449 +44,180 @@ button{font-family:inherit;cursor:pointer}
 .t-dtag:hover{background:var(--rd)}
 .t-dtag.show{display:block}
 
-/* â•â•â• HEADER â•â•â• */
+/* HEADER */
 #hdr{position:fixed;top:40px;left:0;right:0;height:64px;background:linear-gradient(135deg, rgba(183,28,28,0.95) 0%, rgba(211,47,47,0.95) 100%);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;padding:0 16px;z-index:990;box-shadow:0 4px 20px rgba(183,28,28,.4)}
 .h-logo{display:flex;align-items:center;gap:12px;flex:1}
 .h-ico{width:42px;height:42px;background:rgba(255,255,255,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;border:2px solid rgba(255,255,255,.4);animation:pulse 2s ease-in-out infinite;flex-shrink:0}
-.h-txt{color:#fff}
-.h-txt h1{font-size:16px;font-weight:800;letter-spacing:.3px;line-height:1.2;font-family:'Poppins', sans-serif;}
-.h-txt p{font-size:10px;opacity:.9;letter-spacing:.5px;text-transform:uppercase;font-family:'Poppins', sans-serif;}
-.h-btn{background:#fff;color:var(--r);border:none;padding:8px 16px;border-radius:24px;font-size:13px;font-weight:700;font-family:inherit;letter-spacing:.2px;animation:epulse 2s ease-in-out infinite;transition:var(--ease);box-shadow: 0 4px 10px rgba(0,0,0,0.1)}
-.h-btn:hover{transform:translateY(-2px);box-shadow: 0 6px 15px rgba(255,255,255,0.4)}
+.h-txt{display:flex;flex-direction:column}
+.h-txt h1{color:#fff;font-size:17.5px;font-weight:800;letter-spacing:.3px;line-height:1.1;font-family:'Poppins',sans-serif}
+.h-txt p{color:#ffcdd2;font-size:11px;font-weight:500;letter-spacing:.5px;text-transform:uppercase}
+.h-btn{background:#fff;color:var(--rd);border:none;padding:8px 16px;border-radius:20px;font-size:13.5px;font-weight:700;box-shadow:0 2px 10px rgba(0,0,0,.15);transition:var(--ease)}
+.h-btn:hover{background:var(--rbg);transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.2)}
 
-/* â•â•â• BOTTOM NAV â•â•â• */
-#bnav{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-around;align-items:center;padding:8px 4px env(safe-area-inset-bottom,12px);background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid rgba(0,0,0,0.05);border-radius:24px 24px 0 0;z-index:990;box-shadow:0 -4px 24px rgba(0,0,0,.08)}
-.ni{-webkit-tap-highlight-color:transparent;color:var(--tx4);display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;font-weight:700;width:18%;padding:4px 0;border:none;background:none;font-family:inherit;transition:all var(--ease);letter-spacing:.2px;cursor:pointer}
-.ni svg{width:24px;height:24px;fill:var(--tx4);transition:all var(--ease)}
-.ni:hover{color:var(--tx2);transform:translateY(-2px)}
-.ni.on{color:var(--r);transform:translateY(-4px)}
-.ni.on svg{fill:var(--r);filter:drop-shadow(0 4px 6px rgba(211,47,47,0.3))}
-.nfab{background:linear-gradient(135deg,var(--r),var(--rd));width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:4px solid #fff;margin-top:-35px;box-shadow:0 6px 20px rgba(211,47,47,.5);cursor:pointer;flex-shrink:0;transition:all var(--ease)}
-.nfab:hover{transform:translateY(-5px) scale(1.05);box-shadow:0 10px 25px rgba(211,47,47,.6)}
-.nfab:active{transform:scale(.95)}
-.nfab svg{fill:#fff;width:28px;height:28px;animation: heartbeat 2s infinite;}
-.nfl{font-size:11px;color:var(--r);font-weight:800;text-align:center;margin-top:4px}
+/* NAV */
+#nav{position:fixed;bottom:0;left:0;right:0;height:64px;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:flex;justify-content:space-around;align-items:center;border-top:1px solid rgba(0,0,0,.08);padding-bottom:env(safe-area-inset-bottom);z-index:990;box-shadow:0 -4px 20px rgba(0,0,0,.05)}
+.n-it{display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--tx4);width:25%;height:100%;transition:var(--ease);position:relative;background:transparent;border:none}
+.n-it::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:0;height:3px;background:var(--r);border-radius:0 0 4px 4px;transition:var(--ease)}
+.n-it svg{width:22px;height:22px;margin-bottom:4px;fill:currentColor;transition:var(--ease)}
+.n-it span{font-size:11.5px;font-weight:600;transition:var(--ease)}
+.n-it:hover{color:var(--r);background:var(--rbg)}
+.n-it.on{color:var(--r)}
+.n-it.on::before{width:36px}
+.n-it.on svg{transform:translateY(-2px) scale(1.1)}
 
-/* â•â•â• MAIN â•â•â• */
-#app{padding-top:115px;padding-bottom:0;min-height:100vh}
-.page{display:none;padding:0 16px;animation:fadeInUp .4s cubic-bezier(0.165, 0.84, 0.44, 1)}
+/* MAIN */
+#main{padding:120px 16px 84px;max-width:480px;margin:0 auto;position:relative}
+.page{display:none;animation:fadeUp .4s var(--ease)}
 .page.on{display:block}
 
-/* â•â•â• HERO â•â•â• */
-.hero{background:linear-gradient(135deg,var(--rd) 0%,var(--r) 50%,#e53935 100%);border-radius:24px;padding:32px 24px;color:#fff;text-align:center;margin-bottom:20px;position:relative;overflow:hidden;box-shadow:0 10px 30px rgba(183,28,28,0.4);transition:var(--ease)}
-.hero:hover{transform:translateY(-5px);box-shadow:0 15px 35px rgba(183,28,28,0.5)}
-.hero::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='30' cy='30' r='20' fill='%23ffffff' fill-opacity='.05'/%3E%3C/svg%3E") repeat;pointer-events:none}
-/* NEW: User Images */
-.hero-img{width:100%;max-width:350px;border-radius:16px;margin-bottom:16px;box-shadow:0 8px 24px rgba(0,0,0,0.3);transition:var(--ease);border:3px solid rgba(255,255,255,0.2);display:inline-block;}
-.hero-img:hover{transform:scale(1.03) rotate(-1deg);border-color:rgba(255,255,255,0.5)}
+/* HOME */
+.hero{background:linear-gradient(135deg,var(--r),var(--rd));border-radius:var(--radius);padding:24px 20px;color:#fff;text-align:center;margin-bottom:20px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.hero::after{content:'';position:absolute;top:-50%;right:-50%;width:200%;height:200%;background:radial-gradient(circle,rgba(255,255,255,.1) 0%,transparent 60%);pointer-events:none}
+.hero h2{font-size:22px;font-weight:800;margin-bottom:8px;line-height:1.2;font-family:'Poppins',sans-serif}
+.hero p{font-size:14px;color:#ffcdd2;line-height:1.5;margin-bottom:20px;font-weight:500}
+.hero-stats{display:flex;justify-content:space-between;background:rgba(0,0,0,.15);border-radius:16px;padding:12px;backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,.1)}
+.hs-it{flex:1;display:flex;flex-direction:column;align-items:center}
+.hs-it:not(:last-child){border-right:1px solid rgba(255,255,255,.2)}
+.hs-v{font-size:20px;font-weight:800;font-family:'Poppins',sans-serif;margin-bottom:2px}
+.hs-l{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;opacity:.9}
+.hs-sk{width:40px;height:24px;background:rgba(255,255,255,.2);border-radius:4px;animation:shimmer 1.4s infinite}
+.updt{font-size:11px;color:#ffcdd2;margin-top:10px;font-weight:500}
 
-.hero h2{font-size:26px;font-weight:800;letter-spacing:.5px;margin-bottom:8px;position:relative;font-family:'Poppins', sans-serif;}
-.hero p{font-size:14.5px;opacity:.9;line-height:1.6;margin-bottom:24px;position:relative;font-weight:500;}
-.hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;position:relative}
-.hb{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:30px;font-size:14.5px;font-weight:700;border:none;font-family:inherit;-webkit-tap-highlight-color:transparent;transition:all var(--ease);letter-spacing:.2px;cursor:pointer}
-.hb:hover{transform:translateY(-4px);box-shadow:0 8px 20px rgba(0,0,0,0.25)}
-.hb:active{transform:scale(.96)}
-.hb1{background:#fff;color:var(--r);}
-.hb2{background:rgba(255,255,255,.2);color:#fff;border:1.5px solid rgba(255,255,255,.5);backdrop-filter:blur(5px);}
+/* SEC */
+.ssec{background:#fff;border-radius:var(--radius);padding:20px;margin-bottom:20px;box-shadow:var(--shadow);border:1px solid rgba(0,0,0,.04)}
+.shd{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid var(--g2)}
+.shd h3{font-size:17px;font-weight:800;color:var(--tx);display:flex;align-items:center;gap:8px}
+.shd h3 svg{width:20px;height:20px;fill:var(--r)}
+.shd span{font-size:12px;font-weight:600;color:var(--tx3);background:var(--g2);padding:4px 10px;border-radius:20px}
+.bg-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.bgc{background:var(--rbg);border:1.5px solid var(--rbd);border-radius:14px;padding:12px 6px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:var(--ease)}
+.bgc:hover{background:var(--r);border-color:var(--r);color:#fff;transform:translateY(-3px);box-shadow:0 4px 12px rgba(211,47,47,.2)}
+.bgc:hover span{color:#fff;background:rgba(255,255,255,.2)}
+.bgc b{font-family:'Poppins',sans-serif;font-size:18px;font-weight:800;margin-bottom:4px;color:var(--r);transition:var(--ease)}
+.bgc:hover b{color:#fff}
+.bgc span{font-size:12px;font-weight:700;color:var(--rd);background:#fff;padding:2px 8px;border-radius:10px;transition:var(--ease)}
 
-/* â•â•â• QUICK ACTIONS â•â•â• */
-.qg{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}
-.qa{background:#fff;border-radius:20px;padding:20px 16px;border:1px solid rgba(0,0,0,0.04);text-align:center;box-shadow:var(--shadow);-webkit-tap-highlight-color:transparent;width:100%;font-family:inherit;transition:all var(--ease);position:relative;overflow:hidden;z-index:1}
-.qa::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(211,47,47,0.05),transparent);z-index:-1;opacity:0;transition:var(--ease)}
-.qa:hover{transform:translateY(-6px);box-shadow:var(--shadow-hover);border-color:var(--rbd)}
-.qa:hover::after{opacity:1}
-.qa:active{transform:scale(.95)}
-.qa-i{font-size:38px;display:block;margin-bottom:12px;transition:var(--ease)}
-.qa:hover .qa-i{transform:scale(1.15) rotate(5deg)}
-.qa-t{font-size:14.5px;font-weight:800;color:var(--tx);margin-bottom:6px}
-.qa-d{font-size:12px;color:var(--tx3);line-height:1.5;font-weight:500}
-.qa.pri{background:linear-gradient(135deg,var(--r),var(--rd));border:none}
-.qa.pri .qa-t,.qa.pri .qa-d{color:#fff}
-.qa.pri:hover{box-shadow:0 12px 28px rgba(183,28,28,0.4)}
+/* NOTICES */
+.no-nd{text-align:center;padding:24px 0}
+.no-nd svg{width:48px;height:48px;fill:var(--tx4);margin-bottom:12px}
+.no-nd p{color:var(--tx3);font-size:14px;font-weight:500;line-height:1.5}
+.nc{background:var(--rbg);border-left:4px solid var(--r);border-radius:12px;padding:16px;margin-bottom:12px;display:flex;align-items:flex-start;gap:12px}
+.nc-ic{width:36px;height:36px;background:rgba(211,47,47,.1);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.nc-ic svg{width:20px;height:20px;fill:var(--r)}
+.nc-tx{flex:1;font-size:14px;font-weight:500;line-height:1.5;color:var(--tx2)}
+.nc-tx b{color:var(--rd)}
 
-/* â•â•â• STATS â•â•â• */
-.sc{background:#fff;border-radius:24px;padding:22px;border:1px solid rgba(0,0,0,0.04);border-top:5px solid var(--r);margin-bottom:20px;box-shadow:var(--shadow);transition:var(--ease)}
-.sc:hover{box-shadow:var(--shadow-hover)}
-.sc-t{text-align:center;color:var(--rd);font-weight:800;font-size:18px;margin-bottom:18px;padding-bottom:12px;border-bottom:2px dashed var(--rbd)}
-.sg{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
-.sb{background:var(--g1);border:1px solid #e8eaed;padding:16px 12px;border-radius:16px;text-align:center;transition:var(--ease)}
-.sb:hover{background:#fff;box-shadow:0 6px 16px rgba(0,0,0,0.06);transform:translateY(-3px)}
-.sb.r{background:var(--rbg);border-color:var(--rbd)}
-.sb.r:hover{background:#fff;box-shadow:0 6px 16px rgba(211,47,47,0.1)}
-.sl{font-size:12px;color:var(--tx3);font-weight:700;display:block;margin-bottom:6px}
-.sn{font-size:30px;color:var(--r);font-weight:800;display:block;line-height:1;font-family:'Poppins', sans-serif;}
-.bg4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;background:var(--g1);padding:10px;border-radius:16px;border:1px solid rgba(0,0,0,0.04)}
-.bgc{font-size:13px;text-align:center;color:var(--tx2);font-weight:700;background:#fff;padding:10px 4px;border-radius:12px;border:1px solid rgba(0,0,0,0.05);transition:var(--ease);font-family:'Poppins', sans-serif;}
-.bgc:hover{transform:translateY(-3px);box-shadow:0 4px 12px rgba(211,47,47,0.15);border-color:var(--rbd)}
-.bgc span{color:var(--r);display:block;font-size:18px;font-weight:800;margin-top:4px}
-.skr{border-radius:8px;background:linear-gradient(90deg,#eee 25%,#f5f5f5 50%,#eee 75%);background-size:200%;animation:shimmer 1.3s infinite}
-.skh{height:30px;margin:6px auto;width:55%}
-.skl{height:13px;width:75%;margin:0 auto 8px}
-.skb{height:20px;width:65%;margin:6px auto}
-.su{text-align:center;font-size:12px;color:var(--tx4);margin-top:14px;font-weight:500;}
+/* FORMS */
+.fm .ig{margin-bottom:20px}
+.fm label{display:block;font-size:13.5px;font-weight:700;color:var(--tx2);margin-bottom:8px}
+.fm input,.fm select,.fm textarea{width:100%;background:var(--g1);border:1.5px solid var(--gb);border-radius:12px;padding:14px;font-size:15px;font-family:inherit;color:var(--tx);transition:var(--ease)}
+.fm input:focus,.fm select:focus,.fm textarea:focus{background:#fff;border-color:var(--r);outline:none;box-shadow:0 0 0 4px rgba(211,47,47,.1)}
+.fm input::placeholder,.fm textarea::placeholder{color:var(--tx4)}
+.fm textarea{resize:vertical;min-height:100px}
+.cb-wrap{display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:20px}
+.cb-wrap input[type="checkbox"]{width:18px;height:18px;accent-color:var(--r);cursor:pointer}
+.cb-wrap span{font-size:13px;font-weight:600;color:var(--tx2)}
+.fm-btn{width:100%;background:var(--r);color:#fff;border:none;padding:16px;border-radius:14px;font-size:16px;font-weight:700;display:flex;justify-content:center;align-items:center;gap:10px;transition:var(--ease)}
+.fm-btn:hover{background:var(--rd);box-shadow:var(--shadow-hover);transform:translateY(-2px)}
+.fm-btn:disabled{background:var(--gb);color:var(--tx4);box-shadow:none;transform:none;cursor:not-allowed}
+.fm-err,.fm-suc{padding:14px;border-radius:12px;font-size:13.5px;font-weight:600;margin-bottom:20px;display:none;align-items:center;gap:8px}
+.fm-err{background:var(--rbg);color:var(--rd);border:1px solid var(--rbd)}
+.fm-suc{background:var(--gnbg);color:var(--gnd);border:1px solid var(--gnbd)}
+.spinner{display:none;width:20px;height:20px;border:3px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite}
+.sp-red{border-color:rgba(211,47,47,.2);border-top-color:var(--r)}
 
-/* â•â•â• INFO SECTION â•â•â• */
-.isec{background:transparent;border:none;box-shadow:none;margin-bottom:24px;overflow:visible;}
-.isec-h{text-align:center;font-size:20px;font-weight:800;color:var(--rd);margin-bottom:16px;background:none;border:none;font-family:'Poppins',sans-serif;}
-.ii-g{display:grid;grid-template-columns:1fr;gap:16px;}
-@media(min-width:480px){.ii-g{grid-template-columns:1fr 1fr;}}
-.ii{background:#fff;border-radius:20px;padding:20px 16px;border:1px solid rgba(0,0,0,0.05);box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;text-align:center;transition:all var(--ease);position:relative;overflow:hidden;}
-.ii::before{content:'';position:absolute;top:0;left:0;width:100%;height:5px;background:linear-gradient(90deg,var(--r),var(--rd));}
-.ii:hover{transform:translateY(-5px);box-shadow:var(--shadow-hover);}
-.ii-i{font-size:38px;margin-bottom:14px;transition:var(--ease)}
-.ii:hover .ii-i{transform:scale(1.15) rotate(5deg)}
-.ii h5{font-size:16px;font-weight:800;color:var(--tx);margin-bottom:8px;font-family:'Poppins',sans-serif;}
-.ii p{font-size:13.5px;color:var(--tx3);line-height:1.6;font-weight:600;}
+/* DONOR LIST */
+#d-res{margin-top:20px}
+.no-res{text-align:center;padding:30px 20px;background:var(--g1);border-radius:16px;border:1.5px dashed var(--gb);color:var(--tx3);font-size:14px;font-weight:500;line-height:1.5}
+.no-res b{color:var(--tx2);display:block;margin-bottom:8px;font-size:16px}
+.dc{background:#fff;border:1px solid var(--gb);border-radius:16px;padding:16px;margin-bottom:12px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.dn2{font-size:16px;font-weight:700;color:var(--tx);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dp2{font-size:13px;color:var(--tx3);font-weight:500;margin-bottom:6px}
+.dbg{display:inline-block;background:var(--rbg);color:var(--rd);padding:2px 8px;border-radius:8px;font-size:11px;font-weight:800;font-family:'Poppins',sans-serif;border:1px solid var(--rbd)}
+.duz{display:inline-block;background:var(--g2);color:var(--tx2);padding:2px 8px;border-radius:8px;font-size:11px;font-weight:600;margin-left:6px}
+.cbt{background:var(--gnbg);color:var(--gnd);border:1px solid var(--gnbd);padding:8px 16px;border-radius:10px;font-size:13px;font-weight:700;transition:var(--ease);white-space:nowrap;display:flex;align-items:center;gap:6px}
+.cbt:hover{background:var(--gn);color:#fff;border-color:var(--gn)}
 
-/* â•â•â• FORMS â•â•â• */
-.fc{background:#fff;border-radius:24px;border:1px solid rgba(0,0,0,0.05);border-top:5px solid var(--r);box-shadow:var(--shadow);overflow:hidden;margin-bottom:20px}
-.fc.gt{border-top-color:var(--gn)}
-.fh{text-align:center;padding:28px 24px 20px;background:linear-gradient(180deg,var(--rbg) 0%,#fff 100%);border-bottom:1px solid rgba(0,0,0,0.03)}
-.fh.gh{background:linear-gradient(180deg,var(--gnbg) 0%,#fff 100%)}
-<!DOCTYPE html>
-<html lang="bn">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="description" content="à¦¸à§à¦ªà¦¨à§à¦¦à¦¨ à¦¬à§à¦²à¦¾à¦¡ à¦¸à§‹à¦¸à¦¾à¦‡à¦Ÿà¦¿ â€” à¦à¦¿à¦¨à¦¾à¦‡à¦¦à¦¹ à¦Ÿà§‡à¦•à§à¦¸à¦Ÿà¦¾à¦‡à¦² à¦‡à¦žà§à¦œà¦¿à¦¨à¦¿à¦¯à¦¼à¦¾à¦°à¦¿à¦‚ à¦•à¦²à§‡à¦œà¥¤ à¦°à¦•à§à¦¤à¦¦à¦¾à¦¨ à¦•à¦°à§à¦¨, à¦œà§€à¦¬à¦¨ à¦¬à¦¾à¦à¦šà¦¾à¦¨à¥¤">
-<meta name="theme-color" content="#b71c1c">
-<title>à¦¸à§à¦ªà¦¨à§à¦¦à¦¨ à¦¬à§à¦²à¦¾à¦¡ à¦¸à§‹à¦¸à¦¾à¦‡à¦Ÿà¦¿ | Spondon Blood Society</title>
-<!-- NEW: Modern Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<style>
-:root{
-  --r:#d32f2f;--rd:#b71c1c;--rl:#ef5350;--rbg:#fff5f5;--rbd:#ffcdd2;
-  --gn:#2e7d32;--gnd:#1b5e20;--gnl:#43a047;--gnbg:#f1f8e9;--gnbd:#c8e6c9;
-  --bl:#1877f2;--li:#0a66c2;--gm:#ea4335;
-  --g1:#f8f9fa;--g2:#f1f3f4;--gb:#dadce0;
-  --tx:#202124;--tx2:#3c4043;--tx3:#5f6368;--tx4:#9aa0a6;
-  --shadow:0 8px 24px rgba(0,0,0,.08);
-  --shadow-hover:0 14px 28px rgba(211,47,47,.2);
-  --radius:20px;
-  --ease:0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
-body{font-family:'Anek Bangla','Poppins',sans-serif;background:#f4f7f6;color:var(--tx);min-height:100vh;overflow-x:hidden}
-a{color:inherit;text-decoration:none}
-button{font-family:inherit;cursor:pointer}
-/* â•â•â• TICKER â•â•â• */
-#ticker{position:fixed;top:0;left:0;right:0;height:40px;background:var(--rbg);border-bottom:2px solid var(--rbd);display:flex;align-items:center;z-index:1000;box-shadow: 0 2px 10px rgba(211,47,47,0.1);}
-.t-badge{background:linear-gradient(135deg,var(--r),var(--rd));color:#fff;padding:0 14px;height:100%;display:flex;align-items:center;font-weight:700;font-size:12.5px;border-radius:0 14px 14px 0;white-space:nowrap;gap:5px;letter-spacing:.2px;flex-shrink:0}
-.t-dot{animation:blink 1.2s step-end infinite}
-.t-track{flex:1;overflow:hidden;height:100%;display:flex;align-items:center;position:relative}
-.t-sk{width:55%;height:10px;border-radius:6px;margin-left:14px;background:linear-gradient(90deg,#ffcdd2 25%,#ffebee 50%,#ffcdd2 75%);background-size:200%;animation:shimmer 1.4s infinite}
-.t-msg{display:none;padding-left:100%;font-weight:700;font-size:14px;white-space:nowrap;will-change:transform;animation:scroll linear infinite;color:var(--rd);letter-spacing:.1px}
-.t-msg.on{display:inline-block}
-.t-msg:hover{animation-play-state:paused}
-.t-man{display:none;position:absolute;inset:0;background:var(--rbg);align-items:center;padding:0 10px;gap:6px;z-index:4}
-.t-man.show{display:flex}
-.t-man .lbl{font-size:11px;color:var(--rd);font-weight:700;white-space:nowrap;flex-shrink:0}
-.t-man select{flex:1;border:1.5px solid var(--r);border-radius:7px;padding:4px 7px;font-size:12px;font-family:inherit;background:#fff;-webkit-appearance:none;color:var(--tx);min-width:0}
-.t-man button{background:linear-gradient(135deg,var(--r),var(--rd));color:#fff;border:none;padding:5px 11px;border-radius:7px;font-size:12px;font-weight:700;white-space:nowrap;flex-shrink:0}
-.t-dtag{display:none;position:absolute;right:6px;top:50%;transform:translateY(-50%);background:rgba(211,47,47,.85);color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:12px;cursor:pointer;white-space:nowrap;z-index:3;transition:var(--ease)}
-.t-dtag:hover{background:var(--rd)}
-.t-dtag.show{display:block}
-/* â•â•â• HEADER â•â•â• */
-#hdr{position:fixed;top:40px;left:0;right:0;height:64px;background:linear-gradient(135deg, rgba(183,28,28,0.95) 0%, rgba(211,47,47,0.95) 100%);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;padding:0 16px;z-index:990;box-shadow:0 4px 20px rgba(183,28,28,.4)}
-.h-logo{display:flex;align-items:center;gap:12px;flex:1}
-.h-ico{width:42px;height:42px;background:rgba(255,255,255,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;border:2px solid rgba(255,255,255,.4);animation:pulse 2s ease-in-out infinite;flex-shrink:0}
-.h-txt{color:#fff}
-.h-txt h1{font-size:16px;font-weight:800;letter-spacing:.3px;line-height:1.2;font-family:'Poppins', sans-serif;}
-.h-txt p{font-size:10px;opacity:.9;letter-spacing:.5px;text-transform:uppercase;font-family:'Poppins', sans-serif;}
-.h-btn{background:#fff;color:var(--r);border:none;padding:8px 16px;border-radius:24px;font-size:13px;font-weight:700;font-family:inherit;letter-spacing:.2px;animation:epulse 2s ease-in-out infinite;transition:var(--ease);box-shadow: 0 4px 10px rgba(0,0,0,0.1)}
-.h-btn:hover{transform:translateY(-2px);box-shadow: 0 6px 15px rgba(255,255,255,0.4)}
-/* â•â•â• BOTTOM NAV â•â•â• */
-#bnav{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-around;align-items:center;padding:8px 4px env(safe-area-inset-bottom,12px);background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid rgba(0,0,0,0.05);border-radius:24px 24px 0 0;z-index:990;box-shadow:0 -4px 24px rgba(0,0,0,.08)}
-.ni{-webkit-tap-highlight-color:transparent;color:var(--tx4);display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;font-weight:700;width:18%;padding:4px 0;border:none;background:none;font-family:inherit;transition:all var(--ease);letter-spacing:.2px;cursor:pointer}
-.ni svg{width:24px;height:24px;fill:var(--tx4);transition:all var(--ease)}
-.ni:hover{color:var(--tx2);transform:translateY(-2px)}
-.ni.on{color:var(--r);transform:translateY(-4px)}
-.ni.on svg{fill:var(--r);filter:drop-shadow(0 4px 6px rgba(211,47,47,0.3))}
-.nfab{background:linear-gradient(135deg,var(--r),var(--rd));width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:4px solid #fff;margin-top:-35px;box-shadow:0 6px 20px rgba(211,47,47,.5);cursor:pointer;flex-shrink:0;transition:all var(--ease)}
-.nfab:hover{transform:translateY(-5px) scale(1.05);box-shadow:0 10px 25px rgba(211,47,47,.6)}
-.nfab:active{transform:scale(.95)}
-.nfab svg{fill:#fff;width:28px;height:28px;animation: heartbeat 2s infinite;}
-.nfl{font-size:11px;color:var(--r);font-weight:800;text-align:center;margin-top:4px}
-/* â•â•â• MAIN â•â•â• */
-#app{padding-top:115px;padding-bottom:0;min-height:100vh}
-.page{display:none;padding:0 16px;animation:fadeInUp .4s cubic-bezier(0.165, 0.84, 0.44, 1)}
-.page.on{display:block}
-/* â•â•â• HERO â•â•â• */
-.hero{background:linear-gradient(135deg,var(--rd) 0%,var(--r) 50%,#e53935 100%);border-radius:24px;padding:32px 24px;color:#fff;text-align:center;margin-bottom:20px;position:relative;overflow:hidden;box-shadow:0 10px 30px rgba(183,28,28,0.4);transition:var(--ease)}
-.hero:hover{transform:translateY(-5px);box-shadow:0 15px 35px rgba(183,28,28,0.5)}
-.hero::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='30' cy='30' r='20' fill='%23ffffff' fill-opacity='.05'/%3E%3C/svg%3E") repeat;pointer-events:none}
-/* NEW: User Images */
-.hero-img{width:100%;max-width:350px;border-radius:16px;margin-bottom:16px;box-shadow:0 8px 24px rgba(0,0,0,0.3);transition:var(--ease);border:3px solid rgba(255,255,255,0.2);display:inline-block;}
-.hero-img:hover{transform:scale(1.03) rotate(-1deg);border-color:rgba(255,255,255,0.5)}
-.hero h2{font-size:26px;font-weight:800;letter-spacing:.5px;margin-bottom:8px;position:relative;font-family:'Poppins', sans-serif;}
-.hero p{font-size:14.5px;opacity:.9;line-height:1.6;margin-bottom:24px;position:relative;font-weight:500;}
-.hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;position:relative}
-.hb{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:30px;font-size:14.5px;font-weight:700;border:none;font-family:inherit;-webkit-tap-highlight-color:transparent;transition:all var(--ease);letter-spacing:.2px;cursor:pointer}
-.hb:hover{transform:translateY(-4px);box-shadow:0 8px 20px rgba(0,0,0,0.25)}
-.hb:active{transform:scale(.96)}
-.hb1{background:#fff;color:var(--r);}
-.hb2{background:rgba(255,255,255,.2);color:#fff;border:1.5px solid rgba(255,255,255,.5);backdrop-filter:blur(5px);}
-/* â•â•â• QUICK ACTIONS â•â•â• */
-.qg{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}
-.qa{background:#fff;border-radius:20px;padding:20px 16px;border:1px solid rgba(0,0,0,0.04);text-align:center;box-shadow:var(--shadow);-webkit-tap-highlight-color:transparent;width:100%;font-family:inherit;transition:all var(--ease);position:relative;overflow:hidden;z-index:1}
-.qa::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(211,47,47,0.05),transparent);z-index:-1;opacity:0;transition:var(--ease)}
-.qa:hover{transform:translateY(-6px);box-shadow:var(--shadow-hover);border-color:var(--rbd)}
-.qa:hover::after{opacity:1}
-.qa:active{transform:scale(.95)}
-.qa-i{font-size:38px;display:block;margin-bottom:12px;transition:var(--ease)}
-.qa:hover .qa-i{transform:scale(1.15) rotate(5deg)}
-.qa-t{font-size:14.5px;font-weight:800;color:var(--tx);margin-bottom:6px}
-.qa-d{font-size:12px;color:var(--tx3);line-height:1.5;font-weight:500}
-.qa.pri{background:linear-gradient(135deg,var(--r),var(--rd));border:none}
-.qa.pri .qa-t,.qa.pri .qa-d{color:#fff}
-.qa.pri:hover{box-shadow:0 12px 28px rgba(183,28,28,0.4)}
-/* â•â•â• STATS â•â•â• */
-.sc{background:#fff;border-radius:24px;padding:22px;border:1px solid rgba(0,0,0,0.04);border-top:5px solid var(--r);margin-bottom:20px;box-shadow:var(--shadow);transition:var(--ease)}
-.sc:hover{box-shadow:var(--shadow-hover)}
-.sc-t{text-align:center;color:var(--rd);font-weight:800;font-size:18px;margin-bottom:18px;padding-bottom:12px;border-bottom:2px dashed var(--rbd)}
-.sg{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
-.sb{background:var(--g1);border:1px solid #e8eaed;padding:16px 12px;border-radius:16px;text-align:center;transition:var(--ease)}
-.sb:hover{background:#fff;box-shadow:0 6px 16px rgba(0,0,0,0.06);transform:translateY(-3px)}
-.sb.r{background:var(--rbg);border-color:var(--rbd)}
-.sb.r:hover{background:#fff;box-shadow:0 6px 16px rgba(211,47,47,0.1)}
-.sl{font-size:12px;color:var(--tx3);font-weight:700;display:block;margin-bottom:6px}
-.sn{font-size:30px;color:var(--r);font-weight:800;display:block;line-height:1;font-family:'Poppins', sans-serif;}
-.bg4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;background:var(--g1);padding:10px;border-radius:16px;border:1px solid rgba(0,0,0,0.04)}
-.bgc{font-size:13px;text-align:center;color:var(--tx2);font-weight:700;background:#fff;padding:10px 4px;border-radius:12px;border:1px solid rgba(0,0,0,0.05);transition:var(--ease);font-family:'Poppins', sans-serif;}
-.bgc:hover{transform:translateY(-3px);box-shadow:0 4px 12px rgba(211,47,47,0.15);border-color:var(--rbd)}
-.bgc span{color:var(--r);display:block;font-size:18px;font-weight:800;margin-top:4px}
-.skr{border-radius:8px;background:linear-gradient(90deg,#eee 25%,#f5f5f5 50%,#eee 75%);background-size:200%;animation:shimmer 1.3s infinite}
-.skh{height:30px;margin:6px auto;width:55%}
-.skl{height:13px;width:75%;margin:0 auto 8px}
-.skb{height:20px;width:65%;margin:6px auto}
-.su{text-align:center;font-size:12px;color:var(--tx4);margin-top:14px;font-weight:500;}
-/* â•â•â• INFO SECTION â•â•â• */
-.isec{background:transparent;border:none;box-shadow:none;margin-bottom:24px;overflow:visible;}
-.isec-h{text-align:center;font-size:20px;font-weight:800;color:var(--rd);margin-bottom:16px;background:none;border:none;font-family:'Poppins',sans-serif;}
-.ii-g{display:grid;grid-template-columns:1fr;gap:16px;}
-@media(min-width:480px){.ii-g{grid-template-columns:1fr 1fr;}}
-.ii{background:#fff;border-radius:20px;padding:20px 16px;border:1px solid rgba(0,0,0,0.05);box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;text-align:center;transition:all var(--ease);position:relative;overflow:hidden;}
-.ii::before{content:'';position:absolute;top:0;left:0;width:100%;height:5px;background:linear-gradient(90deg,var(--r),var(--rd));}
-.ii:hover{transform:translateY(-5px);box-shadow:var(--shadow-hover);}
-.ii-i{font-size:38px;margin-bottom:14px;transition:var(--ease)}
-.ii:hover .ii-i{transform:scale(1.15) rotate(5deg)}
-.ii h5{font-size:16px;font-weight:800;color:var(--tx);margin-bottom:8px;font-family:'Poppins',sans-serif;}
-.ii p{font-size:13.5px;color:var(--tx3);line-height:1.6;font-weight:600;}
-/* â•â•â• FORMS â•â•â• */
-.fc{background:#fff;border-radius:24px;border:1px solid rgba(0,0,0,0.05);border-top:5px solid var(--r);box-shadow:var(--shadow);overflow:hidden;margin-bottom:20px}
-.fc.gt{border-top-color:var(--gn)}
-.fh{text-align:center;padding:28px 24px 20px;background:linear-gradient(180deg,var(--rbg) 0%,#fff 100%);border-bottom:1px solid rgba(0,0,0,0.03)}
-.fh.gh{background:linear-gradient(180deg,var(--gnbg) 0%,#fff 100%)}
-.fi{font-size:46px;display:block;animation:pulse 2s ease-in-out infinite;margin-bottom:10px}
-.ft{font-size:22px;font-weight:800;color:var(--r);letter-spacing:.3px;margin-bottom:6px;font-family:'Poppins', sans-serif;}
-.ft.gn{color:var(--gn)}
-.fs{font-size:13px;color:var(--tx3);font-weight:500}
-.fb{padding:22px 22px 10px}
-.ff{padding:0 22px 22px}
-.fd{background:var(--rbg);border-left:4px solid var(--rbd);color:var(--rd);padding:14px 16px;border-radius:12px;font-size:14px;margin-bottom:20px;font-weight:700;line-height:1.6;text-align:center;box-shadow:0 4px 12px rgba(211,47,47,0.05)}
-.fd.gn{background:var(--gnbg);border-left-color:var(--gnbd);color:var(--gn)}
-.ig{margin-bottom:16px}
-.ig label{display:block;margin-bottom:6px;font-weight:700;color:var(--tx2);font-size:14px}
-.ig input,.ig select,.ig textarea{width:100%;padding:12px 16px;border:2px solid var(--gb);border-radius:12px;font-size:16px;font-family:'Anek Bangla','Poppins',sans-serif;background:var(--g1);color:var(--tx);-webkit-appearance:none;appearance:none;transition:all var(--ease)}
-.ig input:hover,.ig select:hover,.ig textarea:hover{border-color:#b0b5ba}
-.ig input:focus,.ig select:focus,.ig textarea:focus{border-color:var(--r);outline:none;background:#fff;box-shadow:0 0 0 4px rgba(211,47,47,.1)}
-.ig select:disabled{opacity:.5;cursor:not-allowed}
-.ig textarea{resize:vertical;min-height:90px}
-.ig .hint{font-size:12px;color:var(--tx4);margin-top:6px;font-weight:500}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-@media(max-width:420px){.g2{grid-template-columns:1fr}}
-.sbtn{width:100%;background:linear-gradient(135deg,var(--r),var(--rd));color:#fff;border:none;padding:16px;font-size:16px;font-weight:800;border-radius:14px;display:flex;justify-content:center;align-items:center;gap:10px;-webkit-tap-highlight-color:transparent;letter-spacing:.3px;font-family:inherit;transition:all var(--ease);box-shadow:0 6px 20px rgba(211,47,47,.4);margin-top:8px;cursor:pointer;}
-.sbtn.gn{background:linear-gradient(135deg,var(--gnl),var(--gn));box-shadow:0 6px 20px rgba(67,160,71,.4)}
-.sbtn:hover{transform:translateY(-3px);box-shadow:0 10px 25px rgba(211,47,47,.5)}
-.sbtn.gn:hover{box-shadow:0 10px 25px rgba(67,160,71,.5)}
-.sbtn:active{transform:scale(.96);opacity:.92}
-.sbtn:disabled{opacity:.65;cursor:not-allowed;transform:none}
-.spin{display:none;width:20px;height:20px;border:3px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
-.err{display:none;color:#c62828;background:#ffebee;padding:12px 16px;border-radius:10px;margin-top:12px;font-size:14px;font-weight:700;text-align:center;border:1px solid var(--rbd);animation: shake 0.5s}
-/* â•â•â• SUCCESS â•â•â• */
-.ok-w{display:none;padding:30px 22px}
-.ok-ic{width:86px;height:86px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;animation:popIn .6s cubic-bezier(.175,.885,.32,1.275) both;box-shadow: 0 10px 30px rgba(67,160,71,0.3)}
-.ok-ic svg{width:46px;height:46px;fill:#fff}
-.ok-t{font-size:22px;font-weight:800;text-align:center;letter-spacing:.2px;margin-bottom:8px}
-.ok-s{font-size:14px;color:var(--tx3);text-align:center;line-height:1.6;margin-bottom:20px;font-weight:500}
-.ok-i{border-radius:16px;padding:18px;box-shadow: 0 4px 15px rgba(0,0,0,0.05)}
-.ok-r{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid rgba(0,0,0,.06);font-size:14px;font-weight:600;line-height:1.6;color:var(--tx2)}
-.ok-r:last-child{border-bottom:none}
-.ok-r span:first-child{flex-shrink:0;font-size:18px}
-.wa-btn {
-    display: flex; align-items: center; justify-content: center; gap: 10px;
-    background: #25D366; color: white; padding: 16px; border-radius: 14px;
-    font-weight: 800; font-size: 15px; margin-top: 20px; box-shadow: 0 6px 20px rgba(37,211,102,0.4);
-    transition: var(--ease); cursor: pointer; border: none; font-family: inherit; width: 100%;
-}
-.wa-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(37,211,102,0.5); }
-.wa-btn:active { transform: scale(0.96); }
-/* â•â•â• SOCIAL â•â•â• */
-.soc{display:flex;justify-content:center;gap:10px;margin-top:20px;flex-wrap:wrap}
-.sb2{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:24px;font-size:13px;font-weight:700;color:#fff;-webkit-tap-highlight-color:transparent;transition:all var(--ease);letter-spacing:.2px;font-family:'Poppins', sans-serif;}
-.sb2:hover{transform:translateY(-3px);box-shadow:0 6px 15px rgba(0,0,0,0.2)}
-.sb2:active{opacity:.85;transform:scale(0.95)}
-.sb2 svg{width:16px;height:16px;fill:#fff;flex-shrink:0}
-.sfb{background:#1877f2}.sli{background:#0a66c2}.sgm{background:#ea4335}
-/* â•â•â• DONOR CARDS â•â•â• */
-.rs{padding:18px 20px}
-.ri{background:var(--g1);border:1px solid #e8eaed;border-radius:14px;padding:16px 18px;font-size:14.5px;color:var(--tx2);font-weight:700;line-height:1.7;margin-bottom:16px;box-shadow: inset 0 2px 4px rgba(0,0,0,0.02)}
-.dc{background:#fff;border:1px solid rgba(0,0,0,0.05);border-radius:16px;padding:16px 18px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 4px 12px rgba(60,64,67,.06);transition:var(--ease)}
-.dc:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(60,64,67,.1);border-color:var(--rbd)}
-.dn2{font-weight:800;color:var(--tx);font-size:15.5px;margin-bottom:4px;font-family:'Poppins',sans-serif;}
-.dp2{font-size:14px;color:var(--tx3);margin-bottom:8px;font-weight:600;}
-.dbg{background:linear-gradient(135deg,var(--r),var(--rd));color:#fff;padding:4px 12px;border-radius:14px;font-size:13px;font-weight:800;display:inline-block;font-family:'Poppins',sans-serif;}
-.duz{display:inline-flex;align-items:center;gap:4px;background:#e8f0fe;color:#1a73e8;padding:4px 12px;border-radius:14px;font-size:13px;font-weight:700;margin-left:6px}
-.cbt{background:linear-gradient(135deg,var(--r),var(--rd));color:#fff;padding:12px 20px;border-radius:28px;font-weight:800;font-size:14px;white-space:nowrap;flex-shrink:0;transition:var(--ease);box-shadow:0 4px 12px rgba(211,47,47,.3)}
-.cbt:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(211,47,47,.4)}
-.nd{background:var(--rbg);border:2px dashed var(--rbd);border-radius:16px;padding:26px;text-align:center;color:#c62828}
-.cs{background:linear-gradient(135deg,var(--gnbg),#e8f5e9);border:1px solid var(--gnbd);border-radius:16px;padding:20px;text-align:center;margin-top:16px;display:none;box-shadow:0 4px 15px rgba(67,160,71,0.1)}
-.cs p{font-size:14px;color:var(--gn);font-weight:700;margin-bottom:14px;line-height:1.6}
-.csb{display:inline-block;background:linear-gradient(135deg,var(--gnl),var(--gn));color:#fff;padding:14px 28px;border-radius:30px;font-weight:800;font-size:15px;box-shadow:0 6px 16px rgba(67,160,71,.35);border:none;font-family:inherit;cursor:pointer;transition:var(--ease)}
-.csb:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(67,160,71,.45)}
-.mdi{background:linear-gradient(135deg,var(--gnbg),#e8f5e9);border:1px solid var(--gnbd);border-radius:16px;padding:20px;margin-bottom:16px;box-shadow:0 4px 15px rgba(67,160,71,0.1)}
-.mdn{font-size:18px;font-weight:800;color:var(--gnd);margin-bottom:8px;font-family:'Poppins',sans-serif;}
-.mdm{font-size:14px;color:#33691e;font-weight:600;line-height:1.7}
-.stc{background:#fff;border:1px solid rgba(0,0,0,0.05);border-radius:14px;padding:16px;box-shadow:0 4px 10px rgba(0,0,0,0.02)}
-.str{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--g2);font-size:14px;font-weight:600;color:var(--tx2);line-height:1.55}
-.str:last-child{border-bottom:none}
-.adb{width:100%;background:#fff;color:var(--gn);border:2px solid var(--gnbd);padding:14px;border-radius:14px;font-weight:800;font-size:15px;margin-top:14px;font-family:inherit;transition:all var(--ease);cursor:pointer;}
-.adb:hover{background:var(--gnbg);border-color:var(--gn);transform:translateY(-2px)}
-/* â•â•â• GUIDELINES â•â•â• */
-.gc{background:#fff;border-radius:24px;border:1px solid rgba(0,0,0,0.05);border-top:5px solid var(--r);box-shadow:var(--shadow);margin-bottom:20px;overflow:hidden;transition:var(--ease)}
-.gc:hover{box-shadow:var(--shadow-hover)}
-.gc-h{text-align:center;padding:24px 20px 18px;background:linear-gradient(180deg,var(--rbg),#fff);border-bottom:1px solid rgba(0,0,0,0.03)}
-.gc-h h2{font-size:22px;font-weight:800;color:var(--r);font-family:'Poppins',sans-serif;}
-.gc-h p{font-size:14px;color:var(--tx3);margin-top:6px;font-weight:600}
-details{background:var(--g1);border:1px solid rgba(0,0,0,0.05);border-radius:14px;margin:0 16px 12px;transition:all .3s ease;}
-details:last-of-type{margin-bottom:20px}
-details[open]{border-color:var(--rbd);background:#fff;box-shadow:0 4px 15px rgba(211,47,47,0.08);transform:scale(1.01)}
-summary{padding:16px 18px;font-weight:700;color:var(--tx2);font-size:14.5px;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;-webkit-tap-highlight-color:transparent;user-select:none;transition:var(--ease)}
-summary:hover{color:var(--r)}
-summary::-webkit-details-marker{display:none}
-summary::after{content:'+';color:var(--r);font-size:24px;flex-shrink:0;margin-left:10px;font-weight:400;line-height:1;transition:var(--ease)}
-details[open] summary::after{content:'âˆ’';transform:rotate(180deg)}
-details[open] summary{color:var(--r);border-bottom:1px solid var(--rbd)}
-.gct{padding:16px 18px;color:var(--tx3);font-size:14px;line-height:1.75;font-weight:500;}
-.gct ul{padding-left:24px;margin-top:8px}
+/* BLOG */
+.bc{background:#fff;border:1px solid var(--gb);border-radius:var(--radius);overflow:hidden;margin-bottom:20px;box-shadow:var(--shadow);position:relative}
+.bi{width:100%;height:220px;object-fit:cover;background:var(--g2)}
+.bpd{padding:20px}
+.bti{font-size:18px;font-weight:800;color:var(--tx);margin-bottom:10px;line-height:1.3}
+.bcn{font-size:14px;color:var(--tx2);line-height:1.6;margin-bottom:16px;white-space:pre-wrap}
+.bmt{display:flex;justify-content:space-between;font-size:12px;color:var(--tx4);font-weight:600;border-top:1px solid var(--g2);padding-top:12px}
+.bpn{position:absolute;top:12px;right:12px;background:rgba(211,47,47,.9);color:#fff;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:800;backdrop-filter:blur(4px);box-shadow:0 2px 10px rgba(0,0,0,.2)}
+.bdel{position:absolute;top:12px;right:12px;background:var(--r);color:#fff;border:none;padding:5px 12px;border-radius:8px;font-size:12px;font-weight:700;z-index:2}
+
+/* INFO ACCORDION */
+.gct{padding:16px;background:var(--g1);border-radius:12px;font-size:14px;line-height:1.6;color:var(--tx2);font-weight:500}
+.gct ul{padding-left:20px;margin-top:10px}
 .gct li{margin-bottom:8px}
-.hl{color:var(--r);font-weight:800}
-/* â•â•â• ABOUT & BLOGS â•â•â• */
-.ac{background:#fff;border-radius:24px;border:1px solid rgba(0,0,0,0.05);border-top:5px solid var(--r);box-shadow:var(--shadow);margin-bottom:20px;overflow:hidden;transition:var(--ease)}
-.ac:hover{box-shadow:var(--shadow-hover)}
-.ac-h{text-align:center;padding:26px 20px 20px;background:linear-gradient(135deg,var(--rbg),#fff9f9,#fff);border-bottom:2px dashed var(--rbd)}
-.ac-h h2{font-size:24px;font-weight:800;color:#c62828;margin-bottom:6px;font-family:'Poppins',sans-serif;}
-.ac-h p{color:var(--tx3);font-size:14.5px;font-weight:600}
-.st2{font-size:16px;font-weight:800;padding:16px 20px 10px;border-left:5px solid var(--r);margin-left:16px;color:var(--r);font-family:'Poppins',sans-serif;}
-.st2.blue{border-left-color:#1a73e8;color:#1a73e8}
-.ab{padding:0 20px 18px;font-size:14.5px;color:var(--tx2);line-height:1.75;font-weight:500}
-.ab ul{padding-left:24px;margin-top:10px}
-.ab li{margin-bottom:8px}
-.cg2{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:0 16px 18px}
-@media(max-width:380px){.cg2{grid-template-columns:1fr}}
-.cc{background:var(--rbg);border:1px solid var(--rbd);padding:18px 14px;border-radius:16px;text-align:center;transition:var(--ease)}
-.cc:hover{transform:translateY(-3px);box-shadow:0 6px 15px rgba(211,47,47,0.15)}
-.ccn{color:var(--rd);font-size:15px;font-weight:800;margin-bottom:4px}
-.ccr{color:var(--tx3);font-size:12.5px;display:block;margin-bottom:12px;font-weight:600}
-.ccb{display:inline-block;background:linear-gradient(135deg,var(--r),var(--rd));color:#fff;padding:10px 20px;border-radius:24px;font-size:14px;font-weight:800;box-shadow:0 4px 10px rgba(211,47,47,0.3);transition:var(--ease)}
-.ccb:hover{box-shadow:0 6px 15px rgba(211,47,47,0.4);transform:translateY(-2px)}
-.ssec{padding:20px;background:var(--g1);border-top:1px solid rgba(0,0,0,0.05);text-align:center}
-.ssec p{font-size:14px;color:var(--tx3);font-weight:600;margin-bottom:16px;line-height:1.55}
-/* NEW: Blog Styles */
-.blog-list { padding: 0 16px 16px; display:flex; flex-direction:column; gap:16px; }
-.bcard { background:#fff; border:1px solid rgba(0,0,0,0.05); border-radius:16px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.05); transition:var(--ease); position:relative; }
-.bcard:hover { transform:translateY(-5px); box-shadow:0 10px 25px rgba(0,0,0,0.1); }
-.bimg { width:100%; max-height:250px; object-fit:contain; background:#f5f7fa; }
-.bp { padding:18px; }
-.bt { font-size:18px; font-weight:800; color:var(--tx); margin-bottom:10px; line-height:1.4; font-family:'Poppins',sans-serif;}
-.bd { font-size:14px; color:var(--tx3); line-height:1.6; font-weight:500; }
-.bmeta { font-size:12px; color:var(--tx4); font-weight:600; margin-bottom:10px; display:flex; justify-content:space-between; }
-.bdel { position:absolute; top:12px; right:12px; background:rgba(211,47,47,0.9); color:white; border:none; padding:6px 12px; border-radius:8px; font-size:12px; font-weight:bold; cursor:pointer; z-index:10; }
-.bfb { display:block; text-align:center; background:#1877f2; color:#fff; padding:12px; border-radius:10px; text-decoration:none; font-weight:700; margin-top:14px; font-size:14px; }
-/* Admin Login & Form */
-#admin-panel { padding: 20px; background:var(--rbg); border-radius:16px; margin: 16px; border:2px dashed var(--r); display:none; }
-.admin-trigger { cursor:pointer; user-select:none; }
-/* â•â•â• POPUP â•â•â• */
-#pop, #admin-pop{display:flex;position:fixed;inset:0;background:rgba(32,33,36,.75);z-index:2000;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);}
-#pop.off, #admin-pop.off{display:none}
-.pop-b{background:#fff;border-radius:24px;max-width:350px;width:100%;box-shadow:0 20px 50px rgba(0,0,0,.3);overflow:hidden;animation:zoomIn .4s cubic-bezier(0.175, 0.885, 0.32, 1.275)}
-.pop-h{background:linear-gradient(135deg,var(--r),var(--rd));padding:24px;text-align:center}
-.pop-h .pi{font-size:42px;margin-bottom:10px;animation:pulse 2s infinite}
-.pop-h h3{color:#fff;font-size:18px;font-weight:800;margin:0 0 4px;font-family:'Poppins',sans-serif;}
-.pop-h p{color:rgba(255,255,255,.9);font-size:13px;margin:0;font-weight:500}
-.pop-bd{padding:20px 22px}
-.rbox{background:#fafafa;border-radius:14px;padding:14px 16px;margin-bottom:18px;border:1px solid rgba(0,0,0,0.05)}
-.ru{display:flex;gap:10px;font-size:13.5px;color:var(--tx2);font-weight:600;line-height:1.55;padding:6px 0;border-bottom:1px solid rgba(0,0,0,0.04)}
-.ru:last-child{border-bottom:none}
-.pcta{font-size:13.5px;color:var(--tx3);font-weight:600;text-align:center;margin-bottom:16px;line-height:1.6}
-.pok{width:100%;background:linear-gradient(135deg,var(--r),var(--rd));color:#fff;border:none;padding:15px;border-radius:14px;font-size:15.5px;font-weight:800;font-family:inherit;box-shadow:0 6px 20px rgba(211,47,47,.4);transition:var(--ease);cursor:pointer;}
-.pok:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(211,47,47,.5)}
-.pok:active{opacity:.9;transform:scale(0.96)}
-.pdm{text-align:center;font-size:13px;color:var(--tx4);margin-top:12px;min-height:20px;font-weight:600}
-/* â•â•â• ANIMATIONS â•â•â• */
-@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
-@keyframes scroll{0%{transform:translate3d(0,0,0)}100%{transform:translate3d(-100%,0,0)}}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
-@keyframes spin{to{transform:rotate(360deg)}}
-@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
-@keyframes heartbeat{0%,100%{transform:scale(1)}15%{transform:scale(1.15)}30%{transform:scale(1)}45%{transform:scale(1.08)}60%{transform:scale(1)}}
-@keyframes popIn{0%{opacity:0;transform:scale(.5)}100%{opacity:1;transform:scale(1)}}
-@keyframes fadeInUp{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
-@keyframes zoomIn{from{opacity:0;transform:scale(0.85)}to{opacity:1;transform:scale(1)}}
-@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
-@keyframes epulse{0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,.6)}50%{box-shadow:0 0 0 8px rgba(255,255,255,0)}}
-/* â•â•â• ANIMATIONS & UTILS â•â•â• */
-.animate-on-scroll { opacity: 0; transform: translateY(30px); transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1); will-change: transform, opacity; }
-.animate-on-scroll.show { opacity: 1; transform: translateY(0); }
-.top-act-grid { display: grid; grid-template-columns: 1fr; gap: 16px; margin-bottom: 24px; }
-@media(min-width: 600px) { .top-act-grid { grid-template-columns: 1fr 1fr; } }
-.section-title { font-size: 22px; font-weight: 800; color: var(--rd); text-align: center; margin: 32px 0 16px; font-family: 'Poppins', sans-serif; }
+.gct .hl{color:var(--rd);font-weight:700}
+details{margin-bottom:12px}
+summary{background:#fff;border:1px solid var(--gb);padding:16px;border-radius:12px;font-size:15px;font-weight:700;color:var(--tx);cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;transition:var(--ease);box-shadow:0 2px 6px rgba(0,0,0,.02)}
+summary::-webkit-details-marker{display:none}
+summary::after{content:'+';font-size:20px;color:var(--r);font-weight:400;transition:var(--ease)}
+details[open] summary{border-bottom-left-radius:0;border-bottom-right-radius:0;border-bottom-color:transparent;background:var(--rbg);color:var(--rd)}
+details[open] summary::after{content:'-';transform:rotate(180deg)}
+details[open] .gct{border:1px solid var(--rbd);border-top:none;border-top-left-radius:0;border-top-right-radius:0}
+
+/* POPUP */
+#pop{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;opacity:1;transition:var(--ease)}
+#pop.off{opacity:0;pointer-events:none}
+.p-bx{background:#fff;border-radius:24px;padding:32px 24px;width:100%;max-width:360px;text-align:center;box-shadow:0 20px 40px rgba(0,0,0,.2);transform:scale(1);transition:var(--ease)}
+#pop.off .p-bx{transform:scale(.9)}
+.p-ic{width:64px;height:64px;background:var(--rbg);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;box-shadow:0 0 0 8px rgba(255,235,238,.5)}
+.p-ic svg{width:32px;height:32px;fill:var(--r)}
+.p-bx h3{font-size:20px;font-weight:800;color:var(--tx);margin-bottom:12px}
+.p-bx p{font-size:14.5px;color:var(--tx3);line-height:1.5;margin-bottom:24px;font-weight:500}
+.p-bx button{width:100%;background:linear-gradient(135deg,var(--r),var(--rd));color:#fff;border:none;padding:14px;border-radius:14px;font-size:16px;font-weight:700;transition:var(--ease);box-shadow:0 8px 16px rgba(211,47,47,.2)}
+.p-bx button:hover{transform:translateY(-2px);box-shadow:0 12px 24px rgba(211,47,47,.3)}
+.pdm{font-size:12px;color:var(--rd);margin-top:12px;font-weight:600;min-height:18px}
+
+/* FOOTER */
+.footer-sec { padding: 40px 20px 100px; background: #111111; color: #f0f0f0; text-align: center; border-top: 4px solid var(--rd); margin-top: 30px; margin-bottom: 0; border-radius: 20px 20px 0 0; display: flex; flex-direction: column; align-items: center; }
+.footer-sec h4 { font-family: "Impact", sans-serif; font-size: 24px; letter-spacing: 1.5px; color: #fff; margin-bottom: 6px; font-weight: normal; }
+.footer-sec .f-motto { font-size: 15px; color: var(--rd); font-weight: bold; margin-bottom: 6px; font-style: italic; }
+.footer-sec p { font-size: 13px; color: #aaa; margin-bottom: 24px; }
+.soc-links { display: flex; justify-content: center; align-items: center; gap: 16px; margin-bottom: 30px; }
+.f-btn { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 12px; background: #fff; border: none; transition: 0.3s; text-decoration: none; }
+.f-btn:hover { background: #333; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+.sc-fb svg { fill: #1877F2; }
+.sc-in svg { fill: #0A66C2; }
+.sc-gm svg { fill: #EA4335; }
+.f-btn svg { width: 24px; height: 24px; }
+.f-bot { width: 100%; border-top: 1px solid #333; padding-top: 20px; font-size: 12px; color: #777; }
+
+@keyframes blink{50%{opacity:.2}}
+@keyframes shimmer{100%{background-position:-200% 0}}
+@keyframes scroll{0%{transform:translateX(0)}100%{transform:translateX(-100%)}}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,255,255,.4)}70%{box-shadow:0 0 0 10px rgba(255,255,255,0)}100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
 </style>
 </head>
 <body>
-<!-- LOCATION POPUP -->
-<div id="pop">
-<div class="pop-b">
-<div class="pop-h"><div class="pi">ðŸ©¸</div><h3>à¦¸à§à¦ªà¦¨à§à¦¦à¦¨ à¦¬à§à¦²à¦¾à¦¡ à¦¸à§‹à¦¸à¦¾à¦‡à¦Ÿà¦¿</h3><p>à¦à¦¿à¦¨à¦¾à¦‡à¦¦à¦¹ à¦Ÿà§‡à¦•à§à¦¸à¦Ÿà¦¾à¦‡à¦² à¦‡à¦žà§à¦œà¦¿à¦¨à¦¿à¦¯à¦¼à¦¾à¦°à¦¿à¦‚ à¦•à¦²à§‡à¦œ</p></div>
-<div class="pop-bd">
-<div class="rbox">
-<div class="ru"><span>â¤ï¸</span><span>à¦à¦•à¦Ÿà¦¿ à¦°à¦•à§à¦¤à¦¦à¦¾à¦¨ à¦à¦•à¦Ÿà¦¿ à¦ªà§à¦°à¦¾à¦£ à¦¬à¦¾à¦à¦šà¦¾à¦¤à§‡ à¦ªà¦¾à¦°à§‡à¥¤</span></div>
-<div class="ru"><span>ðŸš«</span><span>à¦°à¦•à§à¦¤ à¦¬à¦¿à¦•à§à¦°à¦¯à¦¼ à¦¸à¦®à§à¦ªà§‚à¦°à§à¦£ à¦¨à¦¿à¦·à¦¿à¦¦à§à¦§à¥¤ à¦¸à¦¬ à¦¸à§‡à¦¬à¦¾ à¦¬à¦¿à¦¨à¦¾à¦®à§‚à¦²à§à¦¯à§‡à¥¤</span></div>
-<div class="ru"><span>ðŸ“‹</span><span>à¦¸à¦ à¦¿à¦• à¦¤à¦¥à§à¦¯ à¦¦à¦¿à¦¯à¦¼à§‡ à¦°à§‡à¦œà¦¿à¦¸à§à¦Ÿà§à¦°à§‡à¦¶à¦¨ à¦•à¦°à§à¦¨à¥¤</span></div>
-<div class="ru"><span>ðŸ“</span><span>à¦†à¦ªà¦¨à¦¾à¦° à¦œà§‡à¦²à¦¾à¦° à¦œà¦°à§à¦°à¦¿ à¦°à¦•à§à¦¤à§‡à¦° à¦šà¦¾à¦¹à¦¿à¦¦à¦¾ à¦¦à§‡à¦–à¦¾à¦¤à§‡ à¦²à§‹à¦•à§‡à¦¶à¦¨ à¦¬à§à¦¯à¦¬à¦¹à¦¾à¦° à¦¹à¦¬à§‡à¥¤</span></div>
-</div>
-<p class="pcta">à¦†à¦¸à§à¦¨ à¦°à¦•à§à¦¤à¦¦à¦¾à¦¨à§‡ à¦à¦—à¦¿à¦¯à¦¼à§‡ à¦†à¦¸à¦¿! à¦†à¦ªà¦¨à¦¾à¦° à¦œà§‡à¦²à¦¾à¦¯à¦¼ à¦•à¦¾à¦°à§‹ à¦°à¦•à§à¦¤à§‡à¦° à¦ªà§à¦°à¦¯à¦¼à§‹à¦œà¦¨ à¦†à¦›à§‡ à¦•à¦¿à¦¨à¦¾ à¦¦à§‡à¦–à§à¦¨à¥¤</p>
-<button class="pok" id="pok">à¦ à¦¿à¦• à¦†à¦›à§‡, à¦¦à§‡à¦–à§à¦¨ ðŸ©¸</button>
-<div class="pdm" id="pdm"></div>
-</div></div></div>
-<!-- ADMIN LOGIN POPUP -->
-<div id="admin-pop" class="off">
-<div class="pop-b">
-<div class="pop-h"><div class="pi">ðŸ”’</div><h3>à¦à¦¡à¦®à¦¿à¦¨ à¦²à¦—à¦‡à¦¨</h3><p>à¦¶à§à¦§à§à¦®à¦¾à¦¤à§à¦° à¦…à¦¥à§‹à¦°à¦¾à¦‡à¦œà¦¡ à¦¸à¦¦à¦¸à§à¦¯à¦¦à§‡à¦° à¦œà¦¨à§à¦¯</p></div>
-<div class="pop-bd">
-<form id="admin-form">
-  <div class="ig"><label>Email</label><input type="email" id="admin-email" required placeholder="admin@gmail.com"></div>
-  <div class="ig"><label>Secret PIN</label><input type="password" id="admin-pin" required placeholder="****"></div>
-  <button type="button" class="pok" id="admin-login-btn">à¦²à¦—à¦‡à¦¨ à¦•à¦°à§à¦¨</button>
-  <button type="button" class="pcta" style="background:none;border:none;width:100%;margin-top:10px;cursor:pointer" onclick="document.getElementById('admin-pop').classList.add('off')">à¦¬à¦¾à¦¤à¦¿à¦²</button>
-  <div class="err" id="admin-err"></div>
-</form>
-</div></div></div>
-<!-- TICKER -->
+
 <div id="ticker">
-<div class="t-badge"><span class="t-dot">ðŸš¨</span>à¦‡à¦®à¦¾à¦°à§à¦œà§‡à¦¨à§à¦¸à¦¿</div>
-<div class="t-track">
-<div class="t-sk" id="tsk"></div>
-<div class="t-msg" id="tmsg"></div>
-<div class="t-man" id="tman">
-<span class="lbl">à¦œà§‡à¦²à¦¾ à¦¬à§‡à¦›à§‡ à¦¨à¦¿à¦¨:</span>
-<select id="mds"><option value="">à¦¬à§‡à¦›à§‡ à¦¨à¦¿à¦¨</option></select>
-<button id="mdb">à¦¦à§‡à¦–à§à¦¨</button>
+  <div class="t-badge"><span class="t-dot">●</span> লাইভ</div>
+  <div class="t-track">
+    <div class="t-sk" id="tsk"></div>
+    <div class="t-msg" id="tmsg"></div>
+    <div class="t-man" id="tman">
+      <div class="lbl">জেলা:</div>
+      <select id="mds">
+        <option value="">বেছে নিন</option>
+        <option value="Jhenaidah">ঝিনাইদহ</option>
+        <option value="Dhaka">ঢাকা</option>
+        <option value="Kushtia">কুষ্টিয়া</option>
+        <option value="Magura">মাগুরা</option>
+        <option value="Chuadanga">চুয়াডাঙ্গা</option>
+      </select>
+      <button id="mdb">দেখুন</button>
+    </div>
+  </div>
+  <div class="t-dtag" id="tdt" title="জেলা পরিবর্তন করুন">📍</div>
 </div>
-<div class="t-dtag" id="tdt">ðŸ“<span id="tdn"></span> âœ•</div>
-</div></div>
-<!-- HEADER -->
+
 <header id="hdr">
   <div class="h-logo" style="justify-content: center; width: 100%; text-align: center;">
     <div class="h-txt" style="text-align: center;">
@@ -495,721 +226,575 @@ details[open] summary{color:var(--r);border-bottom:1px solid var(--rbd)}
     </div>
   </div>
 </header>
-<!-- APP -->
-<div id="app" style="padding-bottom: 20px;">
-<!-- HOME -->
-<div class="page on" id="p-home">
-<div class="hero">
-<!-- NOTE: You can replace the src link with the public link of the image you provided -->
-<img src="home-banner.png" alt="Spondon Group" class="hero-img" id="hero-img1" onerror="this.style.display='none'" style="max-width:100%; border-radius:16px; margin-bottom:16px; width:100%;">
-<h2 style="font-weight: bold; font-size: 24px;">Making a Difference Through Donation</h2>
-<p style="font-family: 'Hind Siliguri', sans-serif;">à¦¸à§à¦¬à§‡à¦šà§à¦›à¦¾à¦¯à¦¼ à¦°à¦•à§à¦¤à¦¦à¦¾à¦¨ à¦•à¦°à§à¦¨ â€” à¦à¦•à¦Ÿà¦¿ à¦œà§€à¦¬à¦¨ à¦¬à¦¾à¦à¦šà¦¾à¦¨à¥¤<br>à¦à¦¿à¦¨à¦¾à¦‡à¦¦à¦¹ à¦Ÿà§‡à¦•à§à¦¸à¦Ÿà¦¾à¦‡à¦² à¦‡à¦žà§à¦œà¦¿à¦¨à¦¿à¦¯à¦¼à¦¾à¦°à¦¿à¦‚ à¦•à¦²à§‡à¦œà§‡à¦° à¦…à¦°à¦¾à¦œà¦¨à§ˆà¦¤à¦¿à¦• à¦¸à§à¦¬à§‡à¦šà§à¦›à¦¾à¦¸à§‡à¦¬à§€ à¦¸à¦‚à¦—à¦ à¦¨à¥¤</p>
-</div>
-<div class="qg">
-<button class="qa pri" onclick="go('donor-reg')"><span class="qa-i">ðŸ’‰</span><div class="qa-t">à¦¡à§‹à¦¨à¦¾à¦° à¦°à§‡à¦œà¦¿à¦¸à§à¦Ÿà§à¦°à§‡à¦¶à¦¨</div><div class="qa-d">à¦¸à§à¦¬à§‡à¦šà§à¦›à¦¾à¦¸à§‡à¦¬à§€ à¦°à¦•à§à¦¤à¦¦à¦¾à¦¤à¦¾ à¦¹à¦¿à¦¸à§‡à¦¬à§‡ à¦¨à¦¿à¦¬à¦¨à§à¦§à¦¨ à¦•à¦°à§à¦¨</div></button>
-<button class="qa" onclick="go('blood-request')"><span class="qa-i">ðŸ†˜</span><div class="qa-t">à¦°à¦•à§à¦¤à§‡à¦° à¦†à¦¬à§‡à¦¦à¦¨</div><div class="qa-d" style="color:#ffcdd2">à¦œà¦°à§à¦°à¦¿ à¦°à¦•à§à¦¤à§‡à¦° à¦œà¦¨à§à¦¯ à¦¡à§‹à¦¨à¦¾à¦° à¦–à§à¦à¦œà§à¦¨</div></button>
-</div>
-<div class="sc">
-<div class="sc-t">ðŸ©¸ à¦°à¦•à§à¦¤à¦¦à¦¾à¦¨ à¦ªà¦°à¦¿à¦¸à¦‚à¦–à§à¦¯à¦¾à¦¨</div>
-<div id="stsk">
-<div class="sg"><div class="sb r"><div class="skr skl"></div><div class="skr skh"></div></div><div class="sb"><div class="skr skl"></div><div class="skr skh"></div></div></div>
-<div class="sg" style="margin-bottom:12px"><div class="sb"><div class="skr skl"></div><div class="skr skh"></div></div><div class="sb r"><div class="skr skl"></div><div class="skr skh"></div></div></div>
-<div class="bg4"><div class="bgc">A+<div class="skr skb"></div></div><div class="bgc">B+<div class="skr skb"></div></div><div class="bgc">O+<div class="skr skb"></div></div><div class="bgc">AB+<div class="skr skb"></div></div><div class="bgc">A-<div class="skr skb"></div></div><div class="bgc">B-<div class="skr skb"></div></div><div class="bgc">O-<div class="skr skb"></div></div><div class="bgc">AB-<div class="skr skb"></div></div></div>
-</div>
-<div id="stdt" hidden>
-<div class="sg"><div class="sb r"><span class="sl">à¦®à§‹à¦Ÿ à¦°à¦•à§à¦¤à¦¦à¦¾à¦¨</span><span class="sn" id="s-td">à§¦</span></div><div class="sb"><span class="sl">à¦ªà§à¦°à¦¸à§à¦¤à§à¦¤ à¦¡à§‹à¦¨à¦¾à¦°</span><span class="sn" id="s-ad">à§¦</span></div></div>
-<div class="sg" style="margin-bottom:12px"><div class="sb"><span class="sl">à¦†à¦œà¦•à§‡à¦° à¦¨à¦¤à§à¦¨ à¦¡à§‹à¦¨à¦¾à¦°</span><span class="sn" id="s-nd">à§¦</span></div><div class="sb r"><span class="sl">à¦…à¦ªà§‡à¦•à§à¦·à¦®à¦¾à¦¨ à¦°à¦¿à¦•à§‹à¦¯à¦¼à§‡à¦¸à§à¦Ÿ</span><span class="sn" id="s-pr">à§¦</span></div></div>
-<div style="font-size:13px;font-weight:700;color:#5f6368;margin-bottom:10px">à¦°à¦•à§à¦¤à§‡à¦° à¦—à§à¦°à§à¦ª à¦…à¦¨à§à¦¯à¦¾à¦¯à¦¼à§€ à¦ªà§à¦°à¦¸à§à¦¤à§à¦¤ à¦¡à§‹à¦¨à¦¾à¦°:</div>
-<div class="bg4" id="s-bg"></div>
-<div class="su" id="s-up"></div>
-</div>
-</div>
-<div class="isec animate-on-scroll">
-<div class="section-title">à¦†à¦®à¦¾à¦¦à§‡à¦° à¦Ÿà¦ª à¦•à¦¾à¦°à§à¦¯à¦•à§à¦°à¦®</div>
-<div class="top-act-grid" id="top-activities">
-<!-- Top activities will load here -->
-<div style="text-align:center; color:var(--tx4); font-size:14px; grid-column: 1/-1;">à¦²à§‹à¦¡ à¦¹à¦šà§à¦›à§‡...</div>
-</div>
-</div>
-<div class="isec">
-<div class="isec-h">ðŸ“‹ à¦•à§€à¦­à¦¾à¦¬à§‡ à¦•à¦¾à¦œ à¦•à¦°à§‡?</div>
-<div class="ii-g">
-<div class="ii"><span class="ii-i">1ï¸âƒ£</span><h5>à¦¡à§‹à¦¨à¦¾à¦° à¦°à§‡à¦œà¦¿à¦¸à§à¦Ÿà§à¦°à§‡à¦¶à¦¨</h5><p>à¦¨à¦¾à¦®, à¦«à§‹à¦¨, à¦‡à¦®à§‡à¦‡à¦², à¦œà§‡à¦²à¦¾, à¦°à¦•à§à¦¤à§‡à¦° à¦—à§à¦°à§à¦ª à¦¦à¦¿à¦¯à¦¼à§‡ à¦°à§‡à¦œà¦¿à¦¸à§à¦Ÿà§à¦°à§‡à¦¶à¦¨ à¦•à¦°à§à¦¨à¥¤</p></div>
-<div class="ii"><span class="ii-i">2ï¸âƒ£</span><h5>à¦°à¦•à§à¦¤à§‡à¦° à¦†à¦¬à§‡à¦¦à¦¨</h5><p>à¦°à§‹à¦—à§€à¦° à¦¤à¦¥à§à¦¯ à¦¦à¦¿à¦¨à¥¤ à¦†à¦ªà¦¨à¦¾à¦° à¦œà§‡à¦²à¦¾à¦° à¦®à§à¦¯à¦¾à¦šà¦¿à¦‚ à¦¡à§‹à¦¨à¦¾à¦°à§‡à¦° à¦¤à¦¾à¦²à¦¿à¦•à¦¾ à¦ªà¦¾à¦¬à§‡à¦¨à¥¤</p></div>
-<div class="ii"><span class="ii-i">3ï¸âƒ£</span><h5>à¦®à§à¦¯à¦¾à¦š à¦•à¦¨à¦«à¦¾à¦°à§à¦® à¦“ à¦…à¦Ÿà§‹ à¦‡à¦®à§‡à¦‡à¦²</h5><p>à¦¡à§‹à¦¨à¦¾à¦° à¦°à¦¾à¦œà¦¿ à¦¹à¦²à§‡ à¦¤à¦¾à¦° à¦¨à¦®à§à¦¬à¦° à¦¦à¦¿à¦¨à¥¤ à¦¸à§à¦¬à¦¯à¦¼à¦‚à¦•à§à¦°à¦¿à¦¯à¦¼à¦­à¦¾à¦¬à§‡ à¦°à§‹à¦—à§€à¦° à¦¤à¦¥à§à¦¯ à¦‡à¦®à§‡à¦‡à¦²à§‡ à¦¯à¦¾à¦¬à§‡à¥¤</p></div>
-<div class="ii"><span class="ii-i">4ï¸âƒ£</span><h5>à¦¸à§à¦Ÿà§à¦¯à¦¾à¦Ÿà¦¾à¦¸ à¦†à¦ªà¦¡à§‡à¦Ÿ</h5><p>à¦°à¦•à§à¦¤à¦¦à¦¾à¦¨ à¦¸à¦®à§à¦ªà¦¨à§à¦¨ à¦¹à¦²à§‡ à¦†à¦ªà¦¡à§‡à¦Ÿ à¦¦à¦¿à¦¨à¥¤ à§§à§¨à§¦ à¦¦à¦¿à¦¨ à¦†à¦° à¦•à§‹à¦¨à§‹ à¦…à¦¨à§à¦°à§‹à¦§ à¦†à¦¸à¦¬à§‡ à¦¨à¦¾à¥¤</p></div>
-</div>
-</div>
-</div>
-<!-- DONOR REG -->
-<div class="page" id="p-donor-reg">
-<img src="donor-banner.png" alt="Donor Registration" class="hero-img" style="max-width:100%; border-radius:16px; margin-bottom:16px; width:100%;">
-<div class="fc">
-<div id="drfs">
-<div class="fh"><span class="fi">ðŸ©¸</span><div class="ft">Donor Registration</div><div class="fs">à¦¸à§à¦ªà¦¨à§à¦¦à¦¨ à¦¬à§à¦²à¦¾à¦¡ à¦¸à§‹à¦¸à¦¾à¦‡à¦Ÿà¦¿, à¦à¦¿à¦¨à¦¾à¦‡à¦¦à¦¹ à¦Ÿà§‡à¦•à§à¦¸à¦Ÿà¦¾à¦‡à¦² à¦‡à¦žà§à¦œà¦¿à¦¨à¦¿à¦¯à¦¼à¦¾à¦°à¦¿à¦‚ à¦•à¦²à§‡à¦œ</div></div>
-<div class="fb">
-<p class="fd">à¦†à¦ªà¦¨à¦¾à¦° à¦à¦• à¦¬à§à¦¯à¦¾à¦— à¦°à¦•à§à¦¤ à¦¬à¦¾à¦à¦šà¦¾à¦¤à§‡ à¦ªà¦¾à¦°à§‡ à¦à¦•à¦Ÿà¦¿ à¦®à§à¦®à§‚à¦°à§à¦·à§ à¦°à§‹à¦—à§€à¦° à¦ªà§à¦°à¦¾à¦£à¥¤</p>
-<form id="drf"><input type="hidden" name="formType" value="donorRegistration">
-<div class="ig"><label>à¦¸à¦®à§à¦ªà§‚à¦°à§à¦£ à¦¨à¦¾à¦® *</label><input type="text" name="name" required autocomplete="name" placeholder="à¦†à¦ªà¦¨à¦¾à¦° à¦ªà§‚à¦°à§à¦£ à¦¨à¦¾à¦® à¦²à¦¿à¦–à§à¦¨"></div>
-<div class="g2">
-<div class="ig"><label>à¦®à§‹à¦¬à¦¾à¦‡à¦² à¦¨à¦¾à¦®à§à¦¬à¦¾à¦° *</label><input type="tel" name="phone" required autocomplete="tel" placeholder="01XXXXXXXXX"></div>
-<div class="ig"><label>à¦‡à¦®à§‡à¦‡à¦² à¦à¦¡à§à¦°à§‡à¦¸ *</label><input type="email" name="email" required autocomplete="email" placeholder="email@gmail.com"></div>
-</div>
-<div class="g2">
-<!-- NOTE: The full district list should be here, keeping it short for this build -->
-<div class="ig"><label>à¦¬à¦°à§à¦¤à¦®à¦¾à¦¨ à¦œà§‡à¦²à¦¾ *</label><select name="district" id="dd" required><option value="">à¦¨à¦¿à¦°à§à¦¬à¦¾à¦šà¦¨ à¦•à¦°à§à¦¨</option></select></div>
-<div class="ig"><label>à¦‰à¦ªà¦œà§‡à¦²à¦¾ *</label><select name="upazilla" id="du" required disabled><option value="">à¦†à¦—à§‡ à¦œà§‡à¦²à¦¾ à¦¨à¦¿à¦°à§à¦¬à¦¾à¦šà¦¨ à¦•à¦°à§à¦¨</option></select><div class="hint" id="uh">à¦œà§‡à¦²à¦¾ à¦¨à¦¿à¦°à§à¦¬à¦¾à¦šà¦¨ à¦•à¦°à¦²à§‡ à¦‰à¦ªà¦œà§‡à¦²à¦¾ à¦¦à§‡à¦–à¦¾à¦¬à§‡</div></div>
-</div>
-<div class="ig"><label>à¦°à¦•à§à¦¤à§‡à¦° à¦—à§à¦°à§à¦ª *</label><select name="bloodGroup" required><option value="">à¦¨à¦¿à¦°à§à¦¬à¦¾à¦šà¦¨ à¦•à¦°à§à¦¨</option><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>AB+</option><option>AB-</option><option>O+</option><option>O-</option></select></div>
-<div class="ig"><label>à¦¸à¦°à§à¦¬à¦¶à§‡à¦· à¦°à¦•à§à¦¤à¦¦à¦¾à¦¨à§‡à¦° à¦¤à¦¾à¦°à¦¿à¦– <span style="color:#9aa0a6;font-size:12px">(à¦¨à¦¾ à¦¥à¦¾à¦•à¦²à§‡ à¦–à¦¾à¦²à¦¿)</span></label><input type="date" name="lastDate"></div>
-</form></div>
-<div class="ff"><button type="button" class="sbtn" id="drb"><span id="drt">à¦°à§‡à¦œà¦¿à¦¸à§à¦Ÿà§à¦°à§‡à¦¶à¦¨ à¦•à¦°à§à¦¨ ðŸ’š</span><div class="spin" id="drs"></div></button><div class="err" id="dre"></div></div>
-</div>
-<div class="ok-w" id="drok">
-<div class="ok-ic" style="background:linear-gradient(135deg,#43a047,#1b5e20)"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-<div class="ok-t" style="color:#1b5e20">ðŸŽ‰ à¦…à¦­à¦¿à¦¨à¦¨à§à¦¦à¦¨! à¦°à§‡à¦œà¦¿à¦¸à§à¦Ÿà§à¦°à§‡à¦¶à¦¨ à¦¸à¦®à§à¦ªà¦¨à§à¦¨!</div>
-<div class="ok-s">à¦†à¦ªà¦¨à¦¿ à¦¸à§à¦¬à§‡à¦šà§à¦›à¦¾à¦¸à§‡à¦¬à§€ à¦°à¦•à§à¦¤à¦¦à¦¾à¦¤à¦¾ à¦¹à¦¿à¦¸à§‡à¦¬à§‡ à¦¨à¦¿à¦¬à¦¨à§à¦§à¦¿à¦¤ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¦¨à¥¤</div>
-<div class="ok-i" style="background:linear-gradient(135deg,#f1f8e9,#e8f5e9);border:1px solid #c8e6c9">
-<div class="ok-r"><span>âœ…</span><span>à¦†à¦ªà¦¨à¦¾à¦° à¦¤à¦¥à§à¦¯ à¦¡à¦¾à¦Ÿà¦¾à¦¬à§‡à¦¸à§‡ à¦¸à¦‚à¦°à¦•à§à¦·à¦¿à¦¤ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤</span></div>
-<div class="ok-r"><span>ðŸ“</span><span>à¦†à¦ªà¦¨à¦¾à¦° à¦œà§‡à¦²à¦¾ à¦“ à¦‰à¦ªà¦œà§‡à¦²à¦¾ à¦¸à§‡à¦­ â€” à¦¨à¦¿à¦•à¦Ÿà¦¸à§à¦¥ à¦°à§‹à¦—à§€à¦° à¦¸à¦¾à¦¥à§‡ à¦®à§à¦¯à¦¾à¦š à¦¹à¦¬à§‡à¥¤</span></div>
-<div class="ok-r"><span>ðŸ“§</span><span>à¦°à§‹à¦—à§€à¦° à¦ªà§à¦°à¦¯à¦¼à§‹à¦œà¦¨à§‡ à¦†à¦ªà¦¨à¦¾à¦•à§‡ à¦‡à¦®à§‡à¦‡à¦² à¦“ à¦«à§‹à¦¨à§‡ à¦¯à§‹à¦—à¦¾à¦¯à§‹à¦— à¦•à¦°à¦¾ à¦¹à¦¬à§‡à¥¤</span></div>
-<div class="ok-r"><span>ðŸ’‰</span><span>à¦°à¦•à§à¦¤à¦¦à¦¾à¦¨à§‡à¦° à¦ªà¦° à¦†à¦ªà¦¡à§‡à¦Ÿ à¦¦à¦¿à¦²à§‡ à§§à§¨à§¦ à¦¦à¦¿à¦¨ à¦†à¦° à¦•à§‹à¦¨à§‹ à¦…à¦¨à§à¦°à§‹à¦§ à¦ªà¦¾à¦ à¦¾à¦¨à§‹ à¦¹à¦¬à§‡ à¦¬à¦¾à¦¹à¦¿à¦° à¦¹à¦¬à§‡ à¦¨à¦¾à¥¤</span></div>
-</div>
-</div></div></div>
-<!-- BLOOD REQUEST -->
-<div class="page" id="p-blood-request">
-<img src="request-banner.png" alt="Blood Request" class="hero-img" style="max-width:100%; border-radius:16px; margin-bottom:16px; width:100%;">
-<div class="fc">
-<div id="brfs">
-<div class="fh"><span class="fi" style="animation:heartbeat 1.5s ease-in-out infinite">ðŸ†˜</span><div class="ft">Blood Request</div><div class="fs" style="color:#d32f2f;font-weight:700">à¦œà¦°à§à¦°à¦¿ à¦°à¦•à§à¦¤à§‡à¦° à¦ªà§à¦°à¦¯à¦¼à§‹à¦œà¦¨à§‡ à¦«à¦°à§à¦®à¦Ÿà¦¿ à¦ªà§‚à¦°à¦£ à¦•à¦°à§à¦¨</div></div>
-<div class="fb">
-<p class="fd">à¦®à§à¦®à§‚à¦°à§à¦·à§ à¦°à§‹à¦—à§€à¦° à¦œà§€à¦¬à¦¨ à¦¬à¦¾à¦à¦šà¦¾à¦¤à§‡ à¦¸à¦ à¦¿à¦• à¦“ à¦¸à¦®à§à¦ªà§‚à¦°à§à¦£ à¦¤à¦¥à§à¦¯ à¦¦à¦¿à¦¨à¥¤</p>
-<form id="brf"><input type="hidden" name="formType" value="bloodRequest"><input type="hidden" id="rfd" name="prescriptionFile" value="">
-<div class="ig"><label>à¦°à§‹à¦—à§€à¦° à¦¸à¦®à§à¦ªà§‚à¦°à§à¦£ à¦¨à¦¾à¦® *</label><input type="text" name="patientName" required placeholder="à¦°à§‹à¦—à§€à¦° à¦ªà§‚à¦°à§à¦£ à¦¨à¦¾à¦® à¦²à¦¿à¦–à§à¦¨"></div>
-<div class="ig"><label>à¦†à¦ªà¦¨à¦¾à¦° à¦®à§‹à¦¬à¦¾à¦‡à¦² à¦¨à¦¾à¦®à§à¦¬à¦¾à¦° *</label><input type="tel" name="phone" required autocomplete="tel" placeholder="01XXXXXXXXX"></div>
-<div class="g2">
-<div class="ig"><label>à¦°à¦•à§à¦¤à§‡à¦° à¦—à§à¦°à§à¦ª *</label><select name="bloodGroup" required><option value="">à¦¨à¦¿à¦°à§à¦¬à¦¾à¦šà¦¨ à¦•à¦°à§à¦¨</option><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>AB+</option><option>AB-</option><option>O+</option><option>O-</option></select></div>
-<div class="ig"><label>à¦ªà¦°à¦¿à¦®à¦¾à¦£ (à¦¬à§à¦¯à¦¾à¦—) *</label><input type="number" name="units" min="1" max="10" required placeholder="à§§â€“à§§à§¦"></div>
-</div>
-<div class="ig"><label>à¦¯à§‡ à¦œà§‡à¦²à¦¾à¦¯à¦¼ à¦°à¦•à§à¦¤ à¦²à¦¾à¦—à¦¬à§‡ *</label><select name="district" id="brd" required><option value="">à¦¨à¦¿à¦°à§à¦¬à¦¾à¦šà¦¨ à¦•à¦°à§à¦¨</option></select></div>
-<div class="ig"><label>à¦†à¦ªà¦¨à¦¾à¦° à¦‡à¦®à§‡à¦‡à¦² *</label><input type="email" name="email" required autocomplete="email" placeholder="email@gmail.com"></div>
-<div class="ig"><label>à¦¹à¦¾à¦¸à¦ªà¦¾à¦¤à¦¾à¦²à§‡à¦° à¦¨à¦¾à¦® à¦“ à¦ à¦¿à¦•à¦¾à¦¨à¦¾ *</label><input type="text" name="hospital" required placeholder="à¦¹à¦¾à¦¸à¦ªà¦¾à¦¤à¦¾à¦², à¦“à¦¯à¦¼à¦¾à¦°à§à¦¡/à¦•à§‡à¦¬à¦¿à¦¨ à¦¨à¦®à§à¦¬à¦° à¦¸à¦¹"></div>
-<div class="ig"><label>à¦°à§‹à¦—à§€à¦° à¦¸à¦®à¦¸à§à¦¯à¦¾ *</label><textarea name="problem" required placeholder="à¦°à§‹à¦—à§€à¦° à¦…à¦¬à¦¸à§à¦¥à¦¾ à¦¸à¦‚à¦•à§à¦·à§‡à¦ªà§‡ à¦²à¦¿à¦–à§à¦¨"></textarea></div>
-<div class="ig"><label>à¦ªà§à¦°à§‡à¦¸à¦•à§à¦°à¦¿à¦ªà¦¶à¦¨ <span style="color:#9aa0a6;font-size:12px">(à¦à¦šà§à¦›à¦¿à¦• â€” à¦¸à¦°à§à¦¬à§‹à¦šà§à¦š à§«, à§§à§¦MB)</span></label><input type="file" id="rfi" accept=".pdf,image/*"></div>
-<div class="ig"><label>à¦°à¦•à§à¦¤à¦¦à¦¾à¦¨à§‡à¦° à¦¤à¦¾à¦°à¦¿à¦– à¦“ à¦¸à¦®à¦¯à¦¼ *</label><input type="datetime-local" name="dateTime" required></div>
-</form></div>
-<div class="ff"><button type="button" class="sbtn" id="brb"><span id="brt">à¦¡à§‹à¦¨à¦¾à¦° à¦–à§à¦à¦œà§à¦¨ ðŸ”</span><div class="spin" id="brs"></div></button><div class="err" id="bre"></div></div>
-</div>
-<div id="brr" style="display:none">
-<div class="fh" style="background:#f8f9fa"><span class="fi">ðŸ”</span><div class="ft">à¦¡à§‹à¦¨à¦¾à¦° à¦…à¦¨à§à¦¸à¦¨à§à¦§à¦¾à¦¨à§‡à¦° à¦«à¦²à¦¾à¦«à¦²</div></div>
-<div class="rs"><div class="ri" id="bri"></div><div id="brdl"></div>
-<div class="cs" id="brcs"><p>âœ… à¦•à§‹à¦¨à§‹ à¦¡à§‹à¦¨à¦¾à¦° à¦°à¦¾à¦œà¦¿ à¦¹à¦²à§‡ à¦¨à¦¿à¦šà§‡à¦° à¦¬à¦¾à¦Ÿà¦¨à§‡ à¦•à§à¦²à¦¿à¦• à¦•à¦°à§‡ à¦®à§à¦¯à¦¾à¦š à¦•à¦¨à¦«à¦¾à¦°à§à¦® à¦•à¦°à§à¦¨à¥¤</p><button class="csb" onclick="go('match-secured')">ðŸ¤ à¦¡à§‹à¦¨à¦¾à¦° à¦•à¦¨à¦«à¦¾à¦°à§à¦® à¦•à¦°à§à¦¨</button></div>
-</div></div></div></div>
-<!-- MATCH SECURED (HIDDEN FROM NORMAL NAV) -->
-<div class="page" id="p-match-secured">
-<div class="fc gt">
-<div id="msfs">
-<div class="fh gh"><span class="fi">ðŸ¤</span><div class="ft gn">Match Secured</div><div class="fs">à¦¸à§à¦ªà¦¨à§à¦¦à¦¨ à¦¬à§à¦²à¦¾à¦¡ à¦¸à§‹à¦¸à¦¾à¦‡à¦Ÿà¦¿, à¦à¦¿à¦¨à¦¾à¦‡à¦¦à¦¹ à¦Ÿà§‡à¦•à§à¦¸à¦Ÿà¦¾à¦‡à¦² à¦‡à¦žà§à¦œà¦¿à¦¨à¦¿à¦¯à¦¼à¦¾à¦°à¦¿à¦‚ à¦•à¦²à§‡à¦œ</div></div>
-<div class="fb">
-<p class="fd gn">à¦¡à§‹à¦¨à¦¾à¦°à§‡à¦° à¦¨à¦¾à¦®à§à¦¬à¦¾à¦° à¦¦à¦¿à¦¨à¥¤ à¦°à§‹à¦—à§€à¦° à¦¬à¦¿à¦¸à§à¦¤à¦¾à¦°à¦¿à¦¤ à¦¤à¦¥à§à¦¯ à¦¡à§‹à¦¨à¦¾à¦°à§‡à¦° à¦‡à¦®à§‡à¦‡à¦²à§‡ à¦ªà¦¾à¦ à¦¾à¦¨à§‹ à¦¹à¦¬à§‡à¥¤</p>
-<form id="msf"><input type="hidden" name="action" value="secureMatch">
-<div class="ig"><label>à¦†à¦ªà¦¨à¦¾à¦° à¦¨à¦¾à¦®à§à¦¬à¦¾à¦° (Blood Request-à¦ à¦¦à§‡à¦“à¦¯à¦¼à¦¾) *</label><input type="tel" name="reqPhone" id="ms_req_p" required autocomplete="tel" placeholder="01XXXXXXXXX"></div>
-<div class="ig"><label>à¦¸à¦®à§à¦®à¦¤à¦¿ à¦¦à§‡à¦“à¦¯à¦¼à¦¾ à¦¡à§‹à¦¨à¦¾à¦°à§‡à¦° à¦¨à¦¾à¦®à§à¦¬à¦¾à¦° *</label><input type="tel" name="donorPhone" id="msdp" required placeholder="01XXXXXXXXX"></div>
-</form></div>
-<div class="ff"><button type="button" class="sbtn gn" id="msb"><span id="mst">à¦•à¦¨à¦«à¦¾à¦°à§à¦® à¦“ à¦‡à¦®à§‡à¦‡à¦² à¦ªà¦¾à¦ à¦¾à¦¨ ðŸ“§</span><div class="spin" id="mss"></div></button><div class="err" id="mse"></div></div>
-</div>
-<div class="ok-w" id="msok">
-<div class="ok-ic" style="background:linear-gradient(135deg,#43a047,#1b5e20)"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-<div class="ok-t" style="color:#1b5e20">ðŸŽ‰ à¦¸à¦«à¦²à¦­à¦¾à¦¬à§‡ à¦®à§à¦¯à¦¾à¦š à¦•à¦¨à¦«à¦¾à¦°à§à¦®!</div>
-<div class="ok-s">à¦¡à§‹à¦¨à¦¾à¦° à¦“ à¦°à§‹à¦—à§€à¦° à¦¸à§à¦¬à¦œà¦¨ à¦‰à¦­à¦¯à¦¼à¦•à§‡ à¦…à¦¸à¦‚à¦–à§à¦¯ à¦§à¦¨à§à¦¯à¦¬à¦¾à¦¦à¥¤</div>
-<div class="mdi"><div class="mdn">ðŸ©¸ à¦¡à§‹à¦¨à¦¾à¦°: <span id="msdn"></span></div><div class="mdm">à¦¡à§‹à¦¨à¦¾à¦°à¦•à§‡ à¦¸à¦«à¦²à¦­à¦¾à¦¬à§‡ à¦¨à¦¿à¦¶à§à¦šà¦¿à¦¤ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤<br>à¦°à§‹à¦—à§€à¦° à¦¸à¦®à§à¦ªà§‚à¦°à§à¦£ à¦¤à¦¥à§à¦¯ à¦¤à¦¾à¦° à¦‡à¦®à§‡à¦‡à¦²à§‡ à¦ªà¦¾à¦ à¦¾à¦¨à§‹ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤</div></div>
-<!-- WhatsApp Click to Chat Button -->
-<button class="wa-btn" id="wa-btn-1" style="width:100%; margin-bottom: 20px;">
-    <svg style="width:24px;height:24px;fill:white" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
-    à¦¡à§‹à¦¨à¦¾à¦°à¦•à§‡ WhatsApp à¦ à¦®à§‡à¦¸à§‡à¦œ à¦¦à¦¿à¦¨
-</button>
-<div class="stc">
-<div class="str"><span>ðŸ“§</span><span>à¦¡à§‹à¦¨à¦¾à¦°à§‡à¦° à¦‡à¦®à§‡à¦‡à¦²à§‡ à¦°à§‹à¦—à§€à¦° à¦¸à¦•à¦² à¦¤à¦¥à§à¦¯ à¦ªà¦¾à¦ à¦¾à¦¨à§‹ à¦¹à¦¯à¦¼à§‡à¦›à§‡</span></div>
-<div class="str"><span>ðŸ“‹</span><span>Request_DB-à¦¤à§‡ à¦¸à§à¦Ÿà§à¦¯à¦¾à¦Ÿà¦¾à¦¸ "Assigned" à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡</span></div>
-<div class="str"><span>â°</span><span>à§¨à§ª à¦“ à§ªà§® à¦˜à¦£à§à¦Ÿà¦¾ à¦ªà¦°à§‡ à¦¸à§à¦¬à¦¯à¦¼à¦‚à¦•à§à¦°à¦¿à¦¯à¦¼ à¦°à¦¿à¦®à¦¾à¦‡à¦¨à§à¦¡à¦¾à¦° à¦ªà¦¾à¦ à¦¾à¦¨à§‹ à¦¹à¦¬à§‡</span></div>
-<div class="str"><span>âž•</span><span>à¦†à¦°à§‡à¦•à¦œà¦¨ à¦¡à§‹à¦¨à¦¾à¦° à¦¯à§‹à¦— à¦•à¦°à¦¤à§‡ à¦¨à¦¿à¦šà§‡à¦° à¦¬à¦¾à¦Ÿà¦¨à§‡ à¦•à§à¦²à¦¿à¦• à¦•à¦°à§à¦¨</span></div>
-</div>
-<button class="adb" id="msab">âž• à¦†à¦°à§‡à¦•à¦œà¦¨ à¦¡à§‹à¦¨à¦¾à¦° à¦¯à§à¦•à§à¦¤ à¦•à¦°à§à¦¨</button>
-</div></div></div>
-<!-- CONFIRMATION (HIDDEN FROM NORMAL NAV) -->
-<div class="page" id="p-confirm">
-<div class="fc" style="border-top-color:#c62828">
-<div id="cffs">
-<div class="fh"><span class="fi">ðŸ©º</span><div class="ft">Donation Confirmation</div><div class="fs">à¦¸à§à¦ªà¦¨à§à¦¦à¦¨ à¦¬à§à¦²à¦¾à¦¡ à¦¸à§‹à¦¸à¦¾à¦‡à¦Ÿà¦¿, à¦à¦¿à¦¨à¦¾à¦‡à¦¦à¦¹</div></div>
-<div class="fb">
-<p class="fd">à¦°à¦•à§à¦¤à¦¦à¦¾à¦¨à§‡à¦° à¦†à¦ªà¦¡à§‡à¦Ÿ à¦¦à¦¿à¦¨à¥¤ à¦†à¦—à¦¾à¦®à§€ à§ª à¦®à¦¾à¦¸ à¦†à¦° à¦•à§‹à¦¨à§‹ à¦…à¦¨à§à¦°à§‹à¦§ à¦ªà¦¾à¦ à¦¾à¦¨à§‹ à¦¹à¦¬à§‡ à¦¨à¦¾à¥¤</p>
-<form id="cff"><input type="hidden" name="formType" value="donationConfirmation">
-<div class="ig"><label>à¦†à¦ªà¦¨à¦¾à¦° à¦‡à¦®à§‡à¦‡à¦² à¦à¦¡à§à¦°à§‡à¦¸ *</label><input type="email" name="donorEmail" required autocomplete="email" placeholder="à¦¯à§‡ à¦‡à¦®à§‡à¦‡à¦²à§‡ à¦†à¦®à¦¾à¦¦à§‡à¦° à¦®à§‡à¦‡à¦² à¦ªà§‡à¦¯à¦¼à§‡à¦›à§‡à¦¨"></div>
-<div class="ig"><label>à¦°à¦•à§à¦¤à¦¦à¦¾à¦¨à§‡à¦° à¦¸à§à¦Ÿà§à¦¯à¦¾à¦Ÿà¦¾à¦¸ *</label><select name="donationStatus" id="cfst" required><option value="">à¦¸à§à¦Ÿà§à¦¯à¦¾à¦Ÿà¦¾à¦¸ à¦¨à¦¿à¦°à§à¦¬à¦¾à¦šà¦¨ à¦•à¦°à§à¦¨</option><option value="Donated">âœ… à¦¹à§à¦¯à¦¾à¦, à¦°à¦•à§à¦¤ à¦¦à¦¿à¦¯à¦¼à§‡à¦›à¦¿</option><option value="Not Needed">ðŸ™ à¦°à§‹à¦—à§€à¦° à¦†à¦° à¦°à¦•à§à¦¤ à¦²à¦¾à¦—à§‡à¦¨à¦¿</option><option value="Failed">ðŸ˜” à¦•à§‹à¦¨à§‹ à¦•à¦¾à¦°à¦£à§‡ à¦¦à¦¿à¦¤à§‡ à¦ªà¦¾à¦°à¦¿à¦¨à¦¿</option></select></div>
-<div class="ig" id="cfdr" hidden><label>à¦°à¦•à§à¦¤à¦¦à¦¾à¦¨à§‡à¦° à¦¤à¦¾à¦°à¦¿à¦– *</label><input type="date" name="donationDate"></div>
-</form></div>
-<div class="ff"><button type="button" class="sbtn" id="cfb" style="background:linear-gradient(135deg,#c62828,#b71c1c)"><span id="cft">à¦¸à§à¦Ÿà§à¦¯à¦¾à¦Ÿà¦¾à¦¸ à¦†à¦ªà¦¡à§‡à¦Ÿ à¦•à¦°à§à¦¨ âœ…</span><div class="spin" id="cfs"></div></button><div class="err" id="cfe"></div></div>
-</div>
-<div class="ok-w" id="cfok">
-<div class="ok-ic" style="background:linear-gradient(135deg,#ef5350,#b71c1c)"><svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></div>
-<div class="ok-t" style="color:#c62828">â¤ï¸ à¦¸à§à¦Ÿà§à¦¯à¦¾à¦Ÿà¦¾à¦¸ à¦¸à¦«à¦²à¦­à¦¾à¦¬à§‡ à¦†à¦ªà¦¡à§‡à¦Ÿ!</div>
-<div class="ok-s">à¦¸à§à¦ªà¦¨à§à¦¦à¦¨ à¦¬à§à¦²à¦¾à¦¡ à¦¸à§‹à¦¸à¦¾à¦‡à¦Ÿà¦¿à¦° à¦ªà¦•à§à¦· à¦¥à§‡à¦•à§‡ à¦†à¦ªà¦¨à¦¾à¦•à§‡ à¦…à¦¸à¦‚à¦–à§à¦¯ à¦§à¦¨à§à¦¯à¦¬à¦¾à¦¦à¥¤</div>
-<!-- WhatsApp Click to Chat Button -->
-<button class="wa-btn" id="wa-btn-2" style="width:100%; margin-bottom: 20px;" onclick="window.open('https://wa.me/?text='+encodeURIComponent('à¦†à¦²à¦¹à¦¾à¦®à¦¦à§à¦²à¦¿à¦²à§à¦²à¦¾à¦¹, à¦†à¦®à¦¿ à¦¸à§à¦ªà¦¨à§à¦¦à¦¨ à¦¬à§à¦²à¦¾à¦¡ à¦¸à§‹à¦¸à¦¾à¦‡à¦Ÿà¦¿à¦° à¦®à¦¾à¦§à§à¦¯à¦®à§‡ à¦¸à¦«à¦²à¦­à¦¾à¦¬à§‡ à¦°à¦•à§à¦¤à¦¦à¦¾à¦¨ à¦¸à¦®à§à¦ªà¦¨à§à¦¨ à¦•à¦°à§‡à¦›à¦¿à¥¤ à¦°à¦•à§à¦¤à¦¦à¦¾à¦¨à§‡ à¦à¦—à¦¿à§Ÿà§‡ à¦†à¦¸à§à¦¨, à¦œà§€à¦¬à¦¨ à¦¬à¦¾à¦à¦šà¦¾à¦¨! ðŸ©¸â¤ï¸'), '_blank')">
-    <svg style="width:24px;height:24px;fill:white" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
-    à¦¸à§à¦Ÿà§à¦¯à¦¾à¦Ÿà¦¾à¦¸ WhatsApp à¦ à¦¶à§‡à¦¯à¦¼à¦¾à¦° à¦•à¦°à§à¦¨
-</button>
-<div class="ok-i" style="background:linear-gradient(135deg,#fff5f5,#fff);border:1px solid #ffcdd2">
-<div class="ok-r"><span>âœ…</span><span>à¦†à¦ªà¦¨à¦¾à¦° à¦°à¦•à§à¦¤à¦¦à¦¾à¦¨à§‡à¦° à¦¤à¦¥à§à¦¯ à¦¸à¦«à¦²à¦­à¦¾à¦¬à§‡ à¦†à¦ªà¦¡à§‡à¦Ÿ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤</span></div>
-<div class="ok-r"><span>ðŸ˜´</span><span>à¦ªà¦°à¦¬à¦°à§à¦¤à§€ à§§à§¨à§¦ à¦¦à¦¿à¦¨ à¦†à¦° à¦•à§‹à¦¨à§‹ à¦°à¦¿à¦•à§‹à¦¯à¦¼à§‡à¦¸à§à¦Ÿ à¦ªà¦¾à¦ à¦¾à¦¨à§‹ à¦¹à¦¬à§‡ à¦¨à¦¾à¥¤</span></div>
-<div class="ok-r"><span>ðŸ¥</span><span>à¦°à§‹à¦—à§€ à¦“ à¦¤à¦¾à¦° à¦ªà¦°à¦¿à¦¬à¦¾à¦°à§‡à¦° à¦ªà¦•à§à¦· à¦¥à§‡à¦•à§‡ à¦—à¦­à§€à¦° à¦•à§ƒà¦¤à¦œà§à¦žà¦¤à¦¾à¥¤</span></div>
-<div class="ok-r"><span>ðŸ©¸</span><span>à¦†à¦ªà¦¨à¦¾à¦° à¦à¦‡ à¦®à¦¹à§Ž à¦•à¦¾à¦œ à¦¸à¦®à¦¾à¦œà§‡à¦° à¦œà¦¨à§à¦¯ à¦…à¦¨à§à¦ªà§à¦°à§‡à¦°à¦£à¦¾à¥¤</span></div>
-</div>
-</div></div></div>
-<!-- DONOR PROFILE PAGE -->
-<div class="page" id="p-donor-profile">
-<div class="ac" id="dp-step1">
-  <div class="ac-h"><h2>à¦¡à§‹à¦¨à¦¾à¦° à¦ªà§à¦°à§‹à¦«à¦¾à¦‡à¦²</h2><p>à¦¨à¦¿à¦œà§‡ à¦ªà§à¦°à§‹à¦«à¦¾à¦‡à¦² à¦†à¦ªà¦¡à§‡à¦Ÿ à¦•à¦°à§à¦¨</p></div>
-  <form id="dp-form1">
-    <div class="ig">
-      <label>à¦†à¦ªà¦¨à¦¾à¦° à¦°à§‡à¦œà¦¿à¦¸à§à¦Ÿà§à¦°à¦¿à¦•à§ƒà¦¤ à¦‡à¦®à§‡à¦‡à¦² à¦¦à¦¿à¦¨ *</label>
-      <input type="email" id="dp-email" required placeholder="example@gmail.com">
+
+<div id="main">
+  <!-- PAGE: HOME -->
+  <div class="page on" id="p-home">
+    <div class="hero">
+      <img src="home-banner.png" alt="Spondon Group" class="hero-img" id="hero-img1" onerror="this.style.display='none'" style="max-width:100%; border-radius:16px; margin-bottom:16px; width:100%;">
+      <h2 style="font-weight: bold; font-size: 24px;">Making a Difference Through Donation</h2>
+      <p style="font-family: 'Hind Siliguri', sans-serif;">স্পন্দন ব্লাড সোসাইটি ঝিনাইদহ টেক্সটাইল ইঞ্জিনিয়ারিং কলেজের একটি স্বেচ্ছাসেবী রক্তদান সংগঠন।<br>স্পন্দন ব্লাড সোসাইটি মানুষের জীবন বাঁচাতে রক্তদান কার্যক্রম পরিচালনা করে।</p>
+      <div class="hero-stats" id="stdt" hidden>
+        <div class="hs-it"><span class="hs-v" id="s-td">-</span><span class="hs-l">রক্তদান</span></div>
+        <div class="hs-it"><span class="hs-v" id="s-ad">-</span><span class="hs-l">রক্তদাতা</span></div>
+        <div class="hs-it"><span class="hs-v" id="s-nd">-</span><span class="hs-l">আজকের</span></div>
+        <div class="hs-it"><span class="hs-v" id="s-pr">-</span><span class="hs-l">অপেক্ষমাণ</span></div>
+      </div>
+      <div class="hero-stats" id="stsk">
+        <div class="hs-it"><div class="hs-sk"></div></div>
+        <div class="hs-it"><div class="hs-sk"></div></div>
+        <div class="hs-it"><div class="hs-sk"></div></div>
+      </div>
+      <div class="updt" id="s-up">লোড হচ্ছে...</div>
     </div>
-    <div class="err" id="dp-err1"></div>
-    <button type="submit" class="pok" id="dp-b1">OTP à¦ªà¦¾à¦ à¦¾à¦¨</button>
-  </form>
-</div>
-<div class="ac" id="dp-step2" style="display:none;">
-  <div class="ac-h"><h2>OTP à¦­à§‡à¦°à¦¿à¦«à¦¿à¦•à§‡à¦¶à¦¨</h2><p>à¦†à¦ªà¦¨à¦¾à¦° à¦‡à¦®à§‡à¦‡à¦²à§‡ à¦ªà§à¦°à§‡à¦°à¦¿à¦¤ à§ª-à¦¡à¦¿à¦œà¦¿à¦Ÿà§‡à¦° à¦ªà¦¿à¦¨à¦Ÿà¦¿ à¦¦à¦¿à¦¨</p></div>
-  <form id="dp-form2">
-    <div class="ig">
-      <label>à¦ªà¦¿à¦¨ à¦•à§‹à¦¡ (OTP) *</label>
-      <input type="text" id="dp-otp" required placeholder="1234">
+    <div class="ssec">
+      <div class="shd">
+        <h3><svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>রক্তের গ্রুপ</h3>
+        <span>মজুদ</span>
+      </div>
+      <div class="bg-grid" id="s-bg">
+        <div class="bgc"><b>A+</b><div class="hs-sk" style="width:20px;height:14px"></div></div>
+        <div class="bgc"><b>B+</b><div class="hs-sk" style="width:20px;height:14px"></div></div>
+        <div class="bgc"><b>O+</b><div class="hs-sk" style="width:20px;height:14px"></div></div>
+        <div class="bgc"><b>AB+</b><div class="hs-sk" style="width:20px;height:14px"></div></div>
+        <div class="bgc"><b>A-</b><div class="hs-sk" style="width:20px;height:14px"></div></div>
+        <div class="bgc"><b>B-</b><div class="hs-sk" style="width:20px;height:14px"></div></div>
+        <div class="bgc"><b>O-</b><div class="hs-sk" style="width:20px;height:14px"></div></div>
+        <div class="bgc"><b>AB-</b><div class="hs-sk" style="width:20px;height:14px"></div></div>
+      </div>
     </div>
-    <div class="err" id="dp-err2"></div>
-    <button type="submit" class="pok" id="dp-b2">à¦­à§‡à¦°à¦¿à¦«à¦¾à¦‡ à¦•à¦°à§à¦¨</button>
-  </form>
-</div>
-<div class="ac" id="dp-step3" style="display:none;">
-  <div class="ac-h"><h2>à¦ªà§à¦°à§‹à¦«à¦¾à¦‡à¦² à¦à¦¡à¦¿à¦Ÿ à¦•à¦°à§à¦¨</h2><p>à¦†à¦ªà¦¨à¦¾à¦° à¦¨à¦¤à§à¦¨ à¦¤à¦¥à§à¦¯ à¦¦à¦¿à§Ÿà§‡ à¦¸à§‡à¦­ à¦•à¦°à§à¦¨</p></div>
-  <form id="dp-form3">
-    <div class="ig"><label>à¦†à¦ªà¦¨à¦¾à¦° à¦¨à¦¾à¦® *</label><input type="text" id="dp-name" required></div>
-    <div class="ig"><label>à¦®à§‹à¦¬à¦¾à¦‡à¦² à¦¨à¦¾à¦®à§à¦¬à¦¾à¦° *</label><input type="tel" id="dp-phone" required></div>
-    <div class="ig"><label>à¦¬à¦°à§à¦¤à¦®à¦¾à¦¨ à¦œà§‡à¦²à¦¾ *</label><select id="dp-district" required><option value="">à¦¨à¦¿à¦°à§à¦¬à¦¾à¦šà¦¨ à¦•à¦°à§à¦¨</option><option value="à¦¢à¦¾à¦•à¦¾">à¦¢à¦¾à¦•à¦¾</option><option value="à¦šà¦Ÿà§à¦Ÿà¦—à§à¦°à¦¾à¦®">à¦šà¦Ÿà§à¦Ÿà¦—à§à¦°à¦¾à¦®</option><option value="à¦°à¦¾à¦œà¦¶à¦¾à¦¹à§€">à¦°à¦¾à¦œà¦¶à¦¾à¦¹à§€</option><option value="à¦–à§à¦²à¦¨à¦¾">à¦–à§à¦²à¦¨à¦¾</option><option value="à¦¬à¦°à¦¿à¦¶à¦¾à¦²">à¦¬à¦°à¦¿à¦¶à¦¾à¦²</option><option value="à¦¸à¦¿à¦²à§‡à¦Ÿ">à¦¸à¦¿à¦²à§‡à¦Ÿ</option><option value="à¦°à¦‚à¦ªà§à¦°">à¦°à¦‚à¦ªà§à¦°</option><option value="à¦®à¦¯à¦¼à¦®à¦¨à¦¸à¦¿à¦‚à¦¹">à¦®à¦¯à¦¼à¦®à¦¨à¦¸à¦¿à¦‚à¦¹</option><option value="à¦à¦¿à¦¨à¦¾à¦‡à¦¦à¦¹">à¦à¦¿à¦¨à¦¾à¦‡à¦¦à¦¹</option></select></div>
-    <div class="ig"><label>à¦‰à¦ªà¦œà§‡à¦²à¦¾/à¦à¦²à¦¾à¦•à¦¾ *</label><input type="text" id="dp-upazilla" required></div>
-    <div class="ig"><label>à¦°à¦•à§à¦¤à§‡à¦° à¦—à§à¦°à§à¦ª *</label><select id="dp-bg" required><option value="">à¦¨à¦¿à¦°à§à¦¬à¦¾à¦šà¦¨ à¦•à¦°à§à¦¨</option><option value="A+">A+</option><option value="A-">A-</option><option value="B+">B+</option><option value="B-">B-</option><option value="AB+">AB+</option><option value="AB-">AB-</option><option value="O+">O+</option><option value="O-">O-</option></select></div>
-    <div class="ig"><label>à¦¶à§‡à¦· à¦•à¦¬à§‡ à¦°à¦•à§à¦¤ à¦¦à¦¿à§Ÿà§‡à¦›à§‡à¦¨? (à¦¯à¦¦à¦¿ à¦¦à§‡à¦¨)</label><input type="date" id="dp-lastdate"></div>
     
-    <div class="err" id="dp-err3"></div>
-    <div class="okm" id="dp-ok3" style="display:none;">à¦ªà§à¦°à§‹à¦«à¦¾à¦‡à¦² à¦¸à¦«à¦²à¦­à¦¾à¦¬à§‡ à¦†à¦ªà¦¡à§‡à¦Ÿ à¦¹à§Ÿà§‡à¦›à§‡! âœ…</div>
-    <button type="submit" class="pok" id="dp-b3">à¦ªà¦°à¦¿à¦¬à¦°à§à¦¤à¦¨ à¦¸à§‡à¦­ à¦•à¦°à§à¦¨</button>
-  </form>
-</div>
-</div>
-<!-- ABOUT & GUIDELINES -->
-<div class="page" id="p-about">
-<div class="ac">
-<div class="ac-h"><h2>à¦ªà¦°à¦¿à¦šà¦¿à¦¤à¦¿ à¦“ à¦—à¦¾à¦‡à¦¡à¦²à¦¾à¦‡à¦¨ ðŸ©¸</h2><p>à¦¸à§à¦ªà¦¨à§à¦¦à¦¨ à¦¬à§à¦²à¦¾à¦¡ à¦¸à§‹à¦¸à¦¾à¦‡à¦Ÿà¦¿ à¦à¦¬à¦‚ à¦°à¦•à§à¦¤à¦¦à¦¾à¦¨à§‡à¦° à¦—à¦¾à¦‡à¦¡à¦²à¦¾à¦‡à¦¨</p></div>
-<div class="st2">à¦†à¦®à¦¾à¦¦à§‡à¦° à¦²à¦•à§à¦·à§à¦¯ à¦“ à¦ªà¦°à¦¿à¦šà¦¯à¦¼</div>
-<div class="ab">à¦¸à§à¦ªà¦¨à§à¦¦à¦¨ à¦¬à§à¦²à¦¾à¦¡ à¦¸à§‹à¦¸à¦¾à¦‡à¦Ÿà¦¿ à¦à¦•à¦Ÿà¦¿ à¦¸à¦®à§à¦ªà§‚à¦°à§à¦£ <b>à¦…à¦°à¦¾à¦œà¦¨à§ˆà¦¤à¦¿à¦• à¦¸à§à¦¬à§‡à¦šà§à¦›à¦¾à¦¸à§‡à¦¬à§€ à¦¸à¦‚à¦—à¦ à¦¨</b>à¥¤<ul><li>à¦®à§à¦®à§‚à¦°à§à¦·à§ à¦°à§‹à¦—à§€à¦° à¦œà¦¨à§à¦¯ à¦¬à¦¿à¦¨à¦¾à¦®à§‚à¦²à§à¦¯à§‡ à¦¨à¦¿à¦°à¦¾à¦ªà¦¦ à¦°à¦•à§à¦¤à§‡à¦° à¦¬à§à¦¯à¦¬à¦¸à§à¦¥à¦¾ à¦•à¦°à¦¾à¥¤</li><li>à¦°à¦•à§à¦¤ à¦¦à§‡à¦“à¦¯à¦¼à¦¾ à¦¬à¦¾ à¦¨à§‡à¦“à¦¯à¦¼à¦¾à¦° à¦œà¦¨à§à¦¯ <b>à¦…à¦°à§à¦¥ à¦²à§‡à¦¨à¦¦à§‡à¦¨ à¦¸à¦®à§à¦ªà§‚à¦°à§à¦£ à¦¨à¦¿à¦·à§‡à¦§</b>à¥¤</li><li>à¦¡à§‹à¦¨à¦¾à¦°à¦¦à§‡à¦° à¦¤à¦¥à§à¦¯ à¦¶à§à¦§à§à¦®à¦¾à¦¤à§à¦° à¦œà¦°à§à¦°à¦¿ à¦ªà§à¦°à¦¯à¦¼à§‹à¦œà¦¨à§‡ à¦¬à§à¦¯à¦¬à¦¹à§ƒà¦¤à¥¤</li><li>à¦†à¦®à¦°à¦¾ à¦¸à§à¦¬à§‡à¦šà§à¦›à¦¾ à¦°à¦•à§à¦¤à¦¦à¦¾à¦¨à§‡ à¦‰à§Žà¦¸à¦¾à¦¹à¦¿à¦¤ à¦•à¦°à¦¿à¥¤</li></ul></div>
-<div class="st2">à¦°à¦•à§à¦¤à¦¦à¦¾à¦¨à§‡à¦° à¦—à¦¾à¦‡à¦¡à¦²à¦¾à¦‡à¦¨ ðŸ©¸</div>
-<div class="gc" style="padding:0; margin-top:10px;">
-<details><summary>à¦°à¦•à§à¦¤à¦¦à¦¾à¦¨à§‡à¦° à¦ªà§à¦°à¦¾à¦¥à¦®à¦¿à¦• à¦¯à§‹à¦—à§à¦¯à¦¤à¦¾ à¦•à§€?</summary><div class="gct"><ul><li><span class="hl">à¦¬à¦¯à¦¼à¦¸:</span> à§§à§® à¦¥à§‡à¦•à§‡ à§¬à§¦ à¦¬à¦›à¦°à¥¤</li><li><span class="hl">à¦“à¦œà¦¨:</span> à¦ªà§à¦°à§à¦· à¦¨à§à¦¯à§‚à¦¨à¦¤à¦® à§«à§¦ à¦•à§‡à¦œà¦¿, à¦¨à¦¾à¦°à§€ à¦¨à§à¦¯à§‚à¦¨à¦¤à¦® à§ªà§« à¦•à§‡à¦œà¦¿à¥¤</li><li><span class="hl">à¦¶à¦¾à¦°à§€à¦°à¦¿à¦• à¦…à¦¬à¦¸à§à¦¥à¦¾:</span> à¦¸à¦®à§à¦ªà§‚à¦°à§à¦£ à¦¸à§à¦¸à§à¦¥, à¦•à§‹à¦¨à§‹ à¦¦à§€à¦°à§à¦˜à¦®à§‡à¦¯à¦¼à¦¾à¦¦à§€ à¦°à§‹à¦— à¦¨à§‡à¦‡à¥¤</li><li><span class="hl">à¦¹à¦¿à¦®à§‹à¦—à§à¦²à§‹à¦¬à¦¿à¦¨:</span> à¦ªà§à¦°à§à¦· à§§à§¨.à§« g/dL, à¦¨à¦¾à¦°à§€ à§§à§¨ g/dLà¥¤</li></ul></div></details>
-<details><summary>à¦•à¦¤à¦¦à¦¿à¦¨ à¦ªà¦°à¦ªà¦° à¦°à¦•à§à¦¤ à¦¦à§‡à¦“à¦¯à¦¼à¦¾ à¦¯à¦¾à¦¯à¦¼?</summary><div class="gct">à¦ªà§à¦°à§à¦· à¦ªà§à¦°à¦¤à¦¿ <span class="hl">à§© à¦®à¦¾à¦¸ (à§¯à§¦ à¦¦à¦¿à¦¨)</span> à¦à¦¬à¦‚ à¦¨à¦¾à¦°à§€ à¦ªà§à¦°à¦¤à¦¿ <span class="hl">à§ª à¦®à¦¾à¦¸ (à§§à§¨à§¦ à¦¦à¦¿à¦¨)</span> à¦…à¦¨à§à¦¤à¦°à¥¤<br>à¦†à¦®à¦¾à¦¦à§‡à¦° à¦¸à¦¿à¦¸à§à¦Ÿà§‡à¦®à§‡ <span class="hl">à¦¸à¦°à§à¦¬à¦œà¦¨à§€à¦¨ à§§à§¨à§¦ à¦¦à¦¿à¦¨</span> à¦—à¦£à¦¨à¦¾ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à¥¤</div></details>
-<details><summary>à¦°à¦•à§à¦¤à¦¦à¦¾à¦¨à§‡à¦° à¦ªà§‚à¦°à§à¦¬à§‡ à¦ªà§à¦°à¦¸à§à¦¤à§à¦¤à¦¿ à¦•à§€?</summary><div class="gct"><ul><li><span class="hl">à§¬â€“à§® à¦˜à¦£à§à¦Ÿà¦¾</span> à¦˜à§à¦® à¦¨à¦¿à¦¶à§à¦šà¦¿à¦¤ à¦•à¦°à§à¦¨à¥¤</li><li>à¦…à¦¨à§à¦¤à¦¤ à§¨ à¦˜à¦£à§à¦Ÿà¦¾ à¦†à¦—à§‡ à¦ªà§à¦·à§à¦Ÿà¦¿à¦•à¦° à¦–à¦¾à¦¬à¦¾à¦° à¦–à¦¾à¦¨à¥¤ <span class="hl">à¦–à¦¾à¦²à¦¿ à¦ªà§‡à¦Ÿà§‡ à¦¨à¦¯à¦¼à¥¤</span></li><li>à¦ªà§à¦°à¦šà§à¦° à¦ªà¦¾à¦¨à¦¿ à¦ªà¦¾à¦¨ à¦•à¦°à§à¦¨à¥¤</li><li>à¦­à¦¾à¦°à§€ à¦¬à§à¦¯à¦¾à¦¯à¦¼à¦¾à¦® à¦à¦¡à¦¼à¦¿à¦¯à¦¼à§‡ à¦šà¦²à§à¦¨à¥¤</li></ul></div></details>
-<details><summary>à¦•à§‹à¦¨ à¦…à¦¬à¦¸à§à¦¥à¦¾à¦¯à¦¼ à¦°à¦•à§à¦¤ à¦¦à§‡à¦“à¦¯à¦¼à¦¾ à¦¨à¦¿à¦·à§‡à¦§?</summary><div class="gct"><ul><li>à¦œà§à¦¬à¦°, à¦¸à¦°à§à¦¦à¦¿, à¦•à¦¾à¦¶à¦¿ à¦¬à¦¾ à¦¡à¦¾à¦¯à¦¼à¦°à¦¿à¦¯à¦¼à¦¾à¥¤</li><li>à¦…à§à¦¯à¦¾à¦¨à§à¦Ÿà¦¿à¦¬à¦¾à¦¯à¦¼à§‹à¦Ÿà¦¿à¦• à¦—à§à¦°à¦¹à¦£à¦•à¦¾à¦²à§€à¦¨à¥¤</li><li>à¦—à¦¤ à§¬ à¦®à¦¾à¦¸à§‡ à¦¬à¦¡à¦¼ à¦…à¦¸à§à¦¤à§à¦°à§‹à¦ªà¦šà¦¾à¦° à¦¬à¦¾ à¦Ÿà§à¦¯à¦¾à¦Ÿà§à¥¤</li><li>à¦—à¦°à§à¦­à¦¾à¦¬à¦¸à§à¦¥à¦¾à¦¯à¦¼, à¦¸à§à¦¤à¦¨à§à¦¯à¦ªà¦¾à¦¨ à¦“ à¦®à¦¾à¦¸à¦¿à¦• à¦šà¦²à¦¾à¦•à¦¾à¦²à§€à¦¨à¥¤</li><li>à¦…à¦¨à¦¿à¦¯à¦¼à¦¨à§à¦¤à§à¦°à¦¿à¦¤ à¦¡à¦¾à¦¯à¦¼à¦¾à¦¬à§‡à¦Ÿà¦¿à¦¸ à¦¬à¦¾ à¦‰à¦šà§à¦š à¦°à¦•à§à¦¤à¦šà¦¾à¦ªà¥¤</li></ul></div></details>
-<details><summary>à¦°à§‹à¦—à§€à¦° à¦œà¦¨à§à¦¯ à¦°à¦•à§à¦¤ à¦¨à§‡à¦“à¦¯à¦¼à¦¾à¦° à¦¸à¦¤à¦°à§à¦•à¦¤à¦¾</summary><div class="gct"><ul><li><span class="hl">à¦•à§à¦°à¦¸à¦®à§à¦¯à¦¾à¦šà¦¿à¦‚</span> à¦ªà¦°à§€à¦•à§à¦·à¦¾ à¦¬à¦¾à¦§à§à¦¯à¦¤à¦¾à¦®à§‚à¦²à¦•à¥¤</li><li>à§«à¦Ÿà¦¿ à¦­à¦¾à¦‡à¦°à¦¾à¦¸à§‡à¦° <span class="hl">à¦¸à§à¦•à§à¦°à¦¿à¦¨à¦¿à¦‚ à¦Ÿà§‡à¦¸à§à¦Ÿ</span>: HIV, HBV, HCV, Syphilis, Malariaà¥¤</li><li>à¦²à¦¾à¦‡à¦¸à§‡à¦¨à§à¦¸à¦ªà§à¦°à¦¾à¦ªà§à¦¤ à¦¬à§à¦²à¦¾à¦¡ à¦¬à§à¦¯à¦¾à¦‚à¦• à¦¥à§‡à¦•à§‡ à¦¸à¦‚à¦—à§à¦°à¦¹ à¦•à¦°à§à¦¨à¥¤</li></ul></div></details>
-<details><summary>à¦°à¦•à§à¦¤à¦¦à¦¾à¦¨à§‡à¦° à¦ªà¦° à¦•à§€ à¦•à¦°à¦¬à§‡à¦¨?</summary><div class="gct"><ul><li>à§§à§¦-à§§à§« à¦®à¦¿à¦¨à¦¿à¦Ÿ à¦¬à¦¿à¦¶à§à¦°à¦¾à¦® à¦¨à¦¿à¦¨à¥¤</li><li>à¦ªà§à¦°à¦šà§à¦° à¦ªà¦¾à¦¨à¦¿ à¦ªà¦¾à¦¨ à¦•à¦°à§à¦¨à¥¤</li><li>à¦¸à§‡à¦¦à¦¿à¦¨ à¦­à¦¾à¦°à§€ à¦•à¦¾à¦œ à¦à¦¡à¦¼à¦¿à¦¯à¦¼à§‡ à¦šà¦²à§à¦¨à¥¤</li><li>à¦¸à§à¦¬à¦¾à¦­à¦¾à¦¬à¦¿à¦• à¦ªà§à¦·à§à¦Ÿà¦¿à¦•à¦° à¦–à¦¾à¦¬à¦¾à¦° à¦–à¦¾à¦¨à¥¤</li></ul></div></details>
-</div>
-<div class="st2">à¦œà¦°à§à¦°à¦¿ à¦¯à§‹à¦—à¦¾à¦¯à§‹à¦—</div>
-<div class="cg2">
-<div class="cc"><div class="ccn">à¦®à§‹à¦¹à¦¾à¦®à§à¦®à¦¦ à¦œà¦¯à¦¼à¦¨à¦¾à¦² à¦†à¦¬à§‡à¦¦à§€à¦¨</div><small class="ccr">à¦¦à¦¾à¦¯à¦¼à¦¿à¦¤à§à¦¬à¦ªà§à¦°à¦¾à¦ªà§à¦¤ à¦¸à¦¦à¦¸à§à¦¯</small><a href="tel:01995047930" class="ccb">ðŸ“ž 01995047930</a></div>
-<div class="cc"><div class="ccn">à¦®à§‹à¦¹à¦¾à¦®à§à¦®à¦¦ à¦¨à¦¯à¦¼à¦¨ à¦šà§Œà¦§à§à¦°à§€</div><small class="ccr">à¦¦à¦¾à¦¯à¦¼à¦¿à¦¤à§à¦¬à¦ªà§à¦°à¦¾à¦ªà§à¦¤ à¦¸à¦¦à¦¸à§à¦¯</small><a href="tel:01947662428" class="ccb">ðŸ“ž 01947662428</a></div>
-</div>
-</div></div>
-<!-- ACTIVITIES PAGE -->
-<div class="page" id="p-activities">
-<div class="ac">
-<div class="ac-h"><h2>à¦†à¦®à¦¾à¦¦à§‡à¦° à¦•à¦¾à¦°à§à¦¯à¦•à§à¦°à¦® ðŸš€</h2><p>à¦¸à§à¦ªà¦¨à§à¦¦à¦¨ à¦¬à§à¦²à¦¾à¦¡ à¦¸à§‹à¦¸à¦¾à¦‡à¦Ÿà¦¿à¦° à¦¸à¦°à§à¦¬à¦¶à§‡à¦· à¦–à¦¬à¦° à¦“ à¦•à¦¾à¦°à§à¦¯à¦•à§à¦°à¦®</p></div>
-<img src="activity-banner.jpg" alt="Blood Donation" style="width:100%; border-bottom:1px solid rgba(0,0,0,0.05); margin-bottom: 20px; border-radius: 12px;" onerror="this.style.display='none'">
-<div id="admin-panel">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;"><h4 style="color:var(--rd);font-size:16px;margin:0;">ðŸ“ à¦¨à¦¤à§à¦¨ à¦ªà§‹à¦¸à§à¦Ÿ à¦¯à§à¦•à§à¦¤ à¦•à¦°à§à¦¨</h4><button onclick="sessionStorage.clear();location.reload()" style="background:#444;color:#fff;border:none;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;box-shadow:0 2px 5px rgba(0,0,0,0.2);">à¦²à¦— à¦†à¦‰à¦Ÿ</button></div>
-    <form id="add-blog-form">
-        <div class="ig"><label>à¦Ÿà¦¾à¦‡à¦Ÿà§‡à¦² (Title) *</label><input type="text" id="bl-t" required placeholder="à¦ªà§‹à¦¸à§à¦Ÿà§‡à¦° à¦¶à¦¿à¦°à§‹à¦¨à¦¾à¦®"></div>
-        <div class="ig"><label>à¦¬à¦¿à¦¸à§à¦¤à¦¾à¦°à¦¿à¦¤ (Description) *</label><textarea id="bl-d" required placeholder="à¦¬à¦¿à¦¸à§à¦¤à¦¾à¦°à¦¿à¦¤ à¦²à¦¿à¦–à§à¦¨..."></textarea></div>
-        <div class="ig"><label>à¦›à¦¬à¦¿à¦° à¦²à¦¿à¦‚à¦• (Google Drive Link)</label><input type="url" id="bl-i" placeholder="https://drive.google.com/file/d/..."></div>
-        <div class="ig"><label>à¦«à§‡à¦¸à¦¬à§à¦• à¦ªà§‹à¦¸à§à¦Ÿ à¦²à¦¿à¦‚à¦• (à¦à¦šà§à¦›à¦¿à¦•)</label><input type="url" id="bl-fb" placeholder="https://facebook.com/..."></div>
-        <button type="button" class="pok" id="bl-btn" style="padding:12px;font-size:14px;box-shadow:none;">à¦ªà§‹à¦¸à§à¦Ÿ à¦•à¦°à§à¦¨ ðŸš€</button>
-        <div class="err" id="bl-err"></div>
-    </form>
-</div>
-<div class="blog-list" id="blog-list">
-    <div style="text-align:center;padding:20px;color:var(--tx4);font-size:14px;font-weight:600;">à¦²à§‹à¦¡ à¦¹à¦šà§à¦›à§‡...</div>
-</div>
-<!-- Admin trigger (Clicking text 3 times opens login) -->
-<div style="text-align:center;padding:12px;opacity:0.4;font-size:11px;font-weight:700;" class="admin-trigger" id="admin-trig">App Version: 11.2 (Click to Login)</div>
-</div></div>
-</div><!-- /app -->
-<!-- BOTTOM NAV -->
-<nav id="bnav">
-<button class="ni on" id="n-home" onclick="go('home')"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>à¦¹à§‹à¦®</button>
-<button class="ni" id="n-donor-reg" onclick="go('donor-reg')"><svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>à¦°à§‡à¦œà¦¿à¦¸à§à¦Ÿà§à¦°à§‡à¦¶à¦¨</button>
-<div style="display:flex;flex-direction:column;align-items:center"><div class="nfab" onclick="go('blood-request')"><svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></div><span class="nfl">à¦°à¦•à§à¦¤à§‡à¦° à¦†à¦¬à§‡à¦¦à¦¨</span></div>
-<button class="ni" id="n-activities" onclick="go('activities')"><svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12zM10 9h8v2h-8zm0 3h4v2h-4zm0-6h8v2h-8z"/></svg>à¦•à¦¾à¦°à§à¦¯à¦•à§à¦°à¦®</button>
-<button class="ni" id="n-about" onclick="go('about')"><svg viewBox="0 0 24 24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></svg>à¦ªà¦°à¦¿à¦šà¦¿à¦¤à¦¿</button>
-function sv(d){try{localStorage.setItem('sbs_d',d);localStorage.setItem('sbs_t',''+Date.now())}catch(x){}}
-function popDist(){var o='<option value="">à¦¨à¦¿à¦°à§à¦¬à¦¾à¦šà¦¨ à¦•à¦°à§à¦¨</option>';for(var i=0;i<BD.length;i++)o+='<option value="'+BD[i]+'">'+BD[i]+'</option>';['mds','dd','brd'].forEach(function(id){var e=document.getElementById(id);if(e)e.innerHTML=o;});}
-popDist();
-function autoSetDist(d){if(!d)return;['dd','brd'].forEach(function(id){var e=document.getElementById(id);if(e&&e.value!==d){e.value=d;e.dispatchEvent(new Event('change'))}})}
+    <!-- Blogs Section -->
+    <div class="shd" style="margin-top:30px">
+        <h3><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>আপডেট ও নিউজ</h3>
+    </div>
+    <div id="blg-wr">
+        <div class="no-res">লোড হচ্ছে...</div>
+    </div>
+  </div>
 
-var socH='<style>.footer-sec { padding: 40px 20px 100px; background: #111111; color: #f0f0f0; text-align: center; border-top: 4px solid var(--rd); margin-top: 30px; margin-bottom: 0; border-radius: 20px 20px 0 0; display: flex; flex-direction: column; align-items: center; } .footer-sec h4 { font-family: "Impact", sans-serif; font-size: 24px; letter-spacing: 1.5px; color: #fff; margin-bottom: 6px; font-weight: normal; } .footer-sec .f-motto { font-size: 15px; color: var(--rd); font-weight: bold; margin-bottom: 6px; font-style: italic; } .footer-sec p { font-size: 13px; color: #aaa; margin-bottom: 24px; } .soc-links { display: flex; justify-content: center; align-items: center; gap: 16px; margin-bottom: 30px; } .f-btn { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 12px; background: #fff; border: none; transition: 0.3s; text-decoration: none; } .f-btn:hover { background: #333; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.5); } .sc-fb svg { fill: #1877F2; } .sc-in svg { fill: #0A66C2; } .sc-gm svg { fill: #EA4335; } .f-btn svg { width: 24px; height: 24px; } .f-bot { width: 100%; border-top: 1px solid #333; padding-top: 20px; font-size: 12px; color: #777; }</style><div class="ssec footer-sec"><div class="f-top"><h4>SPONDON BLOOD SOCIETY</h4><div class="f-motto">"à¦•à¦°à¦¿à¦¬ à¦°à¦•à§à¦¤à¦¦à¦¾à¦¨, à¦¸à¦šà¦² à¦°à¦¾à¦–à¦¿à¦¬ à¦ªà§à¦°à¦¾à¦£à§‡à¦° à¦¸à§à¦ªà¦¨à§à¦¦à¦¨"</div><p>à¦à¦¿à¦¨à¦¾à¦‡à¦¦à¦¹ à¦Ÿà§‡à¦•à§à¦¸à¦Ÿà¦¾à¦‡à¦² à¦‡à¦žà§à¦œà¦¿à¦¨à¦¿à¦¯à¦¼à¦¾à¦°à¦¿à¦‚ à¦•à¦²à§‡à¦œ</p></div><div class="soc-links"><a href="https://www.facebook.com/spondon.jtec" target="_blank" class="f-btn sc-fb"><svg viewBox="0 0 24 24"><path d="M22.675 0h-21.35C.597 0 0 .597 0 1.325v21.351C0 23.403.597 24 1.325 24H12.82v-9.294H9.692v-3.622h3.128V8.413c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12V24h6.116c.73 0 1.323-.597 1.323-1.324V1.325C24 .597 23.403 0 22.675 0z"/></svg></a><a href="https://www.linkedin.com/company/sktec-spondon-blood-society/" target="_blank" class="f-btn sc-in"><svg viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg></a><a href="mailto:spondonbloodsociety.jtec@gmail.com" class="f-btn sc-gm"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg></a></div><div class="f-bot">&copy; 2026 Spondon Blood Society. All rights reserved.</div></div>';
-document.querySelectorAll('.page').forEach(function(p){ p.insertAdjacentHTML('beforeend', socH); });
+  <!-- PAGE: FIND DONOR -->
+  <div class="page" id="p-find">
+    <div class="ssec fm">
+      <div class="shd">
+        <h3><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>রক্তদাতা খুঁজুন</h3>
+      </div>
+      <form id="f-find">
+        <div class="ig">
+          <label>রক্তের গ্রুপ</label>
+          <select name="bloodGroup" required>
+            <option value="">বেছে নিন</option>
+            <option value="A+">A+</option>
+            <option value="B+">B+</option>
+            <option value="O+">O+</option>
+            <option value="AB+">AB+</option>
+            <option value="A-">A-</option>
+            <option value="B-">B-</option>
+            <option value="O-">O-</option>
+            <option value="AB-">AB-</option>
+          </select>
+        </div>
+        <div class="ig">
+          <label>জেলা</label>
+          <select name="district" id="fd-dist" required>
+            <option value="">জেলা বেছে নিন</option>
+            <option value="Jhenaidah">ঝিনাইদহ</option>
+            <option value="Dhaka">ঢাকা</option>
+            <option value="Kushtia">কুষ্টিয়া</option>
+            <option value="Magura">মাগুরা</option>
+            <option value="Chuadanga">চুয়াডাঙ্গা</option>
+          </select>
+        </div>
+        <div class="ig">
+          <label>উপজেলা (ঐচ্ছিক)</label>
+          <input type="text" name="upazilla" placeholder="যেমন: শৈলকুপা">
+        </div>
+        <div class="fm-err" id="fe-find"></div>
+        <button type="submit" class="fm-btn" id="fb-find">
+          <span class="spinner" id="fs-find"></span>
+          <span id="ft-find">খুঁজুন</span>
+        </button>
+      </form>
+    </div>
+    
+    <div id="wa-card-1" style="display:none; background:#E8F5E9; border:1px solid #A5D6A7; border-radius:16px; padding:20px; margin-bottom:20px; text-align:center;">
+        <h4 style="color:#2E7D32; margin-bottom:10px; font-size:18px;">কাঙ্ক্ষিত রক্তদাতা পাচ্ছেন না?</h4>
+        <p style="color:#1B5E20; font-size:14px; margin-bottom:16px;">সরাসরি আমাদের সেচ্ছাসেবক দলের সাথে যোগাযোগ করুন। আমরা দ্রুত রক্তদাতা খুঁজে দেওয়ার চেষ্টা করব।</p>
+        <button id="wa-btn-1" style="background:#25D366; color:#fff; border:none; padding:12px 24px; border-radius:12px; font-weight:bold; font-size:16px; cursor:pointer; display:inline-flex; align-items:center; gap:8px;">
+            <svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+            হোয়াটসঅ্যাপ এ ম্যাসেজ দিন
+        </button>
+    </div>
 
-// PAGE ROUTER with URL Param Support
-var pm={'home':'p-home','donor-reg':'p-donor-reg','donor-profile':'p-donor-profile','blood-request':'p-blood-request','match-secured':'p-match-secured','confirm-donation':'p-confirm-donation','confirm':'p-confirm','activities':'p-activities','about':'p-about'};
-var nm={'home':'n-home','donor-reg':'n-donor-reg','donor-profile':'n-donor-profile','activities':'n-activities','about':'n-about'};
-function go(n){
-  if(!pm[n]) n = "home";
-  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('on')});
-  document.querySelectorAll('.ni').forEach(function(b){b.classList.remove('on')});
-  var p=document.getElementById(pm[n]);if(p)p.classList.add('on');
-  if(nm[n]){var nb=document.getElementById(nm[n]);if(nb)nb.classList.add('on');}
-  window.scrollTo({top:0, behavior: 'smooth'});
+    <div id="d-res"></div>
+  </div>
+
+  <!-- PAGE: REGISTER -->
+  <div class="page" id="p-reg">
+    <div class="ssec fm">
+      <div class="shd">
+        <h3><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>নিবন্ধন করুন</h3>
+      </div>
+      <form id="f-reg">
+        <div class="ig">
+          <label>পূর্ণ নাম</label>
+          <input type="text" name="name" required placeholder="আপনার নাম লিখুন">
+        </div>
+        <div class="ig">
+          <label>মোবাইল নম্বর</label>
+          <input type="tel" name="phone" required pattern="[0-9]{11}" placeholder="01XXXXXXXXX">
+        </div>
+        <div class="ig">
+          <label>রক্তের গ্রুপ</label>
+          <select name="bloodGroup" required>
+            <option value="">বেছে নিন</option>
+            <option value="A+">A+</option>
+            <option value="B+">B+</option>
+            <option value="O+">O+</option>
+            <option value="AB+">AB+</option>
+            <option value="A-">A-</option>
+            <option value="B-">B-</option>
+            <option value="O-">O-</option>
+            <option value="AB-">AB-</option>
+          </select>
+        </div>
+        <div class="ig">
+          <label>জেলা</label>
+          <select name="district" required>
+            <option value="">জেলা বেছে নিন</option>
+            <option value="Jhenaidah">ঝিনাইদহ</option>
+            <option value="Dhaka">ঢাকা</option>
+            <option value="Kushtia">কুষ্টিয়া</option>
+            <option value="Magura">মাগুরা</option>
+            <option value="Chuadanga">চুয়াডাঙ্গা</option>
+          </select>
+        </div>
+        <div class="ig">
+          <label>উপজেলা</label>
+          <input type="text" name="upazilla" required placeholder="আপনার উপজেলা">
+        </div>
+        <div class="ig">
+          <label>সর্বশেষ রক্তদানের তারিখ (যদি থাকে)</label>
+          <input type="date" id="dp-lastdate">
+        </div>
+        
+        <!-- NEW: Is Regular Donor Checkbox -->
+        <div class="cb-wrap" style="margin-top:20px; background:var(--g1); padding:14px; border-radius:12px; border:1px solid var(--gb);">
+            <input type="checkbox" name="isRegularDonor" id="cb-is-reg">
+            <span style="font-size:14px;">আমি নিয়মিত রক্তদাতা হতে আগ্রহী</span>
+        </div>
+        
+        <!-- NEW: Email Auth Field (Hidden initially) -->
+        <div class="ig" id="ig-email-auth" style="display:none; margin-top:16px;">
+            <label style="color:var(--rd);">পাসওয়ার্ড (অ্যাডমিনদের জন্য)</label>
+            <input type="password" name="adminPassword" id="admin-pass" placeholder="অ্যাডমিন প্যানেলের পাসওয়ার্ড">
+            <p style="font-size:11px; color:var(--tx3); margin-top:4px;">নিয়মিত রক্তদাতা হিসেবে যুক্ত হতে অ্যাডমিন পাসওয়ার্ড প্রয়োজন।</p>
+        </div>
+
+        <div class="fm-err" id="fe-reg"></div>
+        <div class="fm-suc" id="fsuc-reg"></div>
+        <button type="submit" class="fm-btn" id="fb-reg">
+          <span class="spinner" id="fs-reg"></span>
+          <span id="ft-reg">নিবন্ধন করুন</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- PAGE: INFO -->
+  <div class="page" id="p-info">
+    <div class="ssec">
+      <div class="shd">
+        <h3><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>তথ্যকণিকা</h3>
+      </div>
+      
+      <details>
+        <summary>রক্তদানের যোগ্যতা ও শর্তাবলী</summary>
+        <div class="gct">
+          <ul>
+            <li><span class="hl">বয়স:</span> ১৮ থেকে ৬০ বছরের মধ্যে</li>
+            <li><span class="hl">ওজন:</span> পুরুষদের ক্ষেত্রে কমপক্ষে ৫০ কেজি, মহিলাদের ক্ষেত্রে ৪৫ কেজি।</li>
+            <li><span class="hl">শারীরিক সুস্থতা:</span> শারীরিক ও মানসিকভাবে সুস্থ হতে হবে।</li>
+            <li><span class="hl">হিমোগ্লোবিন:</span> স্বাভাবিক মাত্রায় থাকতে হবে।</li>
+          </ul>
+        </div>
+      </details>
+      
+      <details>
+        <summary>কতদিন পর পর রক্তদান করা যায়?</summary>
+        <div class="gct">
+          পুরুষরা প্রতি <span class="hl">৩ মাস</span> অন্তর এবং মহিলারা প্রতি <span class="hl">৪ মাস</span> অন্তর রক্তদান করতে পারবেন।
+        </div>
+      </details>
+      
+      <details>
+        <summary>কারা রক্তদান করতে পারবেন না?</summary>
+        <div class="gct">
+          <ul>
+            <li><span class="hl">গর্ভবতী মহিলা</span> বা স্তন্যদানকারী মা</li>
+            <li>জন্ডিস, ম্যালেরিয়া, সিফিলিস বা এইচআইভি পজিটিভ থাকলে</li>
+            <li>অ্যান্টিবায়োটিক বা অন্য কোনো ওষুধ সেবন করলে</li>
+            <li>গত ৬ মাসের মধ্যে বড় কোনো সার্জারি হলে</li>
+          </ul>
+        </div>
+      </details>
+      
+      <details>
+        <summary>রক্তদানের আগে ও পরে করণীয়</summary>
+        <div class="gct">
+          <ul>
+            <li>পর্যাপ্ত ঘুম এবং স্বাস্থ্যকর খাবার গ্রহণ করুন।</li>
+            <li>পর্যাপ্ত পরিমাণে জল পান করুন।</li>
+            <li>রক্তদানের পর ভারী কাজ থেকে বিরত থাকুন।</li>
+            <li>ধূমপান বা মদ্যপান থেকে বিরত থাকুন।</li>
+            <li>কোনো সমস্যা অনুভব করলে চিকিৎসকের পরামর্শ নিন।</li>
+          </ul>
+        </div>
+      </details>
+      
+      <details>
+        <summary>রক্তদান কেন করবেন?</summary>
+        <div class="gct">
+          <ul>
+            <li>একজনের রক্তে ৩ জনের জীবন বাঁচানো সম্ভব।</li>
+            <li>নিয়মিত রক্তদান হৃদরোগের ঝুঁকি কমায়।</li>
+            <li>রক্তদান শরীরে নতুন রক্তকোষ তৈরিতে সাহায্য করে।</li>
+            <li>এটি একটি মহৎ মানবিক কাজ।</li>
+          </ul>
+        </div>
+      </details>
+      
+    </div>
+  </div>
+</div>
+
+<nav id="nav">
+  <button class="n-it on" onclick="sP('home')">
+    <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+    <span>হোম</span>
+  </button>
+  <button class="n-it" onclick="sP('find')">
+    <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+    <span>খুঁজুন</span>
+  </button>
+  <button class="n-it" onclick="sP('reg')">
+    <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+    <span>নিবন্ধন</span>
+  </button>
+  <button class="n-it" onclick="sP('info')">
+    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+    <span>তথ্য</span>
+  </button>
+</nav>
+
+<div id="pop" class="off">
+  <div class="p-bx">
+    <div class="p-ic"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z"/></svg></div>
+    <h3>আপনার এলাকা</h3>
+    <p>আপনার এলাকার জরুরী রক্তের চাহিদা দেখতে লোকেশন পারমিশন দিন।</p>
+    <button id="pok">ঠিক আছে</button>
+    <div class="pdm" id="pdm"></div>
+  </div>
+</div>
+
+<script>
+// IMPORTANT: REPLACE WITH YOUR GOOGLE APPS SCRIPT WEB APP URL
+const S = 'https://script.google.com/macros/s/AKfycbye4H2Z68yR-2bH353Hn4Ua5y1iT1l4m9s1eM2q9W9V8j5P3tK5N7X8y7G9E5F2H5J1Q/exec';
+
+const pm = {home:'p-home',find:'p-find',reg:'p-reg',info:'p-info'};
+const en2bn = {'0':'০','1':'১','2':'২','3':'৩','4':'৪','5':'৫','6':'৬','7':'৭','8':'৮','9':'৯'};
+function toBn(n){return (n||'০').toString().replace(/\d/g,function(x){return en2bn[x]})}
+
+function sP(p){
+  for(let k in pm){
+    document.getElementById(pm[k]).classList.remove('on');
+  }
+  document.querySelectorAll('.n-it').forEach(function(e){e.classList.remove('on')});
+  document.getElementById(pm[p]).classList.add('on');
+  event.currentTarget.classList.add('on');
+  window.scrollTo(0,0);
 }
 
-// Check URL param on load
-var urlParams = new URLSearchParams(window.location.search);
-var urlParams = new URLSearchParams(window.location.search);
-var requestedPage = urlParams.get('page');
-var hashPage = window.location.hash.split('?')[0].substring(1);
-if (hashPage === 'confirm-donation') {
-    requestedPage = 'confirm-donation';
+function sv(d){localStorage.setItem('sbs_d',d);localStorage.setItem('sbs_t',Date.now())}
+function gv(){
+  var d=localStorage.getItem('sbs_d'),t=localStorage.getItem('sbs_t');
+  if(d&&t&&(Date.now()-t)<24*60*60*1000) return d;
+  return null;
+}
+
+function mD(s){
+  var x=s.toLowerCase();
+  var ls=['jhenaidah','dhaka','kushtia','magura','chuadanga'];
+  for(var i=0;i<ls.length;i++){
+    if(x.indexOf(ls[i])!==-1) return ls[i].charAt(0).toUpperCase()+ls[i].slice(1);
+  }
+  if(x.indexOf('jhenidah')!==-1||x.indexOf('jinaidaha')!==-1) return 'Jhenaidah';
+  return null;
+}
+
+function stk(msgs,dist){
+  var m=document.getElementById('tmsg'),s=document.getElementById('tsk');
+  s.style.display='none';
+  m.innerHTML=msgs.join(' &nbsp;|&nbsp; ');
+  m.classList.add('on');
+  if(dist) {
+    document.getElementById('tdt').classList.add('show');
+    document.getElementById('tdt').textContent = dist.substring(0,3).toUpperCase();
+  }
+}
+
+function sman(){document.getElementById('tman').classList.add('show');document.getElementById('tsk').style.display='none'}
+
+document.addEventListener("DOMContentLoaded", function() {
+  
+  var socH='<style>.footer-sec { padding: 40px 20px 100px; background: #111111; color: #f0f0f0; text-align: center; border-top: 4px solid var(--rd); margin-top: 30px; margin-bottom: 0; border-radius: 20px 20px 0 0; display: flex; flex-direction: column; align-items: center; } .footer-sec h4 { font-family: "Impact", sans-serif; font-size: 24px; letter-spacing: 1.5px; color: #fff; margin-bottom: 6px; font-weight: normal; } .footer-sec .f-motto { font-size: 15px; color: var(--rd); font-weight: bold; margin-bottom: 6px; font-style: italic; } .footer-sec p { font-size: 13px; color: #aaa; margin-bottom: 24px; } .soc-links { display: flex; justify-content: center; align-items: center; gap: 16px; margin-bottom: 30px; } .f-btn { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 12px; background: #fff; border: none; transition: 0.3s; text-decoration: none; } .f-btn:hover { background: #333; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.5); } .sc-fb svg { fill: #1877F2; } .sc-in svg { fill: #0A66C2; } .sc-gm svg { fill: #EA4335; } .f-btn svg { width: 24px; height: 24px; } .f-bot { width: 100%; border-top: 1px solid #333; padding-top: 20px; font-size: 12px; color: #777; }</style><div class="ssec footer-sec"><div class="f-top"><h4>SPONDON BLOOD SOCIETY</h4><div class="f-motto">"করিব রক্তদান, বাঁচাবো একটি প্রাণ"</div><p>ঝিনাইদহ টেক্সটাইল ইঞ্জিনিয়ারিং কলেজ</p></div><div class="soc-links"><a href="https://www.facebook.com/spondon.jtec" target="_blank" class="f-btn sc-fb"><svg viewBox="0 0 24 24"><path d="M22.675 0h-21.35C.597 0 0 .597 0 1.325v21.351C0 23.403.597 24 1.325 24H12.82v-9.294H9.692v-3.622h3.128V8.413c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12V24h6.116c.73 0 1.323-.597 1.323-1.324V1.325C24 .597 23.403 0 22.675 0z"/></svg></a><a href="https://www.linkedin.com/company/sktec-spondon-blood-society/" target="_blank" class="f-btn sc-in"><svg viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg></a><a href="mailto:spondonbloodsociety.jtec@gmail.com" class="f-btn sc-gm"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg></a></div><div class="f-bot">&copy; 2026 Spondon Blood Society. All rights reserved.</div></div>';
+  document.querySelectorAll('.page').forEach(function(p){ p.insertAdjacentHTML('beforeend', socH); });
+  
+  // PAGE ROUTER with URL Param Support
+  if(window.location.hash) {
+    var hashPage = window.location.hash.split('?')[0].substring(1);
+    if(pm[hashPage]) {
+        sP(hashPage);
+    }
+    
+    // Check for admin login
     let emailParams = new URLSearchParams(window.location.hash.split('?')[1]);
     let email = emailParams ? emailParams.get('email') : null;
-    if(email) setTimeout(() => {
-        let el = document.getElementById('cf-email');
-        if(el) el.value = decodeURIComponent(email);
-    }, 500);
-}
-if(requestedPage && pm[requestedPage]) {
-    go(requestedPage);
-} else {
-    go('home');
-}
-
-// TICKER
-function hsk(){document.getElementById('tsk').style.display='none'}
-function sman(){hsk();document.getElementById('tdt').classList.remove('show');document.getElementById('tman').classList.add('show')}
-function stk(a,d){hsk();document.getElementById('tman').classList.remove('show');if(d){document.getElementById('tdn').textContent=d;document.getElementById('tdt').classList.add('show')}var m=document.getElementById('tmsg'),t=a.join('  \u{1F534}  ');m.textContent=t;m.style.animationDuration=Math.max(15,t.length*.16)+'s';m.className='t-msg on'}
-function ldN(d){autoSetDist(d);fetch(S+'?action=getNotices&district='+encodeURIComponent(d)).then(function(r){return r.json()}).then(function(j){stk(j.notices&&j.notices.length>0?j.notices:[d+' \u099C\u09C7\u09B2\u09BE\u09AF\u09BC \u098F\u0996\u09A8 \u0995\u09CB\u09A8\u09CB \u099C\u09B0\u09C1\u09B0\u09BF \u09B0\u0995\u09CD\u09A4\u09C7\u09B0 \u099A\u09BE\u09B9\u09BF\u09A6\u09BE \u09A8\u09C7\u0987\u0964 \u09B0\u0995\u09CD\u09A4\u09A6\u09BE\u09A8 \u0995\u09B0\u09C1\u09A8! \u2764\uFE0F'],d);sv(d)}).catch(function(){stk(['\u09B8\u09CD\u09AA\u09A8\u09CD\u09A6\u09A8 \u09AC\u09CD\u09B2\u09BE\u09A1 \u09B8\u09CB\u09B8\u09BE\u0987\u099F\u09BF, \u099D\u09BF\u09A8\u09BE\u0987\u09A6\u09B9\u0964'],d)})}
-document.getElementById('tdt').addEventListener('click',function(){try{localStorage.removeItem('sbs_d');localStorage.removeItem('sbs_t')}catch(x){}document.getElementById('tdt').classList.remove('show');document.getElementById('tmsg').className='t-msg';document.getElementById('tsk').style.display='block';sman()});
-document.getElementById('mdb').addEventListener('click',function(){var d=document.getElementById('mds').value;if(!d)return;document.getElementById('tman').classList.remove('show');ldN(d)});
-function tryGPS(ok,fail){if(!navigator.geolocation){fail();return}document.getElementById('pdm').textContent='\u{1F4CD} \u0986\u09AA\u09A8\u09BE\u09B0 \u0985\u09AC\u09B8\u09CD\u09A5\u09BE\u09A8 \u09B6\u09A8\u09BE\u0995\u09CD\u09A4 \u0995\u09B0\u09BE \u09B9\u099A\u09CD\u099B\u09C7...';var done=false;var to=setTimeout(function(){if(!done){done=true;fail()}},6000);navigator.geolocation.getCurrentPosition(function(p){if(done)return;document.getElementById('pdm').textContent='\u2705 GPS \u09AA\u09BE\u0993\u09AF\u09BC\u09BE \u0997\u09C7\u099B\u09C7\u0964';fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat='+p.coords.latitude+'&lon='+p.coords.longitude+'&addressdetails=1&accept-language=en',{headers:{'User-Agent':'SBS/1.0'}}).then(function(r){return r.json()}).then(function(d){if(done)return;clearTimeout(to);done=true;var a=d.address||{},raw=Object.values(a).join(' '),dist=mD(raw);if(dist)ok(dist);else fail()}).catch(function(){if(!done){clearTimeout(to);done=true;fail()}})},function(){if(!done){clearTimeout(to);done=true;fail()}},{timeout:5000,maximumAge:0,enableHighAccuracy:false})}
-function tryIP(ok,fail){document.getElementById('pdm').textContent='\u{1F310} \u0985\u09A8\u09C1\u09AE\u09BE\u09A8\u09BF\u0995 \u0985\u09AC\u09B8\u09CD\u09A5\u09BE\u09A8 \u0996\u09CB\u0981\u099C\u09BE \u09B9\u099A\u09CD\u099B\u09C7...';var done=false,fc=0;function got(raw){if(done)return;var d=mD(raw);if(d){done=true;ok(d)}else nope()}function nope(){if(done)return;fc++;if(fc>=3){done=true;fail()}}fetch('https://ipapi.co/json/?nocache=true&_='+Date.now()).then(function(r){return r.json()}).then(function(d){got(d.city||d.region||'')}).catch(nope);fetch('https://ipinfo.io/json').then(function(r){return r.json()}).then(function(d){got(d.city||d.region||'')}).catch(nope);fetch('https://freeipapi.com/api/json').then(function(r){return r.json()}).then(function(d){got(d.cityName||d.regionName||'')}).catch(nope);setTimeout(function(){if(!done){done=true;fail()}},5000)}
-document.getElementById('pok').addEventListener('click',function(){var btn=this;btn.disabled=true;btn.textContent='\u09B6\u09A8\u09BE\u0995\u09CD\u09A4 \u0995\u09B0\u09BE \u09B9\u099A\u09CD\u099B\u09C7...';var done=false;var fs=setTimeout(function(){if(!done){done=true;document.getElementById('pdm').textContent='';document.getElementById('pop').classList.add('off');sman()}},8000);tryGPS(function(d){if(done)return;clearTimeout(fs);done=true;document.getElementById('pop').classList.add('off');ldN(d)},function(){if(done)return;tryIP(function(d){if(done)return;clearTimeout(fs);done=true;document.getElementById('pop').classList.add('off');ldN(d)},function(){if(done)return;clearTimeout(fs);done=true;document.getElementById('pdm').textContent='';document.getElementById('pop').classList.add('off');sman()})})});
-(function(){var sd='',st=0;try{sd=localStorage.getItem('sbs_d')||'';st=parseInt(localStorage.getItem('sbs_t')||'0')}catch(x){}if(sd&&(Date.now()-st)<1800000){document.getElementById('pop').classList.add('off');ldN(sd)}})();
-
-// STATS
-fetch(S+'?action=getLiveStats').then(function(r){return r.json()}).then(function(d){if(d.status!=='Success')throw 0;document.getElementById('stsk').hidden=true;document.getElementById('stdt').hidden=false;document.getElementById('s-td').textContent=toBn(d.totalDonations);document.getElementById('s-ad').textContent=toBn(d.availableDonors);document.getElementById('s-nd').textContent=toBn(d.newDonorsToday);document.getElementById('s-pr').textContent=toBn(d.pendingRequests);var g=['A+','B+','O+','AB+','A-','B-','O-','AB-'],h='';for(var i=0;i<8;i++){var c=(d.bloodGroups&&d.bloodGroups[g[i]]!==undefined)?d.bloodGroups[g[i]]:0;h+='<div class="bgc">'+g[i]+'<span>'+toBn(c)+'</span></div>'}document.getElementById('s-bg').innerHTML=h;document.getElementById('s-up').textContent='\u09B8\u09B0\u09CD\u09AC\u09B6\u09C7\u09B7 \u0986\u09AA\u09A1\u09C7\u099F: '+(d.lastUpdated||'')}).catch(function(){document.getElementById('stsk').hidden=true;document.getElementById('stdt').hidden=false;document.getElementById('s-up').textContent='\u09A1\u09C7\u099F\u09BE \u09B2\u09CB\u09A1 \u09AC\u09CD\u09AF\u09B0\u09CD\u09A5\u0964 \u09B0\u09BF\u09AB\u09CD\u09B0\u09C7\u09B6 \u0995\u09B0\u09C1\u09A8\u0964'});
-
-// UPAZILLA
-document.getElementById('dd').addEventListener('change',function(){var u=document.getElementById('du'),h=document.getElementById('uh'),d=this.value;if(!d){u.innerHTML='<option value="">\u0986\u0997\u09C7 \u099C\u09C7\u09B2\u09BE \u09A8\u09BF\u09B0\u09CD\u09AC\u09BE\u099A\u09A8 \u0995\u09B0\u09C1\u09A8</option>';u.disabled=true;h.style.display='block';return}var l=UZ[d]||[],s='<option value="">\u0989\u09AA\u099C\u09C7\u09B2\u09BE \u09A8\u09BF\u09B0\u09CD\u09AC\u09BE\u099A\u09A8 \u0995\u09B0\u09C1\u09A8</option>';for(var i=0;i<l.length;i++)s+='<option value="'+l[i]+'">'+l[i]+'</option>';u.innerHTML=s;u.disabled=false;h.style.display='none'});
-
-// FORM HELPERS
-function setL(b,t,sp,on,txt){var bn=document.getElementById(b),tt=document.getElementById(t),s=document.getElementById(sp);bn.disabled=on;tt.textContent=on?'\u0985\u09AA\u09C7\u0995\u09CD\u09B7\u09BE \u0995\u09B0\u09C1\u09A8...':txt;s.style.display=on?'block':'none'}
-function sE(id,m){var e=document.getElementById(id);e.textContent='\u274C '+m;e.style.display='block'}
-function hE(id){document.getElementById(id).style.display='none'}
-
-// DONOR REG
-document.getElementById('drb').addEventListener('click',function(){var f=document.getElementById('drf');if(!f.checkValidity()){f.reportValidity();return}setL('drb','drt','drs',true,'');hE('dre');fetch(S,{method:'POST',body:new FormData(f)}).then(function(r){return r.json()}).then(function(d){if(d.status==='Success'){document.getElementById('drfs').style.display='none';document.getElementById('drok').style.display='block'}else{setL('drb','drt','drs',false,'\u09B0\u09C7\u099C\u09BF\u09B8\u09CD\u099F\u09CD\u09B0\u09C7\u09B6\u09A8 \u0995\u09B0\u09C1\u09A8 \u{1F49A}');sE('dre',d.message||'\u09A4\u09CD\u09B0\u09C1\u099F\u09BF \u09B9\u09AF\u09BC\u09C7\u099B\u09C7\u0964')}}).catch(function(){setL('drb','drt','drs',false,'\u09B0\u09C7\u099C\u09BF\u09B8\u09CD\u099F\u09CD\u09B0\u09C7\u09B6\u09A8 \u0995\u09B0\u09C1\u09A8 \u{1F49A}');sE('dre','\u0987\u09A8\u09CD\u099F\u09BE\u09B0\u09A8\u09C7\u099F \u09B8\u09AE\u09B8\u09CD\u09AF\u09BE\u0964 \u0986\u09AC\u09BE\u09B0 \u099A\u09C7\u09B7\u09CD\u099F\u09BE \u0995\u09B0\u09C1\u09A8\u0964')})});
-
-// BLOOD REQUEST
-document.getElementById('brb').addEventListener('click', async function(){
-    var f = document.getElementById('brf');
-    if(!f.checkValidity()){ f.reportValidity(); return; }
-    setL('brb','brt','brs',true,''); hE('bre');
-    
-    var fd = new FormData(f);
-    fd.delete('prescriptionFile');
-    fd.set('action', 'addRequest');
-    
-    var fi = document.getElementById('rfi');
-    if(fi.files && fi.files.length > 0) {
-        var file = fi.files[0];
-        if(file.size > 10485760){ setL('brb','brt','brs',false,'à¦¡à§‹à¦¨à¦¾à¦° à¦–à§à¦à¦œà§à¦¨ ðŸ”'); sE('bre','à¦«à¦¾à¦‡à¦² à§§à§¦MB à¦à¦° à¦¬à§‡à¦¶à¦¿à¥¤'); return; }
-        
-        var reader = new FileReader();
-        reader.onload = function() {
-            var b64 = reader.result.split(',')[1];
-            fd.set('prescriptionFile', b64);
-            fd.set('mimeType', file.type);
-            fd.set('fileName', file.name);
-            sendReq(fd);
-        };
-        reader.onerror = function() { setL('brb','brt','brs',false,'à¦¡à§‹à¦¨à¦¾à¦° à¦–à§à¦à¦œà§à¦¨ ðŸ”'); sE('bre','à¦«à¦¾à¦‡à¦² à¦°à¦¿à¦¡ à¦•à¦°à¦¤à§‡ à¦¸à¦®à¦¸à§à¦¯à¦¾à¥¤'); };
-        reader.readAsDataURL(file);
-    } else {
-        sendReq(fd);
+    if(email === 'spondonbloodsociety.jtec@gmail.com') {
+        localStorage.setItem('sbs_admin', 'true');
     }
-    
-    function sendReq(formData) {
-        fetch(S, {method:'POST', body: formData})
-        .then(r => r.json())
-        .then(d => {
-            if(d.status !== 'Success') throw new Error(d.message);
-            document.getElementById('brfs').style.display='none';
-            document.getElementById('brr').style.display='block';
-            
-            var dl = document.getElementById('brdl'), intro = document.getElementById('bri'), cs = document.getElementById('brcs');
-            if(d.matchedDonors && d.matchedDonors.length){
-                intro.innerHTML = 'à¦ªà§à¦°à¦¿à¦¯à¦¼ à¦¸à§à¦¬à¦œà¦¨, à¦†à¦ªà¦¨à¦¾à¦° à¦œà¦¨à§à¦¯ <b style="color:#1b5e20">' + d.matchedDonors.length + 'à¦œà¦¨</b> à¦ªà§à¦°à¦¸à§à¦¤à§à¦¤ à¦¡à§‹à¦¨à¦¾à¦° à¦ªà¦¾à¦“à¦¯à¦¼à¦¾ à¦—à§‡à¦›à§‡à¥¤ à¦à¦–à¦¨à¦‡ à¦•à¦² à¦•à¦°à§à¦¨:';
-                var h = '';
-                d.matchedDonors.forEach(m => {
-                    h += '<div class="dc"><div style="flex:1;min-width:0"><div class="dn2">ðŸ‘¤ ' + m.name + '</div><div class="dp2">ðŸ“ž ' + m.phone + '</div><div><span class="dbg">' + (formData.get('bloodGroup') || '') + '</span>' + (m.upazilla ? '<span class="duz">ðŸ“ ' + m.upazilla + '</span>':'') + '</div></div><a href="tel:' + m.phone + '" class="cbt">ðŸ“± à¦•à¦² à¦•à¦°à§à¦¨</a></div>';
-                });
-                dl.innerHTML = h;
-                cs.style.display = 'block';
-            } else {
-                intro.innerHTML = 'à¦ªà§à¦°à¦¿à¦¯à¦¼ à¦¸à§à¦¬à¦œà¦¨, à¦à¦‡ à¦®à§à¦¹à§‚à¦°à§à¦¤à§‡ à¦•à§‹à¦¨à§‹ à¦¡à§‹à¦¨à¦¾à¦° à¦ªà¦¾à¦“à¦¯à¦¼à¦¾ à¦¯à¦¾à¦¯à¦¼à¦¨à¦¿à¥¤';
-                dl.innerHTML = '<div class="nd"><div style="font-size:34px;margin-bottom:8px">ðŸ˜”</div><b style="font-size:15px">à¦¦à§à¦ƒà¦–à¦¿à¦¤!</b><br><span style="font-size:13px;line-height:1.7;display:block;margin-top:5px">à¦…à¦¨à§à¦¯à¦¾à¦¨à§à¦¯ à¦®à¦¾à¦§à§à¦¯à¦®à§‡ à¦–à§‹à¦à¦œ à¦¨à¦¿à¦¨à¥¤</span></div>';
-            }
-        }).catch(e => {
-            setL('brb','brt','brs',false,'à¦¡à§‹à¦¨à¦¾à¦° à¦–à§à¦à¦œà§à¦¨ ðŸ”'); sE('bre', e.message||'à¦‡à¦¨à§à¦Ÿà¦¾à¦°à¦¨à§‡à¦Ÿ à¦¸à¦®à¦¸à§à¦¯à¦¾à¥¤');
-        });
-    }
-});
-  // MATCH SECURED
-document.getElementById('msb').addEventListener('click',function(){var f=document.getElementById('msf');if(!f.checkValidity()){f.reportValidity();return}setL('msb','mst','mss',true,'');hE('mse');fetch(S,{method:'POST',body:new FormData(f)}).then(function(r){return r.json()}).then(function(d){if(d.status==='Success'){document.getElementById('msfs').style.display='none';document.getElementById('msok').style.display='block';document.getElementById('msdn').textContent=d.donorName||'';
+  }
+
+  // Regular Donor Checkbox Logic
+  const cbIsReg = document.getElementById('cb-is-reg');
+  const igEmailAuth = document.getElementById('ig-email-auth');
+  const adminPass = document.getElementById('admin-pass');
   
-  // Update WhatsApp Button Link
-  var donorP = document.getElementById('msdp').value;
-  var txt = encodeURIComponent('à¦†à¦¸à¦¸à¦¾à¦²à¦¾à¦®à§ à¦†à¦²à¦¾à¦‡à¦•à§à¦®, à¦†à¦®à¦¿ à¦¸à§à¦ªà¦¨à§à¦¦à¦¨ à¦¬à§à¦²à¦¾à¦¡ à¦¸à§‹à¦¸à¦¾à¦‡à¦Ÿà¦¿ à¦¥à§‡à¦•à§‡ à¦¯à§‹à¦—à¦¾à¦¯à§‹à¦— à¦•à¦°à¦›à¦¿à¥¤ à¦†à¦ªà¦¨à¦¿ à¦†à¦®à¦¾à¦¦à§‡à¦° à¦°à§‹à¦—à§€à¦° à¦œà¦¨à§à¦¯ à¦°à¦•à§à¦¤à¦¦à¦¾à¦¨à§‡ à¦¸à¦®à§à¦®à¦¤à¦¿ à¦œà¦¾à¦¨à¦¿à§Ÿà§‡à¦›à§‡à¦¨à¥¤ à¦¬à¦¿à¦¸à§à¦¤à¦¾à¦°à¦¿à¦¤ à¦¤à¦¥à§à¦¯à§‡à¦° à¦œà¦¨à§à¦¯ à¦‡à¦®à§‡à¦‡à¦² à¦šà§‡à¦• à¦•à¦°à§à¦¨ à¦…à¦¥à¦¬à¦¾ à¦à¦–à¦¾à¦¨à§‡ à¦°à¦¿à¦ªà§à¦²à¦¾à¦‡ à¦¦à¦¿à¦¨à¥¤ à¦§à¦¨à§à¦¯à¦¬à¦¾à¦¦!');
-  document.getElementById('wa-btn-1').onclick = function(){ window.open('https://wa.me/88'+donorP+'?text='+txt, '_blank'); };
-
-}else{setL('msb','mst','mss',false,'\u0995\u09A8\u09AB\u09BE\u09B0\u09CD\u09AE \u0993 \u0987\u09AE\u09C7\u0987\u09B2 \u09AA\u09BE\u09A0\u09BE\u09A8 \u{1F4E7}');sE('mse',d.message||'\u09A4\u09CD\u09B0\u09C1\u099F\u09BF\u0964')}}).catch(function(){setL('msb','mst','mss',false,'\u0995\u09A8\u09AB\u09BE\u09B0\u09CD\u09AE \u0993 \u0987\u09AE\u09C7\u0987\u09B2 \u09AA\u09BE\u09A0\u09BE\u09A8 \u{1F4E7}');sE('mse','\u0987\u09A8\u09CD\u099F\u09BE\u09B0\u09A8\u09C7\u099F \u09B8\u09AE\u09B8\u09CD\u09AF\u09BE\u0964')})});
-document.getElementById('msab').addEventListener('click',function(){document.getElementById('msok').style.display='none';document.getElementById('msfs').style.display='block';document.getElementById('msdp').value='';setL('msb','mst','mss',false,'\u0995\u09A8\u09AB\u09BE\u09B0\u09CD\u09AE \u0993 \u0987\u09AE\u09C7\u0987\u09B2 \u09AA\u09BE\u09A0\u09BE\u09A8 \u{1F4E7}')});
-
-// CONFIRMATION
-document.getElementById('cfst').addEventListener('change',function(){document.getElementById('cfdr').hidden=this.value!=='Donated'});
-document.getElementById('cfb').addEventListener('click',function(){var f=document.getElementById('cff');if(!f.checkValidity()){f.reportValidity();return}setL('cfb','cft','cfs',true,'');hE('cfe');fetch(S,{method:'POST',body:new FormData(f)}).then(function(r){return r.json()}).then(function(d){if(d.status==='Success'){document.getElementById('cffs').style.display='none';document.getElementById('cfok').style.display='block'}else{setL('cfb','cft','cfs',false,'\u09B8\u09CD\u099F\u09CD\u09AF\u09BE\u099F\u09BE\u09B8 \u0986\u09AA\u09A1\u09C7\u099F \u0995\u09B0\u09C1\u09A8 \u2705');sE('cfe',d.message||'\u09A4\u09CD\u09B0\u09C1\u099F\u09BF\u0964')}}).catch(function(){setL('cfb','cft','cfs',false,'\u09B8\u09CD\u099F\u09CD\u09AF\u09BE\u099F\u09BE\u09B8 \u0986\u09AA\u09A1\u09C7\u099F \u0995\u09B0\u09C1\u09A8 \u2705');sE('cfe','\u0987\u09A8\u09CD\u099F\u09BE\u09B0\u09A8\u09C7\u099F \u09B8\u09AE\u09B8\u09CD\u09AF\u09BE\u0964')})});
-
-// ADMIN & BLOG LOGIC
-var adminTrigCount = 0;
-document.getElementById('admin-trig').addEventListener('click', function() {
-    adminTrigCount++;
-    if(adminTrigCount >= 3) {
-        document.getElementById('admin-pop').classList.remove('off');
-        adminTrigCount = 0;
-    }
-});
-
-document.getElementById('admin-login-btn').addEventListener('click', function() {
-    var e = document.getElementById('admin-email').value;
-    var p = document.getElementById('admin-pin').value;
-    if(!e || !p) return;
-    this.textContent = 'à¦²à¦—à¦‡à¦¨ à¦¹à¦šà§à¦›à§‡...';
-    
-    var fd = new FormData();
-    fd.append('formType', 'adminLogin');
-    fd.append('email', e);
-    fd.append('pin', p);
-
-    fetch(S, {method:'POST', body: fd})
-    .then(r => r.json())
-    .then(d => {
-        if(d.status === 'Success') {
-            sessionStorage.setItem('isAdmin', 'true');
-            sessionStorage.setItem('adminEmail', e);
-            sessionStorage.setItem('adminPin', p);
-            document.getElementById('admin-pop').classList.add('off');
-            document.getElementById('cfb').addEventListener('click',function(){
-    var f=document.getElementById('cff');
-    if(!f.checkValidity()){f.reportValidity();return}
-    setL('cfb','cft','cfs',true,''); hE('cfe');
-    var fd = new FormData(f);
-    fd.set('action', 'confirmDonation');
-    fetch(S,{method:'POST',body:fd}).then(r=>r.json()).then(d=>{
-        if(d.status==='Success'){
-            document.getElementById('cffs').style.display='none';
-            document.getElementById('cfok').style.display='block';
-        } else {
-            setL('cfb','cft','cfs',false,'à¦†à¦ªà¦¡à§‡à¦Ÿ à¦•à¦°à§à¦¨'); sE('cfe',d.message||'à¦¤à§à¦°à§à¦Ÿà¦¿à¥¤');
-        }
-    }).catch(()=>{ setL('cfb','cft','cfs',false,'à¦†à¦ªà¦¡à§‡à¦Ÿ à¦•à¦°à§à¦¨'); sE('cfe','à¦‡à¦¨à§à¦Ÿà¦¾à¦°à¦¨à§‡à¦Ÿ à¦¸à¦®à¦¸à§à¦¯à¦¾à¥¤'); });
-});
-checkAdmin();
-            alert('à¦¸à¦«à¦²à¦­à¦¾à¦¬à§‡ à¦²à¦—à¦‡à¦¨ à¦¹à§Ÿà§‡à¦›à§‡!');
-        } else {
-            sE('admin-err', 'à¦­à§à¦² à¦‡à¦®à§‡à¦‡à¦² à¦¬à¦¾ à¦ªà¦¿à¦¨!');
-            this.textContent = 'à¦²à¦—à¦‡à¦¨ à¦•à¦°à§à¦¨';
-        }
-    }).catch(err => {
-        sE('admin-err', 'à¦¨à§‡à¦Ÿà¦“à§Ÿà¦¾à¦°à§à¦• à¦¸à¦®à¦¸à§à¦¯à¦¾!');
-        this.textContent = 'à¦²à¦—à¦‡à¦¨ à¦•à¦°à§à¦¨';
-    });
-});
-
-function checkAdmin() {
-    if(sessionStorage.getItem('isAdmin') === 'true') {
-        document.getElementById('admin-panel').style.display = 'block';
-    }
-}
-document.getElementById('cfb').addEventListener('click',function(){
-    var f=document.getElementById('cff');
-    if(!f.checkValidity()){f.reportValidity();return}
-    setL('cfb','cft','cfs',true,''); hE('cfe');
-    var fd = new FormData(f);
-    fd.set('action', 'confirmDonation');
-    fetch(S,{method:'POST',body:fd}).then(r=>r.json()).then(d=>{
-        if(d.status==='Success'){
-            document.getElementById('cffs').style.display='none';
-            document.getElementById('cfok').style.display='block';
-        } else {
-            setL('cfb','cft','cfs',false,'à¦†à¦ªà¦¡à§‡à¦Ÿ à¦•à¦°à§à¦¨'); sE('cfe',d.message||'à¦¤à§à¦°à§à¦Ÿà¦¿à¥¤');
-        }
-    }).catch(()=>{ setL('cfb','cft','cfs',false,'à¦†à¦ªà¦¡à§‡à¦Ÿ à¦•à¦°à§à¦¨'); sE('cfe','à¦‡à¦¨à§à¦Ÿà¦¾à¦°à¦¨à§‡à¦Ÿ à¦¸à¦®à¦¸à§à¦¯à¦¾à¥¤'); });
-});
-checkAdmin();
-
-function fixImg(url) {
-    if(!url) return '';
-    // Extract ID from various Google Drive link formats
-    let m = url.match(/drive\.google\.com\/.*[?&]id=([^&]+)|drive\.google\.com\/file\/d\/([^/]+)/);
-    let id = m ? (m[1] || m[2]) : null;
-    if(id) {
-        // Use thumbnail API (bypasses some strict uc?id restrictions, but image MUST be public)
-        return 'https://drive.google.com/thumbnail?id=' + id + '&sz=w1000';
-    }
-    return url;
-}
-window.delBlog = function(id) {
-    if(!confirm('à¦à¦‡ à¦ªà§‹à¦¸à§à¦Ÿà¦Ÿà¦¿ à¦®à§à¦›à§‡ à¦«à§‡à¦²à¦¤à§‡ à¦šà¦¾à¦¨?')) return;
-    var fd = new FormData();
-    fd.append('formType', 'deleteBlog');
-    fd.append('email', sessionStorage.getItem('adminEmail'));
-    fd.append('pin', sessionStorage.getItem('adminPin'));
-    fd.append('rowId', id);
-    fetch(S, {method:'POST', body: fd}).then(r=>r.json()).then(res=>{
-        if(res.status==='Success'){ loadBlogs(); } else { alert('Error: ' + res.message); }
-    });
-};
-window.togglePin = function(id, curState) {
-    var newState = curState === 'true' ? 'false' : 'true';
-    if(!confirm(newState === 'true' ? 'à¦à¦‡ à¦ªà§‹à¦¸à§à¦Ÿà¦Ÿà¦¿à¦•à§‡ à¦¹à§‹à¦®à¦ªà§‡à¦œà§‡à¦° à¦Ÿà¦ª à§ª-à¦ à¦°à¦¾à¦–à¦¤à§‡ à¦šà¦¾à¦¨?' : 'à¦¹à§‹à¦®à¦ªà§‡à¦œ à¦¥à§‡à¦•à§‡ à¦à¦‡ à¦ªà§‹à¦¸à§à¦Ÿà¦Ÿà¦¿ à¦¸à¦°à¦¾à¦¤à§‡ à¦šà¦¾à¦¨?')) return;
-    var fd = new FormData();
-    fd.append('formType', 'togglePinBlog');
-    fd.append('email', sessionStorage.getItem('adminEmail'));
-    fd.append('pin', sessionStorage.getItem('adminPin'));
-    fd.append('rowId', id);
-    fd.append('pinState', newState);
-    fetch(S, {method:'POST', body: fd}).then(r=>r.json()).then(res=>{
-        if(res.status==='Success'){ loadBlogs(); } else { alert('Error: ' + res.message); }
-    });
-};
-
-// Load Blogs
-function loadBlogs() {
-    fetch(S + '?action=getBlogs')
-    .then(r => r.json())
-    .then(d => {
-        var bl = document.getElementById('blog-list');
-        var ta = document.getElementById('top-activities');
-        if(!d.blogs || d.blogs.length === 0) {
-            bl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--tx4);font-size:14px;font-weight:600;">à¦•à§‹à¦¨à§‹ à¦•à¦¾à¦°à§à¦¯à¦•à§à¦°à¦® à¦ªà¦¾à¦“à§Ÿà¦¾ à¦¯à¦¾à§Ÿà¦¨à¦¿à¥¤</div>';
-            if(ta) ta.innerHTML = '<div style="text-align:center;color:var(--tx4);font-size:14px;grid-column: 1/-1;">à¦•à§‹à¦¨à§‹ à¦•à¦¾à¦°à§à¦¯à¦•à§à¦°à¦® à¦¨à§‡à¦‡à¥¤</div>';
-            return;
-        }
-        var h = '';
-        var hTop = '';
-        var isAdmin = sessionStorage.getItem('isAdmin') === 'true';
-        var pinnedCount = 0;
-        
-        d.blogs.forEach(function(b) {
-            var card = '<div class="bcard animate-on-scroll">';
-            if(isAdmin) {
-                card += '<button class="bdel" style="right:85px;background:'+(b.pinned?'#1b5e20':'#ea4335')+';" onclick="togglePin('+b.id+', \''+b.pinned+'\')">'+(b.pinned?'ðŸ“Œ Pinned':'ðŸ“Œ Pin')+'</button>';
-                card += '<button class="bdel" onclick="delBlog('+b.id+')">à¦¡à¦¿à¦²à¦¿à¦Ÿ ðŸ—‘ï¸</button>';
-            }
-            let img = fixImg(b.image);
-            if(img) card += '<img src="'+img+'" class="bimg" onerror="this.style.display=\'none\'">';
-            card += '<div class="bp">';
-            card += '<div class="bmeta"><span>ðŸ“… '+b.date+'</span><span>ðŸ‘¤ '+b.author+'</span></div>';
-            card += '<div class="bt">'+b.title+'</div>';
-            card += '<div class="bd">'+b.desc+'</div>';
-            if(b.fbLink) card += '<a href="'+b.fbLink+'" target="_blank" class="bfb">à¦«à§‡à¦¸à¦¬à§à¦•à§‡ à¦¬à¦¿à¦¸à§à¦¤à¦¾à¦°à¦¿à¦¤ à¦ªà§œà§à¦¨ ðŸ”—</a>';
-            card += '</div></div>';
-            
-            h += card;
-            
-            if(b.pinned && pinnedCount < 4) {
-                // Top activities variant (clicking it goes to about page)
-                var topCard = '<div class="bcard animate-on-scroll" style="cursor:pointer;" onclick="go(\'about\')">';
-                if(img) topCard += '<img src="'+img+'" class="bimg" style="max-height:160px" onerror="this.style.display=\'none\'">';
-                topCard += '<div class="bp" style="padding:12px;">';
-                topCard += '<div class="bt" style="font-size:15px; margin-bottom:4px;">'+b.title+'</div>';
-                topCard += '<div class="bd" style="font-size:13px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">'+b.desc+'</div>';
-                topCard += '</div></div>';
-                hTop += topCard;
-                pinnedCount++;
-            }
-        });
-        bl.innerHTML = h;
-        if(ta) ta.innerHTML = hTop || '<div style="text-align:center;color:var(--tx4);font-size:14px;grid-column: 1/-1;">à¦•à§‹à¦¨à§‹ à¦Ÿà¦ª à¦•à¦¾à¦°à§à¦¯à¦•à§à¦°à¦® à¦ªà¦¿à¦¨ à¦•à¦°à¦¾ à¦¨à§‡à¦‡à¥¤</div>';
-        
-        // Re-initialize animations for new elements
-        setTimeout(initAnimations, 100);
-    }).catch(e => {
-        document.getElementById('blog-list').innerHTML = '<div style="text-align:center;padding:20px;color:red;font-size:14px;font-weight:600;">à¦²à§‹à¦¡ à¦•à¦°à¦¤à§‡ à¦¸à¦®à¦¸à§à¦¯à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤</div>';
-    });
-}
-// Load blogs on start
-setTimeout(loadBlogs, 1000);
-
-// Intersection Observer for scroll animations
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if(entry.isIntersecting) {
-            entry.target.classList.add('show');
-            observer.unobserve(entry.target); // Animate only once
-        }
-    });
-}, { threshold: 0.1, rootMargin: "0px 0px -20px 0px" });
-
-function initAnimations() {
-    document.querySelectorAll('.animate-on-scroll:not(.show)').forEach(el => {
-        observer.observe(el);
-    });
-}
-window.addEventListener('DOMContentLoaded', initAnimations);
-
-
-// Add Blog
-document.getElementById('bl-btn').addEventListener('click', function() {
-    var t = document.getElementById('bl-t').value;
-    var d = document.getElementById('bl-d').value;
-    var i = document.getElementById('bl-i').value;
-    if(!t || !d) { alert('à¦Ÿà¦¾à¦‡à¦Ÿà§‡à¦² à¦à¦¬à¦‚ à¦¡à§‡à¦¸à§à¦•à§à¦°à¦¿à¦ªà¦¶à¦¨ à¦¦à¦¿à¦¨!'); return; }
-    
-    this.textContent = 'à¦ªà§‹à¦¸à§à¦Ÿ à¦¹à¦šà§à¦›à§‡...';
-    var fd = new FormData();
-    var fb = document.getElementById('bl-fb').value;
-    fd.append('formType', 'addBlog');
-    fd.append('email', sessionStorage.getItem('adminEmail'));
-    fd.append('pin', sessionStorage.getItem('adminPin'));
-    fd.append('title', t);
-    fd.append('desc', d);
-    fd.append('image', i);
-    fd.append('fbLink', fb);
-
-    fetch(S, {method:'POST', body: fd})
-    .then(r => r.json())
-    .then(res => {
-        if(res.status === 'Success') {
-            alert('à¦¸à¦«à¦²à¦­à¦¾à¦¬à§‡ à¦ªà§‹à¦¸à§à¦Ÿ à¦¹à§Ÿà§‡à¦›à§‡!');
-            document.getElementById('bl-t').value = '';
-            document.getElementById('bl-d').value = '';
-            document.getElementById('bl-i').value = '';
-            document.getElementById('bl-fb').value = '';
-            this.textContent = 'à¦ªà§‹à¦¸à§à¦Ÿ à¦•à¦°à§à¦¨ ðŸš€';
-            loadBlogs(); // Reload list
-        } else {
-            alert('à¦¸à¦®à¦¸à§à¦¯à¦¾: ' + res.message);
-            this.textContent = 'à¦ªà§‹à¦¸à§à¦Ÿ à¦•à¦°à§à¦¨ ðŸš€';
-        }
-    }).catch(err => {
-        alert('à¦¨à§‡à¦Ÿà¦“à§Ÿà¦¾à¦°à§à¦• à¦¸à¦®à¦¸à§à¦¯à¦¾!');
-        this.textContent = 'à¦ªà§‹à¦¸à§à¦Ÿ à¦•à¦°à§à¦¨ ðŸš€';
-    });
-});
-
-// DONOR PROFILE LOGIC
-let curProfileEmail = "";
-document.getElementById('dp-form1').addEventListener('submit', function(e) {
-  e.preventDefault();
-  let b = document.getElementById('dp-b1');
-  b.textContent = "à¦ªà¦¾à¦ à¦¾à¦¨à§‹ à¦¹à¦šà§à¦›à§‡...";
-  let email = document.getElementById('dp-email').value;
-  let fd = new FormData();
-  fd.append('formType', 'requestOtp');
-  fd.append('email', email);
-  
-  fetch(S, {method:'POST', body:fd}).then(r=>r.json()).then(d=>{
-    if(d.status === 'Success') {
-      curProfileEmail = email;
-      document.getElementById('dp-step1').style.display = 'none';
-      document.getElementById('dp-step2').style.display = 'block';
-    } else {
-      sE('dp-err1', d.message);
-    }
-    b.textContent = "OTP à¦ªà¦¾à¦ à¦¾à¦¨";
-  }).catch(err=>{
-    sE('dp-err1', 'à¦‡à¦¨à§à¦Ÿà¦¾à¦°à¦¨à§‡à¦Ÿ à¦¸à¦®à¦¸à§à¦¯à¦¾à¥¤');
-    b.textContent = "OTP à¦ªà¦¾à¦ à¦¾à¦¨";
-  });
-});
-document.getElementById('dp-form2').addEventListener('submit', function(e) {
-  e.preventDefault();
-  let b = document.getElementById('dp-b2');
-  b.textContent = "à¦­à§‡à¦°à¦¿à¦«à¦¾à¦‡ à¦¹à¦šà§à¦›à§‡...";
-  let otp = document.getElementById('dp-otp').value;
-  let fd = new FormData();
-  fd.append('formType', 'verifyOtp');
-  fd.append('email', curProfileEmail);
-  fd.append('otp', otp);
-  
-  fetch(S, {method:'POST', body:fd}).then(r=>r.json()).then(d=>{
-    if(d.status === 'Success') {
-      document.getElementById('dp-step2').style.display = 'none';
-      document.getElementById('dp-step3').style.display = 'block';
-      // Fill data
-      document.getElementById('dp-name').value = d.donor.name;
-      document.getElementById('dp-phone').value = d.donor.phone;
-      document.getElementById('dp-district').value = d.donor.district;
-      document.getElementById('dp-upazilla').value = d.donor.upazilla;
-      document.getElementById('dp-bg').value = d.donor.bg;
-      if(d.donor.lastDate) {
-        let ld = new Date(d.donor.lastDate);
-        if(!isNaN(ld.getTime())) {
-          document.getElementById('dp-lastdate').value = ld.toISOString().split('T')[0];
-        }
+  // Show/hide admin password based on checkbox and login state
+  cbIsReg.addEventListener('change', function() {
+      if(this.checked) {
+          const isAdmin = localStorage.getItem('sbs_admin') === 'true';
+          if(isAdmin) {
+              // Automatically allow if logged in via URL
+              igEmailAuth.style.display = 'none';
+              adminPass.removeAttribute('required');
+          } else {
+              igEmailAuth.style.display = 'block';
+              adminPass.setAttribute('required', 'required');
+          }
+      } else {
+          igEmailAuth.style.display = 'none';
+          adminPass.removeAttribute('required');
       }
-    } else {
-      sE('dp-err2', d.message);
-    }
-    b.textContent = "à¦­à§‡à¦°à¦¿à¦«à¦¾à¦‡ à¦•à¦°à§à¦¨";
-  }).catch(err=>{
-    sE('dp-err2', 'à¦‡à¦¨à§à¦Ÿà¦¾à¦°à¦¨à§‡à¦Ÿ à¦¸à¦®à¦¸à§à¦¯à¦¾à¥¤');
-    b.textContent = "à¦­à§‡à¦°à¦¿à¦«à¦¾à¦‡ à¦•à¦°à§à¦¨";
   });
-});
-document.getElementById('dp-form3').addEventListener('submit', function(e) {
-  e.preventDefault();
-  let b = document.getElementById('dp-b3');
-  b.textContent = "à¦¸à§‡à¦­ à¦¹à¦šà§à¦›à§‡...";
-  hE('dp-err3');
-  document.getElementById('dp-ok3').style.display = 'none';
-  
-  let fd = new FormData();
-  fd.append('formType', 'updateProfile');
-  fd.append('email', curProfileEmail);
-  fd.append('name', document.getElementById('dp-name').value);
-  fd.append('phone', document.getElementById('dp-phone').value);
-  fd.append('district', document.getElementById('dp-district').value);
-  fd.append('upazilla', document.getElementById('dp-upazilla').value);
-  fd.append('bg', document.getElementById('dp-bg').value);
-  fd.append('lastDate', document.getElementById('dp-lastdate').value);
-  
-  fetch(S, {method:'POST', body:fd}).then(r=>r.json()).then(d=>{
-    if(d.status === 'Success') {
-      document.getElementById('dp-ok3').style.display = 'block';
-    } else {
-      sE('dp-err3', d.message);
+
+
+  var cd=gv();
+  if(cd){ldN(cd)}else{setTimeout(function(){document.getElementById('pop').classList.remove('off')},1000)}
+
+  function popDist(){
+    var d=document.getElementById('fd-dist').value;
+    if(d) {
+        autoSetDist(d);
+        document.getElementById('pop').classList.add('off');
+        ldN(d);
     }
-    b.textContent = "à¦ªà¦°à¦¿à¦¬à¦°à§à¦¤à¦¨ à¦¸à§‡à¦­ à¦•à¦°à§à¦¨";
-  }).catch(err=>{
-    sE('dp-err3', 'à¦‡à¦¨à§à¦Ÿà¦¾à¦°à¦¨à§‡à¦Ÿ à¦¸à¦®à¦¸à§à¦¯à¦¾à¥¤');
-    b.textContent = "à¦ªà¦°à¦¿à¦¬à¦°à§à¦¤à¦¨ à¦¸à§‡à¦­ à¦•à¦°à§à¦¨";
+  }
+  
+  function autoSetDist(d){if(!d)return;['fd-dist','mds'].forEach(function(id){var e=document.getElementById(id);if(e&&e.value!==d){e.value=d;e.dispatchEvent(new Event('change'))}})}
+  
+  function ldN(d){autoSetDist(d);fetch(S+'?action=getNotices&district='+encodeURIComponent(d)).then(function(r){return r.json()}).then(function(j){stk(j.notices&&j.notices.length>0?j.notices:[d+' জেলায় এখন কোনো জরুরি রক্তের চাহিদা নেই। রক্তদান করুন! ❤️'],d);sv(d)}).catch(function(){stk(['স্পন্দন ব্লাড সোসাইটি, ঝিনাইদহ।'],d)})}
+
+  document.getElementById('tdt').addEventListener('click',function(){try{localStorage.removeItem('sbs_d');localStorage.removeItem('sbs_t')}catch(x){}document.getElementById('tdt').classList.remove('show');document.getElementById('tmsg').className='t-msg';document.getElementById('tsk').style.display='block';sman()});
+
+  document.getElementById('mdb').addEventListener('click',function(){var d=document.getElementById('mds').value;if(!d)return;document.getElementById('tman').classList.remove('show');ldN(d)});
+
+  function tryGPS(ok,fail){if(!navigator.geolocation){fail();return}document.getElementById('pdm').textContent='📍 আপনার অবস্থান শনাক্ত করা হচ্ছে...';var done=false;var to=setTimeout(function(){if(!done){done=true;fail()}},6000);navigator.geolocation.getCurrentPosition(function(p){if(done)return;document.getElementById('pdm').textContent='✅ GPS পাওয়া গেছে।';fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat='+p.coords.latitude+'&lon='+p.coords.longitude+'&addressdetails=1&accept-language=en',{headers:{'User-Agent':'SBS/1.0'}}).then(function(r){return r.json()}).then(function(d){if(done)return;clearTimeout(to);done=true;var a=d.address||{},raw=Object.values(a).join(' '),dist=mD(raw);if(dist)ok(dist);else fail()}).catch(function(){if(!done){clearTimeout(to);done=true;fail()}})},function(){if(!done){clearTimeout(to);done=true;fail()}},{timeout:5000,maximumAge:0,enableHighAccuracy:false})}
+
+  function tryIP(ok,fail){document.getElementById('pdm').textContent='🌐 অনুমানিক অবস্থান খোঁজা হচ্ছে...';var done=false,fc=0;function got(raw){if(done)return;var d=mD(raw);if(d){done=true;ok(d)}else nope()}function nope(){if(done)return;fc++;if(fc>=3){done=true;fail()}}fetch('https://ipapi.co/json/?nocache=true&_='+Date.now()).then(function(r){return r.json()}).then(function(d){got(d.city||d.region||'')}).catch(nope);fetch('https://ipinfo.io/json').then(function(r){return r.json()}).then(function(d){got(d.city||d.region||'')}).catch(nope);fetch('https://freeipapi.com/api/json').then(function(r){return r.json()}).then(function(d){got(d.cityName||d.regionName||'')}).catch(nope);setTimeout(function(){if(!done){done=true;fail()}},5000)}
+
+  document.getElementById('pok').addEventListener('click',function(){var btn=this;btn.disabled=true;btn.textContent='শনাক্ত করা হচ্ছে...';var done=false;var fs=setTimeout(function(){if(!done){done=true;document.getElementById('pdm').textContent='';document.getElementById('pop').classList.add('off');sman()}},8000);tryGPS(function(d){if(done)return;clearTimeout(fs);done=true;document.getElementById('pop').classList.add('off');ldN(d)},function(){if(done)return;tryIP(function(d){if(done)return;clearTimeout(fs);done=true;document.getElementById('pop').classList.add('off');ldN(d)},function(){if(done)return;clearTimeout(fs);done=true;document.getElementById('pdm').textContent='';document.getElementById('pop').classList.add('off');sman()})})});
+
+  // STATS
+  fetch(S+'?action=getLiveStats').then(function(r){return r.json()}).then(function(d){if(d.status!=='Success')throw 0;document.getElementById('stsk').hidden=true;document.getElementById('stdt').hidden=false;document.getElementById('s-td').textContent=toBn(d.totalDonations);document.getElementById('s-ad').textContent=toBn(d.availableDonors);document.getElementById('s-nd').textContent=toBn(d.newDonorsToday);document.getElementById('s-pr').textContent=toBn(d.pendingRequests);var g=['A+','B+','O+','AB+','A-','B-','O-','AB-'],h='';for(var i=0;i<8;i++){var c=(d.bloodGroups&&d.bloodGroups[g[i]]!==undefined)?d.bloodGroups[g[i]]:0;h+='<div class="bgc">'+g[i]+'<span>'+toBn(c)+'</span></div>'}document.getElementById('s-bg').innerHTML=h;document.getElementById('s-up').textContent='সর্বশেষ আপডেট: '+(d.lastUpdated||'')}).catch(function(){document.getElementById('stsk').hidden=true;document.getElementById('stdt').hidden=false;document.getElementById('s-up').textContent='ডেটা লোড ব্যর্থ। রিফ্রেশ করুন।'});
+  
+  // FORM HELPERS
+  function setL(b,t,sp,on,txt){var bn=document.getElementById(b),tt=document.getElementById(t),s=document.getElementById(sp);bn.disabled=on;tt.textContent=on?'অপেক্ষা করুন...':txt;s.style.display=on?'block':'none'}
+  function sE(id,m){var e=document.getElementById(id);e.textContent='❌ '+m;e.style.display='block'}
+  function cE(id){document.getElementById(id).style.display='none'}
+
+  // FIND DONOR
+  document.getElementById('f-find').addEventListener('submit', function(e) {
+      e.preventDefault();
+      setL('fb-find','ft-find','fs-find',true,'');
+      cE('fe-find');
+      document.getElementById('wa-card-1').style.display='none';
+      
+      const formData = new FormData(this);
+      const donorP = '01861730070';
+      
+      fetch(S + '?action=findDonor&bloodGroup=' + encodeURIComponent(formData.get('bloodGroup')) + '&district=' + encodeURIComponent(formData.get('district')) + '&upazilla=' + encodeURIComponent(formData.get('upazilla')))
+          .then(r => r.json())
+          .then(d => {
+              setL('fb-find','ft-find','fs-find',false,'খুঁজুন');
+              if (d.status === 'Success') {
+                  let h = '';
+                  d.matchedDonors.forEach(m => {
+                      h += '<div class="dc"><div style="flex:1;min-width:0"><div class="dn2">👤 ' + m.name + '</div><div class="dp2">📞 ' + m.phone + '</div><div><span class="dbg">' + (formData.get('bloodGroup') || '') + '</span>' + (m.upazilla ? '<span class="duz">📍 ' + m.upazilla + '</span>':'') + '</div></div><a href="tel:' + m.phone + '" class="cbt">কল করুন</a></div>';
+                  });
+                  if (d.matchedDonors.length === 0) {
+                      h = '<div class="no-res"><b>দুঃখিত!</b> এই মুহূর্তে কোনো রক্তদাতা পাওয়া যায়নি।<br>দয়া করে হেল্পলাইনে যোগাযোগ করুন।</div>';
+                      document.getElementById('wa-card-1').style.display='block';
+                  } else {
+                      document.getElementById('wa-card-1').style.display='block';
+                  }
+                  document.getElementById('d-res').innerHTML = h;
+              } else {
+                  sE('fe-find', d.message || 'Error occurred');
+              }
+          }).catch(e => {
+              setL('fb-find','ft-find','fs-find',false,'খুঁজুন');
+              sE('fe-find', 'Connection failed.');
+          });
+          
+      var txt = encodeURIComponent('আসসালামু আলাইকুম, আমি স্পন্দন ব্লাড সোসাইটি ঝিনাইদহ এর ওয়েবসাইট থেকে আপনার নাম্বারটি পেয়েছি। জরুরি প্রয়োজনে আপনার সাথে যোগাযোগ করছি...');
+      document.getElementById('wa-btn-1').onclick = function(){ window.open('https://wa.me/88'+donorP+'?text='+txt, '_blank'); };
   });
+
+  // REGISTER
+  document.getElementById('f-reg').addEventListener('submit', function(e) {
+      e.preventDefault();
+      setL('fb-reg','ft-reg','fs-reg',true,'');
+      cE('fe-reg');
+      cE('fsuc-reg');
+      const formData = new FormData(this);
+      
+      // Collect all parameters for POST request
+      const dataParams = new URLSearchParams();
+      dataParams.append('name', formData.get('name'));
+      dataParams.append('phone', formData.get('phone'));
+      dataParams.append('bloodGroup', formData.get('bloodGroup'));
+      dataParams.append('district', formData.get('district'));
+      dataParams.append('upazilla', formData.get('upazilla'));
+      
+      const ld = document.getElementById('dp-lastdate').value;
+      if (ld) {
+        dataParams.append('lastDonationDate', ld);
+      }
+      
+      // Admin logic
+      const isRegular = document.getElementById('cb-is-reg').checked;
+      dataParams.append('isRegularDonor', isRegular);
+      if(isRegular) {
+          const pass = document.getElementById('admin-pass').value;
+          if(pass) {
+              dataParams.append('adminPassword', pass);
+          } else if(localStorage.getItem('sbs_admin') === 'true') {
+              // Include a dummy flag so GAS knows it's logged in if password isn't passed but they reached here
+              dataParams.append('adminOverride', 'true'); 
+          }
+      }
+      
+      fetch(S + '?action=addDonor', {
+          method: 'POST',
+          body: dataParams
+      })
+      .then(r => r.json())
+      .then(d => {
+          setL('fb-reg','ft-reg','fs-reg',false,'নিবন্ধন করুন');
+          if (d.status === 'Success') {
+              var s = document.getElementById('fsuc-reg');
+              s.textContent = '✅ সফলভাবে নিবন্ধিত হয়েছেন!';
+              s.style.display = 'block';
+              this.reset();
+              document.getElementById('cb-is-reg').dispatchEvent(new Event('change'));
+          } else {
+              sE('fe-reg', d.message || 'Error');
+          }
+      }).catch(e => {
+          setL('fb-reg','ft-reg','fs-reg',false,'নিবন্ধন করুন');
+          sE('fe-reg', 'Network error.');
+      });
+  });
+
+  // HELPER: Convert Drive Link to Image src
+  function getDriveImgUrl(url) {
+      if(!url) return '';
+      if(url.indexOf('drive.google.com') === -1) return url;
+      let m = url.match(/drive\.google\.com\/.*[?&]id=([^&]+)|drive\.google\.com\/file\/d\/([^/]+)/);
+      let id = m ? (m[1] || m[2]) : null;
+      if(id) {
+          return 'https://drive.google.com/thumbnail?id=' + id + '&sz=w1000';
+      }
+      return url;
+  }
+
+  // DELETE BLOG
+  window.delBlog = function(id) {
+      if(!confirm('আপনি কি নিশ্চিত যে এটি মুছতে চান?')) return;
+      var fd = new FormData();
+      fd.append('id', id);
+      fetch(S + '?action=deleteBlog', {method: 'POST', body: fd})
+      .then(r => r.json())
+      .then(d => { if(d.status === 'Success') loadBlogs(); else alert(d.message); })
+      .catch(e => alert('Error deleting blog'));
+  }
+
+  // TOGGLE PIN
+  window.togglePin = function(id, curState) {
+      var newState = curState === 'true' ? 'false' : 'true';
+      if(!confirm(newState === 'true' ? 'আপনি কি খবরটিকে পিন করতে চান?' : 'পিন সরাতে চান?')) return;
+      var fd = new FormData();
+      fd.append('id', id);
+      fd.append('pinned', newState);
+      fetch(S + '?action=togglePin', {method: 'POST', body: fd})
+      .then(r => r.json())
+      .then(d => { if(d.status === 'Success') loadBlogs(); else alert(d.message); })
+      .catch(e => alert('Error updating pin'));
+  }
+
+  // LOAD BLOGS
+  function loadBlogs() {
+      fetch(S + '?action=getBlogs')
+      .then(r => r.json())
+      .then(d => {
+          var wr = document.getElementById('blg-wr');
+          if(d.status === 'Success') {
+              if(d.blogs && d.blogs.length > 0) {
+                  var html = '';
+                  const isAdmin = localStorage.getItem('sbs_admin') === 'true';
+                  d.blogs.forEach(function(b) {
+                      var card = '<div class="bc">';
+                      if(b.image) {
+                          card += '<img src="' + getDriveImgUrl(b.image) + '" class="bi" loading="lazy" onerror="this.style.display=\'none\'">';
+                      }
+                      if(b.pinned === true || b.pinned === 'true') {
+                          card += '<div class="bpn">📌 পিন করা</div>';
+                      }
+                      if(isAdmin) {
+                          card += '<button class="bdel" style="right:85px;background:'+(b.pinned?'#1b5e20':'#ea4335')+';" onclick="togglePin('+b.id+', \''+b.pinned+'\')">'+(b.pinned?'📌 Pinned':'📌 Pin')+'</button>';
+                          card += '<button class="bdel" onclick="delBlog('+b.id+')">মুছে ফেলুন</button>';
+                      }
+                      card += '<div class="bpd">';
+                      if(b.title) card += '<h4 class="bti">' + b.title + '</h4>';
+                      if(b.content) card += '<div class="bcn">' + b.content + '</div>';
+                      card += '<div class="bmt"><span>👤 ' + (b.author || 'এডমিন') + '</span><span>' + (b.date || '') + '</span></div>';
+                      card += '</div></div>';
+                      html += card;
+                  });
+                  wr.innerHTML = html;
+              } else {
+                  wr.innerHTML = '<div class="no-res">কোনো আপডেট বা নিউজ নেই।</div>';
+              }
+          } else {
+              wr.innerHTML = '<div class="no-res">লোড করতে ব্যর্থ হয়েছে।</div>';
+          }
+      }).catch(function(e) {
+          document.getElementById('blg-wr').innerHTML = '<div class="no-res">ইন্টারনেট সংযোগ যাচাই করুন।</div>';
+      });
+  }
+
+  loadBlogs();
 });
 </script>
 </body>
