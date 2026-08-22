@@ -76,6 +76,7 @@ button{font-family:inherit;cursor:pointer}
 .hero{background:linear-gradient(135deg,var(--rd) 0%,var(--r) 50%,#e53935 100%);border-radius:24px;padding:32px 24px;color:#fff;text-align:center;margin-bottom:20px;position:relative;overflow:hidden;box-shadow:0 10px 30px rgba(183,28,28,0.4);transition:var(--ease)}
 .hero:hover{transform:translateY(-5px);box-shadow:0 15px 35px rgba(183,28,28,0.5)}
 .hero::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='30' cy='30' r='20' fill='%23ffffff' fill-opacity='.05'/%3E%3C/svg%3E") repeat;pointer-events:none}
+/* NEW: User Images */
 .hero-img{width:100%;max-width:350px;border-radius:16px;margin-bottom:16px;box-shadow:0 8px 24px rgba(0,0,0,0.3);transition:var(--ease);border:3px solid rgba(255,255,255,0.2);display:inline-block;}
 .hero-img:hover{transform:scale(1.03) rotate(-1deg);border-color:rgba(255,255,255,0.5)}
 
@@ -275,6 +276,7 @@ details[open] summary{color:var(--r);border-bottom:1px solid var(--rbd)}
 .bdel { position:absolute; top:12px; right:12px; background:rgba(211,47,47,0.9); color:white; border:none; padding:6px 12px; border-radius:8px; font-size:12px; font-weight:bold; cursor:pointer; z-index:10; }
 .bfb { display:block; text-align:center; background:#1877f2; color:#fff; padding:12px; border-radius:10px; text-decoration:none; font-weight:700; margin-top:14px; font-size:14px; }
 
+
 /* Admin Login & Form */
 #admin-panel { padding: 20px; background:var(--rbg); border-radius:16px; margin: 16px; border:2px dashed var(--r); display:none; }
 .admin-trigger { cursor:pointer; user-select:none; }
@@ -379,6 +381,7 @@ details[open] summary{color:var(--r);border-bottom:1px solid var(--rbd)}
 <!-- HOME -->
 <div class="page on" id="p-home">
 <div class="hero">
+<!-- NOTE: You can replace the src link with the public link of the image you provided -->
 <img src="home-banner.png" alt="Spondon Group" class="hero-img" id="hero-img1" onerror="this.style.display='none'" style="max-width:100%; border-radius:16px; margin-bottom:16px; width:100%;">
 <h2 style="font-weight: bold; font-size: 24px;">Making a Difference Through Donation</h2>
 <p style="font-family: 'Hind Siliguri', sans-serif;">স্বেচ্ছায় রক্তদান করুন — একটি জীবন বাঁচান।<br>ঝিনাইদহ টেক্সটাইল ইঞ্জিনিয়ারিং কলেজের অরাজনৈতিক স্বেচ্ছাসেবী সংগঠন।</p>
@@ -407,6 +410,7 @@ details[open] summary{color:var(--r);border-bottom:1px solid var(--rbd)}
 <div class="isec animate-on-scroll">
 <div class="section-title">আমাদের টপ কার্যক্রম</div>
 <div class="top-act-grid" id="top-activities">
+<!-- Top activities will load here -->
 <div style="text-align:center; color:var(--tx4); font-size:14px; grid-column: 1/-1;">লোড হচ্ছে...</div>
 </div>
 </div>
@@ -436,6 +440,7 @@ details[open] summary{color:var(--r);border-bottom:1px solid var(--rbd)}
 <div class="ig"><label>ইমেইল এড্রেস *</label><input type="email" name="email" required autocomplete="email" placeholder="email@gmail.com"></div>
 </div>
 <div class="g2">
+<!-- NOTE: The full district list should be here, keeping it short for this build -->
 <div class="ig"><label>বর্তমান জেলা *</label><select name="district" id="dd" required><option value="">নির্বাচন করুন</option></select></div>
 <div class="ig"><label>উপজেলা *</label><select name="upazilla" id="du" required disabled><option value="">আগে জেলা নির্বাচন করুন</option></select><div class="hint" id="uh">জেলা নির্বাচন করলে উপজেলা দেখাবে</div></div>
 </div>
@@ -487,7 +492,7 @@ details[open] summary{color:var(--r);border-bottom:1px solid var(--rbd)}
 <div class="cs" id="brcs"><p>✅ কোনো ডোনার রাজি হলে নিচের বাটনে ক্লিক করে ম্যাচ কনফার্ম করুন।</p><button class="csb" onclick="go('match-secured')">🤝 ডোনার কনফার্ম করুন</button></div>
 </div></div></div></div>
 
-<!-- MATCH SECURED -->
+<!-- MATCH SECURED (HIDDEN FROM NORMAL NAV) -->
 <div class="page" id="p-match-secured">
 <div class="fc gt">
 <div id="msfs">
@@ -506,20 +511,23 @@ details[open] summary{color:var(--r);border-bottom:1px solid var(--rbd)}
 <div class="ok-s">ডোনার ও রোগীর স্বজন উভয়কে অসংখ্য ধন্যবাদ।</div>
 <div class="mdi"><div class="mdn">🩸 ডোনার: <span id="msdn"></span></div><div class="mdm">ডোনারকে সফলভাবে নিশ্চিত করা হয়েছে।<br>রোগীর সম্পূর্ণ তথ্য তার ইমেইলে পাঠানো হয়েছে।</div></div>
 
+<!-- WhatsApp Click to Chat Button -->
 <button class="wa-btn" id="wa-btn-1" style="width:100%; margin-bottom: 20px;">
     <svg style="width:24px;height:24px;fill:white" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
     ডোনারকে WhatsApp এ মেসেজ দিন
 </button>
+
 <div class="stc">
 <div class="str"><span>📧</span><span>ডোনারের ইমেইলে রোগীর সকল তথ্য পাঠানো হয়েছে</span></div>
 <div class="str"><span>📋</span><span>Request_DB-তে স্ট্যাটাস "Assigned" করা হয়েছে</span></div>
 <div class="str"><span>⏰</span><span>২৪ ও ৪৮ ঘণ্টা পরে স্বয়ংক্রিয় রিমাইন্ডার পাঠানো হবে</span></div>
 <div class="str"><span>➕</span><span>আরেকজন ডোনার যোগ করতে নিচের বাটনে ক্লিক করুন</span></div>
 </div>
+
 <button class="adb" id="msab">➕ আরেকজন ডোনার যুক্ত করুন</button>
 </div></div></div>
 
-<!-- CONFIRMATION -->
+<!-- CONFIRMATION (HIDDEN FROM NORMAL NAV) -->
 <div class="page" id="p-confirm">
 <div class="fc" style="border-top-color:#c62828">
 <div id="cffs">
@@ -538,16 +546,19 @@ details[open] summary{color:var(--r);border-bottom:1px solid var(--rbd)}
 <div class="ok-t" style="color:#c62828">❤️ স্ট্যাটাস সফলভাবে আপডেট!</div>
 <div class="ok-s">স্পন্দন ব্লাড সোসাইটির পক্ষ থেকে আপনাকে অসংখ্য ধন্যবাদ।</div>
 
+<!-- WhatsApp Click to Chat Button -->
 <button class="wa-btn" id="wa-btn-2" style="width:100%; margin-bottom: 20px;" onclick="window.open('https://wa.me/?text='+encodeURIComponent('আলহামদুলিল্লাহ, আমি স্পন্দন ব্লাড সোসাইটির মাধ্যমে সফলভাবে রক্তদান সম্পন্ন করেছি। রক্তদানে এগিয়ে আসুন, জীবন বাঁচান! 🩸❤️'), '_blank')">
     <svg style="width:24px;height:24px;fill:white" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
     স্ট্যাটাস WhatsApp এ শেয়ার করুন
 </button>
+
 <div class="ok-i" style="background:linear-gradient(135deg,#fff5f5,#fff);border:1px solid #ffcdd2">
 <div class="ok-r"><span>✅</span><span>আপনার রক্তদানের তথ্য সফলভাবে আপডেট হয়েছে।</span></div>
 <div class="ok-r"><span>😴</span><span>পরবর্তী ১২০ দিন আর কোনো রিকোয়েস্ট পাঠানো হবে না।</span></div>
 <div class="ok-r"><span>🏥</span><span>রোগী ও তার পরিবারের পক্ষ থেকে গভীর কৃতজ্ঞতা।</span></div>
 <div class="ok-r"><span>🩸</span><span>আপনার এই মহৎ কাজ সমাজের জন্য অনুপ্রেরণা।</span></div>
 </div>
+
 </div></div></div>
 
 <!-- DONOR PROFILE PAGE -->
@@ -583,8 +594,9 @@ details[open] summary{color:var(--r);border-bottom:1px solid var(--rbd)}
     <div class="ig"><label>উপজেলা/এলাকা *</label><input type="text" id="dp-upazilla" required></div>
     <div class="ig"><label>রক্তের গ্রুপ *</label><select id="dp-bg" required><option value="">নির্বাচন করুন</option><option value="A+">A+</option><option value="A-">A-</option><option value="B+">B+</option><option value="B-">B-</option><option value="AB+">AB+</option><option value="AB-">AB-</option><option value="O+">O+</option><option value="O-">O-</option></select></div>
     <div class="ig"><label>শেষ কবে রক্ত দিয়েছেন? (যদি দেন)</label><input type="date" id="dp-lastdate"></div>
+    
     <div class="err" id="dp-err3"></div>
-    <div class="okm" id="dp-ok3" style="display:none; color:green; text-align:center; margin-bottom:10px;">প্রোফাইল সফলভাবে আপডেট হয়েছে! ✅</div>
+    <div class="okm" id="dp-ok3" style="display:none;">প্রোফাইল সফলভাবে আপডেট হয়েছে! ✅</div>
     <button type="submit" class="pok" id="dp-b3">পরিবর্তন সেভ করুন</button>
   </form>
 </div>
@@ -629,7 +641,8 @@ details[open] summary{color:var(--r);border-bottom:1px solid var(--rbd)}
 <div class="blog-list" id="blog-list">
     <div style="text-align:center;padding:20px;color:var(--tx4);font-size:14px;font-weight:600;">লোড হচ্ছে...</div>
 </div>
-<div style="text-align:center;padding:12px;opacity:0.4;font-size:11px;font-weight:700;" class="admin-trigger" id="admin-trig">App Version: 11.3 (Click to Login)</div>
+<!-- Admin trigger (Clicking text 3 times opens login) -->
+<div style="text-align:center;padding:12px;opacity:0.4;font-size:11px;font-weight:700;" class="admin-trigger" id="admin-trig">App Version: 11.2 (Click to Login)</div>
 </div></div>
 
 </div><!-- /app -->
@@ -676,6 +689,7 @@ function go(n){
 
 // Check URL param on load
 var urlParams = new URLSearchParams(window.location.search);
+var urlParams = new URLSearchParams(window.location.search);
 var requestedPage = urlParams.get('page');
 var hashPage = window.location.hash.split('?')[0].substring(1);
 if (hashPage === 'confirm-donation') {
@@ -687,89 +701,23 @@ if (hashPage === 'confirm-donation') {
         if(el) el.value = decodeURIComponent(email);
     }, 500);
 }
-if(requestedPage && pm[requestedPage]) { go(requestedPage); } else { go('home'); }
+if(requestedPage && pm[requestedPage]) {
+    go(requestedPage);
+} else {
+    go('home');
+}
 
 // TICKER
 function hsk(){document.getElementById('tsk').style.display='none'}
 function sman(){hsk();document.getElementById('tdt').classList.remove('show');document.getElementById('tman').classList.add('show')}
 function stk(a,d){hsk();document.getElementById('tman').classList.remove('show');if(d){document.getElementById('tdn').textContent=d;document.getElementById('tdt').classList.add('show')}var m=document.getElementById('tmsg'),t=a.join('  \u{1F534}  ');m.textContent=t;m.style.animationDuration=Math.max(15,t.length*.16)+'s';m.className='t-msg on'}
 function ldN(d){autoSetDist(d);fetch(S+'?action=getNotices&district='+encodeURIComponent(d)).then(function(r){return r.json()}).then(function(j){stk(j.notices&&j.notices.length>0?j.notices:[d+' \u099C\u09C7\u09B2\u09BE\u09AF\u09BC \u098F\u0996\u09A8 \u0995\u09CB\u09A8\u09CB \u099C\u09B0\u09C1\u09B0\u09BF \u09B0\u0995\u09CD\u09A4\u09C7\u09B0 \u099A\u09BE\u09B9\u09BF\u09A6\u09BE \u09A8\u09C7\u0987\u0964 \u09B0\u0995\u09CD\u09A4\u09A6\u09BE\u09A8 \u0995\u09B0\u09C1\u09A8! \u2764\uFE0F'],d);sv(d)}).catch(function(){stk(['\u09B8\u09CD\u09AA\u09A8\u09CD\u09A6\u09A8 \u09AC\u09CD\u09B2\u09BE\u09A1 \u09B8\u09CB\u09B8\u09BE\u0987\u099F\u09BF, \u099D\u09BF\u09A8\u09BE\u0987\u09A6\u09B9\u0964'],d)})}
-
 document.getElementById('tdt').addEventListener('click',function(){try{localStorage.removeItem('sbs_d');localStorage.removeItem('sbs_t')}catch(x){}document.getElementById('tdt').classList.remove('show');document.getElementById('tmsg').className='t-msg';document.getElementById('tsk').style.display='block';sman()});
 document.getElementById('mdb').addEventListener('click',function(){var d=document.getElementById('mds').value;if(!d)return;document.getElementById('tman').classList.remove('show');ldN(d)});
-
-
-// ═══ IMPROVED AUTOMATIC LOCATION TRACKING ═══
-function tryGPS(ok, fail) {
-    if(!navigator.geolocation) { fail(); return; }
-    navigator.geolocation.getCurrentPosition(function(p) {
-        document.getElementById('pdm').textContent='\u2705 GPS \u09AA\u09BE\u0993\u09AF\u09BC\u09BE \u0997\u09C7\u099B\u09C7\u0964';
-        fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat='+p.coords.latitude+'&lon='+p.coords.longitude+'&addressdetails=1&accept-language=en', {headers:{'User-Agent':'SBS/1.0'}})
-        .then(r => r.json())
-        .then(d => {
-            var raw = Object.values(d.address || {}).join(' '), dist = mD(raw);
-            if(dist) ok(dist); else fail();
-        }).catch(fail);
-    }, function(){ fail(); }, {timeout:10000, enableHighAccuracy:true});
-}
-
-function tryIP(ok, fail) {
-    document.getElementById('pdm').textContent='\u{1F310} 🌐 আইপি থেকে অবস্থান খোঁজা হচ্ছে...';
-    let done = false;
-    function got(raw) {
-        if(done) return;
-        let d = mD(raw);
-        if(d) { done = true; ok(d); }
-        else if(!done) { done = true; fail(); }
-    }
-    function nope() { if(!done) { done = true; fail(); } }
-
-    fetch('https://get.geojs.io/v1/ip/geo.json')
-    .then(r => r.json())
-    .then(d => got((d.city || '') + ' ' + (d.region || '')))
-    .catch(() => { nope(); });
-
-    setTimeout(() => { if(!done){ done = true; fail(); } }, 6000);
-}
-
-// 1. CHECK CACHE ON LOAD (DO NOT RUN BACKGROUND IP TRACKER ANYMORE)
-window.addEventListener('load', function() {
-    var sd='', st=0;
-    try { sd=localStorage.getItem('sbs_d')||''; st=parseInt(localStorage.getItem('sbs_t')||'0'); } catch(x){}
-    
-    if(sd && (Date.now()-st)<1800000) {
-        // Already have location saved from a recent visit
-        document.getElementById('pop').classList.add('off');
-        ldN(sd);
-    }
-    // No else block here. We leave the popup on screen so the user can click the button.
-});
-
-// 2. WHEN USER CLICKS "ঠিক আছে, দেখুন"
-document.getElementById('pok').addEventListener('click', function() {
-    this.disabled = true;
-    this.textContent = '\u09B6\u09A8\u09BE\u0995\u09CD\u09A4 \u0995\u09B0\u09BE \u09B9\u099A\u09CD\u099B\u09C7...';
-    document.getElementById('pdm').textContent = '📍 লোকেশান পারমিশন দিন...';
-    
-    // First try GPS (Browser will explicitly ask for permission here!)
-    tryGPS(function(d){
-        document.getElementById('pop').classList.add('off'); 
-        ldN(d);
-    }, function(){
-        // If GPS fails (user denies permission or timeout), try IP as backup
-        tryIP(function(d){
-            document.getElementById('pop').classList.add('off'); 
-            ldN(d);
-        }, function(){
-            // If everything fails, show the manual selection dropdown
-            document.getElementById('pdm').textContent = '';
-            document.getElementById('pop').classList.add('off');
-            sman();
-        });
-    });
-});
-// ════════════════════════════════════════════
-
+function tryGPS(ok,fail){if(!navigator.geolocation){fail();return}document.getElementById('pdm').textContent='\u{1F4CD} \u0986\u09AA\u09A8\u09BE\u09B0 \u0985\u09AC\u09B8\u09CD\u09A5\u09BE\u09A8 \u09B6\u09A8\u09BE\u0995\u09CD\u09A4 \u0995\u09B0\u09BE \u09B9\u099A\u09CD\u099B\u09C7...';navigator.geolocation.getCurrentPosition(function(p){document.getElementById('pdm').textContent='\u2705 GPS \u09AA\u09BE\u0993\u09AF\u09BC\u09BE \u0997\u09C7\u099B\u09C7\u0964';fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat='+p.coords.latitude+'&lon='+p.coords.longitude+'&addressdetails=1&accept-language=en',{headers:{'User-Agent':'SBS/1.0'}}).then(function(r){return r.json()}).then(function(d){var a=d.address||{},raw=Object.values(a).join(' '),dist=mD(raw);if(dist)ok(dist);else fail()}).catch(fail)},function(){fail()},{timeout:7000,maximumAge:0,enableHighAccuracy:false})}
+function tryIP(ok,fail){document.getElementById('pdm').textContent='\u{1F310} \u0985\u09A8\u09C1\u09AE\u09BE\u09A8\u09BF\u0995 \u0985\u09AC\u09B8\u09CD\u09A5\u09BE\u09A8 \u0996\u09CB\u0981\u099C\u09BE \u09B9\u099A\u09CD\u099B\u09C7...';var done=false;function got(raw){if(done)return;var d=mD(raw);if(d){done=true;ok(d)}else if(!done){done=true;fail()}}function nope(){if(!done){done=true;fail()}}fetch('https://ipapi.co/json/?nocache=true&_='+Date.now()).then(function(r){return r.json()}).then(function(d){got(d.city||d.region||'')}).catch(nope);fetch('https://ip-api.com/json/?fields=city,regionName').then(function(r){return r.json()}).then(function(d){got(d.city||d.regionName||'')}).catch(nope);setTimeout(function(){if(!done){done=true;fail()}},5000)}
+document.getElementById('pok').addEventListener('click',function(){this.disabled=true;this.textContent='\u09B6\u09A8\u09BE\u0995\u09CD\u09A4 \u0995\u09B0\u09BE \u09B9\u099A\u09CD\u099B\u09C7...';tryGPS(function(d){document.getElementById('pop').classList.add('off');ldN(d)},function(){tryIP(function(d){document.getElementById('pop').classList.add('off');ldN(d)},function(){document.getElementById('pdm').textContent='';document.getElementById('pop').classList.add('off');sman()})})});
+(function(){var sd='',st=0;try{sd=localStorage.getItem('sbs_d')||'';st=parseInt(localStorage.getItem('sbs_t')||'0')}catch(x){}if(sd&&(Date.now()-st)<1800000){document.getElementById('pop').classList.add('off');ldN(sd)}})();
 
 // STATS
 fetch(S+'?action=getLiveStats').then(function(r){return r.json()}).then(function(d){if(d.status!=='Success')throw 0;document.getElementById('stsk').hidden=true;document.getElementById('stdt').hidden=false;document.getElementById('s-td').textContent=toBn(d.totalDonations);document.getElementById('s-ad').textContent=toBn(d.availableDonors);document.getElementById('s-nd').textContent=toBn(d.newDonorsToday);document.getElementById('s-pr').textContent=toBn(d.pendingRequests);var g=['A+','B+','O+','AB+','A-','B-','O-','AB-'],h='';for(var i=0;i<8;i++){var c=(d.bloodGroups&&d.bloodGroups[g[i]]!==undefined)?d.bloodGroups[g[i]]:0;h+='<div class="bgc">'+g[i]+'<span>'+toBn(c)+'</span></div>'}document.getElementById('s-bg').innerHTML=h;document.getElementById('s-up').textContent='\u09B8\u09B0\u09CD\u09AC\u09B6\u09C7\u09B7 \u0986\u09AA\u09A1\u09C7\u099F: '+(d.lastUpdated||'')}).catch(function(){document.getElementById('stsk').hidden=true;document.getElementById('stdt').hidden=false;document.getElementById('s-up').textContent='\u09A1\u09C7\u099F\u09BE \u09B2\u09CB\u09A1 \u09AC\u09CD\u09AF\u09B0\u09CD\u09A5\u0964 \u09B0\u09BF\u09AB\u09CD\u09B0\u09C7\u09B6 \u0995\u09B0\u09C1\u09A8\u0964'});
@@ -840,8 +788,7 @@ document.getElementById('brb').addEventListener('click', async function(){
         });
     }
 });
-
-// MATCH SECURED
+  // MATCH SECURED
 document.getElementById('msb').addEventListener('click',function(){var f=document.getElementById('msf');if(!f.checkValidity()){f.reportValidity();return}setL('msb','mst','mss',true,'');hE('mse');fetch(S,{method:'POST',body:new FormData(f)}).then(function(r){return r.json()}).then(function(d){if(d.status==='Success'){document.getElementById('msfs').style.display='none';document.getElementById('msok').style.display='block';document.getElementById('msdn').textContent=d.donorName||'';
   
   // Update WhatsApp Button Link
@@ -917,13 +864,32 @@ function checkAdmin() {
         document.getElementById('admin-panel').style.display = 'block';
     }
 }
+document.getElementById('cfb').addEventListener('click',function(){
+    var f=document.getElementById('cff');
+    if(!f.checkValidity()){f.reportValidity();return}
+    setL('cfb','cft','cfs',true,''); hE('cfe');
+    var fd = new FormData(f);
+    fd.set('action', 'confirmDonation');
+    fetch(S,{method:'POST',body:fd}).then(r=>r.json()).then(d=>{
+        if(d.status==='Success'){
+            document.getElementById('cffs').style.display='none';
+            document.getElementById('cfok').style.display='block';
+        } else {
+            setL('cfb','cft','cfs',false,'আপডেট করুন'); sE('cfe',d.message||'ত্রুটি।');
+        }
+    }).catch(()=>{ setL('cfb','cft','cfs',false,'আপডেট করুন'); sE('cfe','ইন্টারনেট সমস্যা।'); });
+});
 checkAdmin();
 
 function fixImg(url) {
     if(!url) return '';
+    // Extract ID from various Google Drive link formats
     let m = url.match(/drive\.google\.com\/.*[?&]id=([^&]+)|drive\.google\.com\/file\/d\/([^/]+)/);
     let id = m ? (m[1] || m[2]) : null;
-    if(id) { return 'https://drive.google.com/thumbnail?id=' + id + '&sz=w1000'; }
+    if(id) {
+        // Use thumbnail API (bypasses some strict uc?id restrictions, but image MUST be public)
+        return 'https://drive.google.com/thumbnail?id=' + id + '&sz=w1000';
+    }
     return url;
 }
 window.delBlog = function(id) {
@@ -986,6 +952,7 @@ function loadBlogs() {
             h += card;
             
             if(b.pinned && pinnedCount < 4) {
+                // Top activities variant (clicking it goes to about page)
                 var topCard = '<div class="bcard animate-on-scroll" style="cursor:pointer;" onclick="go(\'about\')">';
                 if(img) topCard += '<img src="'+img+'" class="bimg" style="max-height:160px" onerror="this.style.display=\'none\'">';
                 topCard += '<div class="bp" style="padding:12px;">';
@@ -999,18 +966,21 @@ function loadBlogs() {
         bl.innerHTML = h;
         if(ta) ta.innerHTML = hTop || '<div style="text-align:center;color:var(--tx4);font-size:14px;grid-column: 1/-1;">কোনো টপ কার্যক্রম পিন করা নেই।</div>';
         
+        // Re-initialize animations for new elements
         setTimeout(initAnimations, 100);
     }).catch(e => {
         document.getElementById('blog-list').innerHTML = '<div style="text-align:center;padding:20px;color:red;font-size:14px;font-weight:600;">লোড করতে সমস্যা হয়েছে।</div>';
     });
 }
+// Load blogs on start
 setTimeout(loadBlogs, 1000);
 
+// Intersection Observer for scroll animations
 const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
         if(entry.isIntersecting) {
             entry.target.classList.add('show');
-            observer.unobserve(entry.target); 
+            observer.unobserve(entry.target); // Animate only once
         }
     });
 }, { threshold: 0.1, rootMargin: "0px 0px -20px 0px" });
@@ -1023,6 +993,7 @@ function initAnimations() {
 window.addEventListener('DOMContentLoaded', initAnimations);
 
 
+// Add Blog
 document.getElementById('bl-btn').addEventListener('click', function() {
     var t = document.getElementById('bl-t').value;
     var d = document.getElementById('bl-d').value;
@@ -1050,7 +1021,7 @@ document.getElementById('bl-btn').addEventListener('click', function() {
             document.getElementById('bl-i').value = '';
             document.getElementById('bl-fb').value = '';
             this.textContent = 'পোস্ট করুন 🚀';
-            loadBlogs(); 
+            loadBlogs(); // Reload list
         } else {
             alert('সমস্যা: ' + res.message);
             this.textContent = 'পোস্ট করুন 🚀';
@@ -1061,6 +1032,7 @@ document.getElementById('bl-btn').addEventListener('click', function() {
     });
 });
 
+// DONOR PROFILE LOGIC
 let curProfileEmail = "";
 document.getElementById('dp-form1').addEventListener('submit', function(e) {
   e.preventDefault();
@@ -1099,6 +1071,7 @@ document.getElementById('dp-form2').addEventListener('submit', function(e) {
     if(d.status === 'Success') {
       document.getElementById('dp-step2').style.display = 'none';
       document.getElementById('dp-step3').style.display = 'block';
+      // Fill data
       document.getElementById('dp-name').value = d.donor.name;
       document.getElementById('dp-phone').value = d.donor.phone;
       document.getElementById('dp-district').value = d.donor.district;
@@ -1151,3 +1124,4 @@ document.getElementById('dp-form3').addEventListener('submit', function(e) {
 </script>
 </body>
 </html>
+
