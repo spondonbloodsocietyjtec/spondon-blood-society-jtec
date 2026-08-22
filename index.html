@@ -6,7 +6,7 @@
 <meta name="description" content="স্পন্দন ব্লাড সোসাইটি — ঝিনাইদহ টেক্সটাইল ইঞ্জিনিয়ারিং কলেজ। রক্তদান করুন, জীবন বাঁচান।">
 <meta name="theme-color" content="#b71c1c">
 <title>স্পন্দন ব্লাড সোসাইটি | Spondon Blood Society</title>
-<!-- NEW: Modern Fonts -->
+<!-- Modern Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -47,12 +47,9 @@ button{font-family:inherit;cursor:pointer}
 /* ═══ HEADER ═══ */
 #hdr{position:fixed;top:40px;left:0;right:0;height:64px;background:linear-gradient(135deg, rgba(183,28,28,0.95) 0%, rgba(211,47,47,0.95) 100%);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;padding:0 16px;z-index:990;box-shadow:0 4px 20px rgba(183,28,28,.4)}
 .h-logo{display:flex;align-items:center;gap:12px;flex:1}
-.h-ico{width:42px;height:42px;background:rgba(255,255,255,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;border:2px solid rgba(255,255,255,.4);animation:pulse 2s ease-in-out infinite;flex-shrink:0}
-.h-txt{color:#fff}
-.h-txt h1{font-size:16px;font-weight:800;letter-spacing:.3px;line-height:1.2;font-family:'Poppins', sans-serif;}
+.h-txt{color:#fff;text-align: center; width: 100%;}
+.h-txt h1{font-size:26px;font-weight:800;letter-spacing:.3px;line-height:1.2;font-family:'Impact', sans-serif;}
 .h-txt p{font-size:10px;opacity:.9;letter-spacing:.5px;text-transform:uppercase;font-family:'Poppins', sans-serif;}
-.h-btn{background:#fff;color:var(--r);border:none;padding:8px 16px;border-radius:24px;font-size:13px;font-weight:700;font-family:inherit;letter-spacing:.2px;animation:epulse 2s ease-in-out infinite;transition:var(--ease);box-shadow: 0 4px 10px rgba(0,0,0,0.1)}
-.h-btn:hover{transform:translateY(-2px);box-shadow: 0 6px 15px rgba(255,255,255,0.4)}
 
 /* ═══ BOTTOM NAV ═══ */
 #bnav{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-around;align-items:center;padding:8px 4px env(safe-area-inset-bottom,12px);background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid rgba(0,0,0,0.05);border-radius:24px 24px 0 0;z-index:990;box-shadow:0 -4px 24px rgba(0,0,0,.08)}
@@ -115,7 +112,7 @@ button{font-family:inherit;cursor:pointer}
 .skh{height:30px;margin:6px auto;width:55%}
 .skl{height:13px;width:75%;margin:0 auto 8px}
 .skb{height:20px;width:65%;margin:6px auto}
-.su{text-align:center;font-size:12px;color:var(--tx4);margin-top:14px;font-weight:500;}
+.su{text-align:center;font-size:12px;color:var(--tx4);margin-top:14px;font-weight:600;}
 
 /* ═══ INFO SECTION ═══ */
 .isec{background:transparent;border:none;box-shadow:none;margin-bottom:24px;overflow:visible;}
@@ -260,7 +257,6 @@ details[open] summary{color:var(--r);border-bottom:1px solid var(--rbd)}
 .bdel { position:absolute; top:12px; right:12px; background:rgba(211,47,47,0.9); color:white; border:none; padding:6px 12px; border-radius:8px; font-size:12px; font-weight:bold; cursor:pointer; z-index:10; }
 .bfb { display:block; text-align:center; background:#1877f2; color:#fff; padding:12px; border-radius:10px; text-decoration:none; font-weight:700; margin-top:14px; font-size:14px; }
 
-
 /* Admin Login & Form */
 #admin-panel { padding: 20px; background:var(--rbg); border-radius:16px; margin: 16px; border:2px dashed var(--r); display:none; }
 .admin-trigger { cursor:pointer; user-select:none; }
@@ -387,7 +383,7 @@ details[open] summary{color:var(--r);border-bottom:1px solid var(--rbd)}
 <div class="sg" style="margin-bottom:12px"><div class="sb"><span class="sl">আজকের নতুন ডোনার</span><span class="sn" id="s-nd">০</span></div><div class="sb r"><span class="sl">অপেক্ষমান রিকোয়েস্ট</span><span class="sn" id="s-pr">০</span></div></div>
 <div style="font-size:13px;font-weight:700;color:#5f6368;margin-bottom:10px">রক্তের গ্রুপ অনুযায়ী প্রস্তুত ডোনার:</div>
 <div class="bg4" id="s-bg"></div>
-<div class="su" id="s-up"></div>
+<div class="su" id="s-up">সর্বশেষ আপডেট লোড হচ্ছে...</div>
 </div>
 </div>
 <div class="isec animate-on-scroll">
@@ -400,7 +396,7 @@ details[open] summary{color:var(--r);border-bottom:1px solid var(--rbd)}
 <div class="isec">
 <div class="isec-h">📋 কীভাবে কাজ করে?</div>
 <div class="ii-g">
-<div class="ii"><span class="ii-i">1️⃣</span><h5>ডোনার রেজিস্ট্রেশন</h5><p>নাম, ফোন, ইমেইল, জেলা, রক্তের গ্রুপ দিয়ে রেজিস্ট্রেশন করুন।</p></div>
+<div class="ii"><span class="ii-i">1️⃣</span><h5>ডোনার রেজিস্ট্রেশন</h5><p>নাম, ফোন, ইমেইল, জেলা, রক্তের গ্রুপ দিয়ে রেজিস্ট্রেশন করুন.</p></div>
 <div class="ii"><span class="ii-i">2️⃣</span><h5>রক্তের আবেদন</h5><p>রোগীর তথ্য দিন। আপনার জেলার ম্যাচিং ডোনারের তালিকা পাবেন।</p></div>
 <div class="ii"><span class="ii-i">3️⃣</span><h5>ম্যাচ কনফার্ম ও অটো ইমেইল</h5><p>ডোনার রাজি হলে তার নম্বর দিন। স্বয়ংক্রিয়ভাবে রোগীর তথ্য ইমেইলে যাবে।</p></div>
 <div class="ii"><span class="ii-i">4️⃣</span><h5>স্ট্যাটাস আপডেট</h5><p>রক্তদান সম্পন্ন হলে আপডেট দিন। ১২০ দিন আর কোনো অনুরোধ আসবে ঘন ঘন।</p></div>
@@ -426,7 +422,6 @@ details[open] summary{color:var(--r);border-bottom:1px solid var(--rbd)}
 <div class="ig"><label>বর্তমান জেলা *</label><select name="district" id="dd" required><option value="">নির্বাচন করুন</option></select></div>
 <div class="ig"><label>উপজেলা *</label><select name="upazilla" id="du" required disabled><option value="">আগে জেলা নির্বাচন করুন</option></select><div class="hint" id="uh">জেলা নির্বাচন করলে উপজেলা দেখাবে</div></div>
 </div>
-<!-- FIXED: Changed name="bloodGroup" to name="bg" -->
 <div class="ig"><label>রক্তের গ্রুপ *</label><select name="bg" required><option value="">নির্বাচন করুন</option><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>AB+</option><option>AB-</option><option>O+</option><option>O-</option></select></div>
 <div class="ig"><label>সর্বশেষ রক্তদানের তারিখ <span style="color:#9aa0a6;font-size:12px">(না থাকলে খালি)</span></label><input type="date" name="lastDate"></div>
 </form></div>
@@ -442,7 +437,6 @@ details[open] summary{color:var(--r);border-bottom:1px solid var(--rbd)}
 <div class="ok-r"><span>📧</span><span>রোগীর প্রয়োজনে আপনাকে ইমেইল ও ফোনে যোগাযোগ করা হবে।</span></div>
 <div class="ok-r"><span>💉</span><span>রক্তদানের পর আপডেট দিলে ১২০ দিন আর কোনো অনুরোধ পাঠানো হবে বাহির হবে না।</span></div>
 </div>
-
 </div></div></div>
 
 <!-- BLOOD REQUEST -->
@@ -457,7 +451,6 @@ details[open] summary{color:var(--r);border-bottom:1px solid var(--rbd)}
 <div class="ig"><label>রোগীর সম্পূর্ণ নাম *</label><input type="text" name="patientName" required placeholder="রোগীর পূর্ণ নাম লিখুন"></div>
 <div class="ig"><label>আপনার মোবাইল নাম্বার *</label><input type="tel" name="phone" required autocomplete="tel" placeholder="01XXXXXXXXX"></div>
 <div class="g2">
-<!-- FIXED: Changed name="bloodGroup" to name="bg" -->
 <div class="ig"><label>রক্তের গ্রুপ *</label><select name="bg" required><option value="">নির্বাচন করুন</option><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>AB+</option><option>AB-</option><option>O+</option><option>O-</option></select></div>
 <div class="ig"><label>পরিমাণ (ব্যাগ) *</label><input type="number" name="units" min="1" max="10" required placeholder="১–১০"></div>
 </div>
@@ -580,7 +573,7 @@ details[open] summary{color:var(--r);border-bottom:1px solid var(--rbd)}
     <div class="ig"><label>শেষ কবে রক্ত দিয়েছেন? (যদি দেন)</label><input type="date" id="dp-lastdate"></div>
     
     <div class="err" id="dp-err3"></div>
-    <div class="okm" id="dp-ok3" style="display:none;">প্রোফাইল সফলভাবে আপডেট হয়েছে! ✅</div>
+    <div class="okm" id="dp-ok3" style="display:none; text-align: center; color: #2e7d32; font-weight: bold; margin-bottom: 10px;">প্রোফাইল সফলভাবে আপডেট হয়েছে! ✅</div>
     <button type="submit" class="pok" id="dp-b3">পরিবর্তন সেভ করুন</button>
   </form>
 </div>
@@ -626,7 +619,7 @@ details[open] summary{color:var(--r);border-bottom:1px solid var(--rbd)}
     <div style="text-align:center;padding:20px;color:var(--tx4);font-size:14px;font-weight:600;">লোড হচ্ছে...</div>
 </div>
 <!-- Admin trigger (Clicking text 3 times opens login) -->
-<div style="text-align:center;padding:12px;opacity:0.4;font-size:11px;font-weight:700;" class="admin-trigger" id="admin-trig">App Version: 11.2 (Click to Login)</div>
+<div style="text-align:center;padding:12px;opacity:0.4;font-size:11px;font-weight:700;" class="admin-trigger" id="admin-trig">App Version: 11.5 (Click to Login)</div>
 </div></div>
 
 </div><!-- /app -->
@@ -642,7 +635,9 @@ details[open] summary{color:var(--r);border-bottom:1px solid var(--rbd)}
 
 <script>
 'use strict';
+// ⚠️ আপনার দেওয়া নির্দিষ্ট Web App URL বসানো হয়েছে
 var S='https://script.google.com/macros/s/AKfycbx4J6C6Pq9E_eejG4notfouWl1JEn_ccbTXPW2bgKun_rhumvuTzdGY-JIuyHLr3FOa/exec';
+
 // Full district array
 var BD=['Bagerhat','Bandarban','Barguna','Barishal','Bhola','Bogura','Brahmanbaria','Chandpur','Chapainawabganj','Chattogram','Chuadanga','Cumilla',"Cox's Bazar",'Dhaka','Dinajpur','Faridpur','Feni','Gaibandha','Gazipur','Gopalganj','Habiganj','Jamalpur','Jashore','Jhalokati','Jhenaidah','Joypurhat','Khagrachari','Khulna','Kishoreganj','Kurigram','Kushtia','Lakshmipur','Lalmonirhat','Madaripur','Magura','Manikganj','Meherpur','Moulvibazar','Munshiganj','Mymensingh','Naogaon','Narail','Narayanganj','Narsingdi','Natore','Netrokona','Nilphamari','Noakhali','Pabna','Panchagarh','Patuakhali','Pirojpur','Rajbari','Rajshahi','Rangamati','Rangpur','Satkhira','Shariatpur','Sherpur','Sirajganj','Sunamganj','Sylhet','Tangail','Thakurgaon'];
 var UZ={"Bagerhat":["Bagerhat Sadar","Chitalmari","Fakirhat","Kachua","Mollahat","Mongla","Morrelganj","Rampal","Sarankhola"],"Bandarban":["Alikadam","Bandarban Sadar","Lama","Naikhongchhari","Rowangchhari","Ruma","Thanchi"],"Barguna":["Amtali","Bamna","Barguna Sadar","Betagi","Patharghata","Taltali"],"Barishal":["Agailjhara","Babuganj","Bakerganj","Banaripara","Gaurnadi","Hizla","Barishal Sadar","Mehendiganj","Muladi","Wazirpur"],"Bhola":["Bhola Sadar","Burhanuddin","Char Fasson","Daulatkhan","Lalmohan","Manpura","Tazumuddin"],"Bogura":["Adamdighi","Bogura Sadar","Dhunot","Dupchanchia","Gabtali","Kahaloo","Nandigram","Shajahanpur","Sherpur","Shibganj","Sonatala"],"Brahmanbaria":["Akhaura","Ashuganj","Bancharampur","Bijoynagar","Brahmanbaria Sadar","Kasba","Nabinagar","Nasirnagar","Sarail"],"Chandpur":["Chandpur Sadar","Faridganj","Haimchar","Haziganj","Kachua","Matlab Dakshin","Matlab Uttar","Shahrasti"],"Chapainawabganj":["Bholahat","Chapainawabganj Sadar","Gomastapur","Nachole","Shibganj"],"Chattogram":["Anwara","Banshkhali","Boalkhali","Chandanaish","Fatikchhari","Hathazari","Karnaphuli","Lohagara","Mirsharai","Patiya","Rangunia","Raozan","Sandwip","Satkania","Sitakunda","Chattogram Sadar"],"Chuadanga":["Alamdanga","Chuadanga Sadar","Damurhuda","Jibannagar"],"Cumilla":["Barura","Brahmanpara","Burichang","Chandina","Chauddagram","Cumilla Sadar North","Cumilla Sadar South","Daudkandi","Debidwar","Homna","Laksam","Lalmai","Meghna","Monohorgonj","Muradnagar","Nangalkot","Titas"],"Cox's Bazar":["Chakaria","Cox's Bazar Sadar","Kutubdia","Maheshkhali","Pekua","Ramu","Teknaf","Ukhia"],"Dhaka":["Dhamrai","Dohar","Keraniganj","Nawabganj","Savar","Dhaka Sadar"],"Dinajpur":["Birampur","Birganj","Biral","Bochaganj","Chirirbandar","Dinajpur Sadar","Fulbari","Ghoraghat","Hakimpur","Kaharole","Khansama","Nawabganj","Parbatipur"],"Faridpur":["Alfadanga","Bhanga","Boalmari","Charbhadrasan","Faridpur Sadar","Madhukhali","Nagarkanda","Sadarpur","Saltha"],"Feni":["Chhagalnaiya","Daganbhuiyan","Feni Sadar","Fulgazi","Parshuram","Sonagazi"],"Gaibandha":["Fulchhari","Gaibandha Sadar","Gobindaganj","Palashbari","Sadullapur","Saghata","Sundarganj"],"Gazipur":["Gazipur Sadar","Kaliakair","Kaliganj","Kapasia","Sreepur"],"Gopalganj":["Gopalganj Sadar","Kashiani","Kotalipara","Muksudpur","Tungipara"],"Habiganj":["Ajmiriganj","Baniachong","Bahubal","Chunarughat","Habiganj Sadar","Lakhai","Madhabpur","Nabiganj","Shayestaganj"],"Jamalpur":["Bakshiganj","Dewanganj","Islampur","Jamalpur Sadar","Madarganj","Melandaha","Sarishabari"],"Jashore":["Abhaynagar","Bagherpara","Chaugachha","Jhikargachha","Keshabpur","Jashore Sadar","Manirampur","Sharsha"],"Jhalokati":["Jhalokati Sadar","Kathalia","Nalchity","Rajapur"],"Jhenaidah":["Harinakunda","Jhenaidah Sadar","Kaliganj","Kotchandpur","Maheshpur","Shailkupa"],"Joypurhat":["Akkelpur","Joypurhat Sadar","Kalai","Khetlal","Panchbibi"],"Khagrachari":["Dighinala","Guimara","Khagrachhari Sadar","Lakshmichhari","Mahalchhari","Manikchhari","Matiranga","Panchhari","Ramgarh"],"Khulna":["Batiaghata","Dacope","Dumuria","Dighalia","Koyra","Paikgachha","Phultala","Rupsa","Terokhada","Khulna Sadar"],"Kishoreganj":["Austagram","Bajitpur","Bhairab","Hossainpur","Itna","Karimganj","Katiadi","Kishoreganj Sadar","Kuliarchar","Mithamain","Nikli","Pakundia","Tarail"],"Kurigram":["Bhurungamari","Char Rajibpur","Chilmari","Kurigram Sadar","Nageshwari","Phulbari","Rajarhat","Rajibpur","Rowmari","Ulipur"],"Kushtia":["Bheramara","Daulatpur","Khoksa","Kumarkhali","Kushtia Sadar","Mirpur"],"Lakshmipur":["Kamalnagar","Lakshmipur Sadar","Ramganj","Ramgati","Roypur"],"Lalmonirhat":["Aditmari","Hatibandha","Kaliganj","Lalmonirhat Sadar","Patgram"],"Madaripur":["Kalkini","Madaripur Sadar","Rajoir","Shibchar"],"Magura":["Magura Sadar","Mohammadpur","Shalikha","Sreepur"],"Manikganj":["Daulatpur","Ghior","Harirampur","Manikganj Sadar","Saturia","Shivalaya","Singair"],"Meherpur":["Gangni","Meherpur Sadar","Mujibnagar"],"Moulvibazar":["Barlekha","Juri","Kamalganj","Kulaura","Moulvibazar Sadar","Rajnagar","Sreemangal"],"Munshiganj":["Gazaria","Lohajang","Munshiganj Sadar","Sirajdikhan","Sreenagar","Tongibari"],"Mymensingh":["Bhaluka","Dhobaura","Fulbaria","Gaffargaon","Gauripur","Haluaghat","Ishwarganj","Mymensingh Sadar","Muktagachha","Nandail","Phulpur","Tarakanda","Trishal"],"Naogaon":["Atrai","Badalgachhi","Dhamoirhat","Mahadebpur","Manda","Naogaon Sadar","Niamatpur","Patnitala","Porsha","Raninagar","Sapahar"],"Narail":["Kalia","Lohagara","Narail Sadar"],"Narayanganj":["Araihazar","Bandar","Narayanganj Sadar","Rupganj","Sonargaon"],"Narsingdi":["Belabo","Monohardi","Narsingdi Sadar","Palash","Raipura","Shibpur"],"Natore":["Bagatipara","Baraigram","Gurudaspur","Lalpur","Natore Sadar","Singra"],"Netrokona":["Atpara","Barhatta","Durgapur","Kalmakanda","Kendua","Khaliajuri","Madan","Mohanganj","Netrokona Sadar","Purbadhala"],"Nilphamari":["Dimla","Domar","Jaldhaka","Kishoreganj","Nilphamari Sadar","Saidpur"],"Noakhali":["Begumganj","Chatkhil","Companiganj","Hatiya","Kabirhat","Noakhali Sadar","Senbagh","Sonaimuri","Subarnachar"],"Pabna":["Atgharia","Bera","Bhangura","Chatmohar","Faridpur","Ishwardi","Pabna Sadar","Santhia","Sujanagar"],"Panchagarh":["Atwari","Boda","Debiganj","Panchagarh Sadar","Tetulia"],"Patuakhali":["Bauphal","Dashmina","Dumki","Galachipa","Kalapara","Mirzaganj","Patuakhali Sadar","Rangabali"],"Pirojpur":["Bhandaria","Kawkhali","Mathbaria","Nazirpur","Nesarabad","Pirojpur Sadar","Zianagar"],"Rajbari":["Baliakandi","Goalandaghat","Kalukhali","Pangsha","Rajbari Sadar"],"Rajshahi":["Bagha","Bagmara","Charghat","Durgapur","Godagari","Mohanpur","Paba","Puthia","Rajshahi Sadar","Tanore"],"Rangamati":["Bagaichhari","Barkal","Belaichhari","Juraichhari","Kaptai","Kawkhali","Langadu","Naniarchar","Rajasthali","Rangamati Sadar"],"Rangpur":["Badarganj","Gangachara","Kaunia","Mithapukur","Pirgachha","Pirganj","Rangpur Sadar","Taraganj"],"Satkhira":["Assasuni","Debhata","Kalaroa","Kaliganj","Satkhira Sadar","Shyamnagar","Tala"],"Shariatpur":["Bhedarganj","Damudya","Gosairhat","Naria","Shariatpur Sadar","Zanjira"],"Sherpur":["Jhenaigati","Nakla","Nalitabari","Sherpur Sadar","Sreebardi"],"Sirajganj":["Belkuchi","Chauhali","Kamarkhanda","Kazipur","Raiganj","Shahjadpur","Sirajganj Sadar","Tarash","Ullahpara"],"Sunamganj":["Bishwamvarpur","Chhatak","Derai","Dharampasha","Dowarabazar","Jagannathpur","Jamalganj","Sulla","Sunamganj Sadar","Tahirpur"],"Sylhet":["Balaganj","Beanibazar","Bishwanath","Companiganj","Fenchuganj","Golapganj","Gowainghat","Jaintiapur","Kanaighat","Osmani Nagar","South Surma","Sylhet Sadar","Zakiganj"],"Tangail":["Basail","Bhuapur","Delduar","Dhanbari","Ghatail","Gopalpur","Kalihati","Madhupur","Mirzapur","Nagarpur","Sakhipur","Tangail Sadar"],"Thakurgaon":["Baliadangi","Haripur","Pirganj","Ranisankail","Thakurgaon Sadar"]};
@@ -673,7 +668,6 @@ function go(n){
 
 // Check URL param on load
 var urlParams = new URLSearchParams(window.location.search);
-var urlParams = new URLSearchParams(window.location.search);
 var requestedPage = urlParams.get('page');
 var hashPage = window.location.hash.split('?')[0].substring(1);
 if (hashPage === 'confirm-donation') {
@@ -703,8 +697,47 @@ function tryIP(ok,fail){document.getElementById('pdm').textContent='\u{1F310} \u
 document.getElementById('pok').addEventListener('click',function(){this.disabled=true;this.textContent='\u09B6\u09A8\u09BE\u0995\u09CD\u09A4 \u0995\u09B0\u09BE \u09B9\u099A\u09CD\u099B\u09C7...';tryGPS(function(d){document.getElementById('pop').classList.add('off');ldN(d)},function(){tryIP(function(d){document.getElementById('pop').classList.add('off');ldN(d)},function(){document.getElementById('pdm').textContent='';document.getElementById('pop').classList.add('off');sman()})})});
 (function(){var sd='',st=0;try{sd=localStorage.getItem('sbs_d')||'';st=parseInt(localStorage.getItem('sbs_t')||'0')}catch(x){}if(sd&&(Date.now()-st)<1800000){document.getElementById('pop').classList.add('off');ldN(sd)}})();
 
-// STATS
-fetch(S+'?action=getLiveStats').then(function(r){return r.json()}).then(function(d){if(d.status!=='Success')throw 0;document.getElementById('stsk').hidden=true;document.getElementById('stdt').hidden=false;document.getElementById('s-td').textContent=toBn(d.totalDonations);document.getElementById('s-ad').textContent=toBn(d.availableDonors);document.getElementById('s-nd').textContent=toBn(d.newDonorsToday);document.getElementById('s-pr').textContent=toBn(d.pendingRequests);var g=['A+','B+','O+','AB+','A-','B-','O-','AB-'],h='';for(var i=0;i<8;i++){var c=(d.bloodGroups&&d.bloodGroups[g[i]]!==undefined)?d.bloodGroups[g[i]]:0;h+='<div class="bgc">'+g[i]+'<span>'+toBn(c)+'</span></div>'}document.getElementById('s-bg').innerHTML=h;document.getElementById('s-up').textContent='\u09B8\u09B0\u09CD\u09AC\u09B6\u09C7\u09B7 \u0986\u09AA\u09A1\u09C7\u099F: '+(d.lastUpdated||'')}).catch(function(){document.getElementById('stsk').hidden=true;document.getElementById('stdt').hidden=false;document.getElementById('s-up').textContent='\u09A1\u09C7\u099F\u09BE \u09B2\u09CB\u09A1 \u09AC\u09CD\u09AF\u09B0\u09CD\u09A5\u0964 \u09B0\u09BF\u09AB\u09CD\u09B0\u09C7\u09B6 \u0995\u09B0\u09C1\u09A8\u0964'});
+// ═══ STATS & AUTO UPDATE ═══
+function fetchStats() {
+    fetch(S+'?action=getLiveStats')
+    .then(r => r.json())
+    .then(d => {
+        if(d.status !== 'Success') throw 0;
+        document.getElementById('stsk').hidden = true;
+        document.getElementById('stdt').hidden = false;
+        
+        // মোট পরিসংখ্যান
+        document.getElementById('s-td').textContent = toBn(d.totalDonations);
+        document.getElementById('s-ad').textContent = toBn(d.availableDonors);
+        document.getElementById('s-nd').textContent = toBn(d.newDonorsToday);
+        document.getElementById('s-pr').textContent = toBn(d.pendingRequests);
+        
+        // গ্রুপ ভিত্তিক পরিসংখ্যান
+        var g = ['A+','B+','O+','AB+','A-','B-','O-','AB-'], h = '';
+        for(var i = 0; i < 8; i++){
+            var c = (d.bloodGroups && d.bloodGroups[g[i]] !== undefined) ? d.bloodGroups[g[i]] : 0;
+            h += '<div class="bgc">' + g[i] + '<span>' + toBn(c) + '</span></div>';
+        }
+        document.getElementById('s-bg').innerHTML = h;
+        
+        // লাইভ ডেট ও টাইম ফরম্যাটিং (সম্পূর্ণ বাংলায়)
+        var today = new Date();
+        var opts = { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true };
+        var dateString = today.toLocaleDateString('bn-BD', opts);
+        
+        document.getElementById('s-up').textContent = 'সর্বশেষ আপডেট: ' + dateString;
+    })
+    .catch(() => {
+        document.getElementById('stsk').hidden = true;
+        document.getElementById('stdt').hidden = false;
+        document.getElementById('s-up').textContent = 'ডেটা লোড ব্যর্থ। রিফ্রেশ করুন।';
+    });
+}
+// কল করা হলো যেন পেজ লোড হলেই স্ট্যাটাস দেখায়
+fetchStats();
+// প্রতি ২ মিনিট পরপর অটোমেটিক লাইভ আপডেট হবে
+setInterval(fetchStats, 120000);
+// ══════════════════════════
 
 // UPAZILLA
 document.getElementById('dd').addEventListener('change',function(){var u=document.getElementById('du'),h=document.getElementById('uh'),d=this.value;if(!d){u.innerHTML='<option value="">\u0986\u0997\u09C7 \u099C\u09C7\u09B2\u09BE \u09A8\u09BF\u09B0\u09CD\u09AC\u09BE\u099A\u09A8 \u0995\u09B0\u09C1\u09A8</option>';u.disabled=true;h.style.display='block';return}var l=UZ[d]||[],s='<option value="">\u0989\u09AA\u099C\u09C7\u09B2\u09BE \u09A8\u09BF\u09B0\u09CD\u09AC\u09BE\u099A\u09A8 \u0995\u09B0\u09C1\u09A8</option>';for(var i=0;i<l.length;i++)s+='<option value="'+l[i]+'">'+l[i]+'</option>';u.innerHTML=s;u.disabled=false;h.style.display='none'});
@@ -759,7 +792,6 @@ document.getElementById('brb').addEventListener('click', async function(){
                 intro.innerHTML = 'প্রিয় স্বজন, আপনার জন্য <b style="color:#1b5e20">' + d.matchedDonors.length + 'জন</b> প্রস্তুত ডোনার পাওয়া গেছে। এখনই কল করুন:';
                 var h = '';
                 d.matchedDonors.forEach(m => {
-                    // FIXED: Using formData.get('bg') instead of formData.get('bloodGroup')
                     h += '<div class="dc"><div style="flex:1;min-width:0"><div class="dn2">👤 ' + m.name + '</div><div class="dp2">📞 ' + m.phone + '</div><div><span class="dbg">' + (formData.get('bg') || '') + '</span>' + (m.upazilla ? '<span class="duz">📍 ' + m.upazilla + '</span>':'') + '</div></div><a href="tel:' + m.phone + '" class="cbt">📱 কল করুন</a></div>';
                 });
                 dl.innerHTML = h;
@@ -773,7 +805,8 @@ document.getElementById('brb').addEventListener('click', async function(){
         });
     }
 });
-  // MATCH SECURED
+
+// MATCH SECURED
 document.getElementById('msb').addEventListener('click',function(){var f=document.getElementById('msf');if(!f.checkValidity()){f.reportValidity();return}setL('msb','mst','mss',true,'');hE('mse');fetch(S,{method:'POST',body:new FormData(f)}).then(function(r){return r.json()}).then(function(d){if(d.status==='Success'){document.getElementById('msfs').style.display='none';document.getElementById('msok').style.display='block';document.getElementById('msdn').textContent=d.donorName||'';
   
   // Update WhatsApp Button Link
