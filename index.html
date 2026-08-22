@@ -635,8 +635,8 @@ details[open] summary{color:var(--r);border-bottom:1px solid var(--rbd)}
 
 <script>
 'use strict';
-// ⚠️ আপনার দেওয়া নির্দিষ্ট Web App URL বসানো হয়েছে
-var S='https://script.google.com/macros/s/AKfycbx4J6C6Pq9E_eejG4notfouWl1JEn_ccbTXPW2bgKun_rhumvuTzdGY-JIuyHLr3FOa/exec';
+// ⚠️ আপনার নতুন Web App URL বসানো হয়েছে
+var S='https://script.google.com/macros/s/AKfycbyi9Fy9_CHsqHOwOvLof2mBHzAmH73q4wlaoddSaawrnxT0npGge6VYZrgyIVLFmYTG/exec';
 
 // Full district array
 var BD=['Bagerhat','Bandarban','Barguna','Barishal','Bhola','Bogura','Brahmanbaria','Chandpur','Chapainawabganj','Chattogram','Chuadanga','Cumilla',"Cox's Bazar",'Dhaka','Dinajpur','Faridpur','Feni','Gaibandha','Gazipur','Gopalganj','Habiganj','Jamalpur','Jashore','Jhalokati','Jhenaidah','Joypurhat','Khagrachari','Khulna','Kishoreganj','Kurigram','Kushtia','Lakshmipur','Lalmonirhat','Madaripur','Magura','Manikganj','Meherpur','Moulvibazar','Munshiganj','Mymensingh','Naogaon','Narail','Narayanganj','Narsingdi','Natore','Netrokona','Nilphamari','Noakhali','Pabna','Panchagarh','Patuakhali','Pirojpur','Rajbari','Rajshahi','Rangamati','Rangpur','Satkhira','Shariatpur','Sherpur','Sirajganj','Sunamganj','Sylhet','Tangail','Thakurgaon'];
@@ -720,11 +720,10 @@ function fetchStats() {
         }
         document.getElementById('s-bg').innerHTML = h;
         
-        // লাইভ ডেট ও টাইম ফরম্যাটিং (সম্পূর্ণ বাংলায়)
+        // লাইভ ডেট ও টাইম ফরম্যাটিং
         var today = new Date();
         var opts = { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true };
         var dateString = today.toLocaleDateString('bn-BD', opts);
-        
         document.getElementById('s-up').textContent = 'সর্বশেষ আপডেট: ' + dateString;
     })
     .catch(() => {
@@ -733,10 +732,8 @@ function fetchStats() {
         document.getElementById('s-up').textContent = 'ডেটা লোড ব্যর্থ। রিফ্রেশ করুন।';
     });
 }
-// কল করা হলো যেন পেজ লোড হলেই স্ট্যাটাস দেখায়
 fetchStats();
-// প্রতি ২ মিনিট পরপর অটোমেটিক লাইভ আপডেট হবে
-setInterval(fetchStats, 120000);
+setInterval(fetchStats, 120000); // 2 mins
 // ══════════════════════════
 
 // UPAZILLA
@@ -748,7 +745,7 @@ function sE(id,m){var e=document.getElementById(id);e.textContent='\u274C '+m;e.
 function hE(id){document.getElementById(id).style.display='none'}
 
 // DONOR REG
-document.getElementById('drb').addEventListener('click',function(){var f=document.getElementById('drf');if(!f.checkValidity()){f.reportValidity();return}setL('drb','drt','drs',true,'');hE('dre');fetch(S,{method:'POST',body:new FormData(f)}).then(function(r){return r.json()}).then(function(d){if(d.status==='Success'){document.getElementById('drfs').style.display='none';document.getElementById('drok').style.display='block'}else{setL('drb','drt','drs',false,'\u09B0\u09C7\u099C\u09BF\u09B8\u09CD\u099F\u09CD\u09B0\u09C7\u09B6\u09A8 \u0995\u09B0\u09C1\u09A8 \u{1F49A}');sE('dre',d.message||'\u09A4\u09CD\u09B0\u09C1\u099F\u09BF \u09B9\u09AF\u09BC\u09C7\u099B\u09C7\u0964')}}).catch(function(){setL('drb','drt','drs',false,'\u09B0\u09C7\u099C\u09BF\u09B8\u09CD\u099F\u09CD\u09B0\u09C7\u09B6\u09A8 \u0995\u09B0\u09C1\u09A8 \u{1F49A}');sE('dre','\u0987\u09A8\u09CD\u099F\u09BE\u09B0\u09A8\u09C7\u099F \u09B8\u09AE\u09B8\u09CD\u09AF\u09BE\u0964 \u0986\u09AC\u09BE\u09B0 \u099A\u09C7\u09B7\u09CD\u099F\u09BE \u0995\u09B0\u09C1\u09A8\u0964')})});
+document.getElementById('drb').addEventListener('click',function(){var f=document.getElementById('drf');if(!f.checkValidity()){f.reportValidity();return}setL('drb','drt','drs',true,'');hE('dre');fetch(S,{method:'POST',body:new FormData(f)}).then(function(r){return r.json()}).then(function(d){if(d.status==='Success'){document.getElementById('drfs').style.display='none';document.getElementById('drok').style.display='block';fetchStats();}else{setL('drb','drt','drs',false,'\u09B0\u09C7\u099C\u09BF\u09B8\u09CD\u099F\u09CD\u09B0\u09C7\u09B6\u09A8 \u0995\u09B0\u09C1\u09A8 \u{1F49A}');sE('dre',d.message||'\u09A4\u09CD\u09B0\u09C1\u099F\u09BF \u09B9\u09AF\u09BC\u09C7\u099B\u09C7\u0964')}}).catch(function(){setL('drb','drt','drs',false,'\u09B0\u09C7\u099C\u09BF\u09B8\u09CD\u099F\u09CD\u09B0\u09C7\u09B6\u09A8 \u0995\u09B0\u09C1\u09A8 \u{1F49A}');sE('dre','\u0987\u09A8\u09CD\u099F\u09BE\u09B0\u09A8\u09C7\u099F \u09B8\u09AE\u09B8\u09CD\u09AF\u09BE\u0964 \u0986\u09AC\u09BE\u09B0 \u099A\u09C7\u09B7\u09CD\u099F\u09BE \u0995\u09B0\u09C1\u09A8\u0964')})});
 
 // BLOOD REQUEST
 document.getElementById('brb').addEventListener('click', async function(){
@@ -786,6 +783,7 @@ document.getElementById('brb').addEventListener('click', async function(){
             if(d.status !== 'Success') throw new Error(d.message);
             document.getElementById('brfs').style.display='none';
             document.getElementById('brr').style.display='block';
+            fetchStats();
             
             var dl = document.getElementById('brdl'), intro = document.getElementById('bri'), cs = document.getElementById('brcs');
             if(d.matchedDonors && d.matchedDonors.length){
@@ -819,7 +817,10 @@ document.getElementById('msab').addEventListener('click',function(){document.get
 
 // CONFIRMATION
 document.getElementById('cfst').addEventListener('change',function(){document.getElementById('cfdr').hidden=this.value!=='Donated'});
-document.getElementById('cfb').addEventListener('click',function(){var f=document.getElementById('cff');if(!f.checkValidity()){f.reportValidity();return}setL('cfb','cft','cfs',true,'');hE('cfe');fetch(S,{method:'POST',body:new FormData(f)}).then(function(r){return r.json()}).then(function(d){if(d.status==='Success'){document.getElementById('cffs').style.display='none';document.getElementById('cfok').style.display='block'}else{setL('cfb','cft','cfs',false,'\u09B8\u09CD\u099F\u09CD\u09AF\u09BE\u099F\u09BE\u09B8 \u0986\u09AA\u09A1\u09C7\u099F \u0995\u09B0\u09C1\u09A8 \u2705');sE('cfe',d.message||'\u09A4\u09CD\u09B0\u09C1\u099F\u09BF\u0964')}}).catch(function(){setL('cfb','cft','cfs',false,'\u09B8\u09CD\u099F\u09CD\u09AF\u09BE\u099F\u09BE\u09B8 \u0986\u09AA\u09A1\u09C7\u099F \u0995\u09B0\u09C1\u09A8 \u2705');sE('cfe','\u0987\u09A8\u09CD\u099F\u09BE\u09B0\u09A8\u09C7\u099F \u09B8\u09AE\u09B8\u09CD\u09AF\u09BE\u0964')})});
+document.getElementById('cfb').addEventListener('click',function(){var f=document.getElementById('cff');if(!f.checkValidity()){f.reportValidity();return}setL('cfb','cft','cfs',true,'');hE('cfe');
+    var fd = new FormData(f);
+    fd.set('action', 'confirmDonation');
+fetch(S,{method:'POST',body:fd}).then(function(r){return r.json()}).then(function(d){if(d.status==='Success'){document.getElementById('cffs').style.display='none';document.getElementById('cfok').style.display='block';fetchStats();}else{setL('cfb','cft','cfs',false,'\u09B8\u09CD\u099F\u09CD\u09AF\u09BE\u099F\u09BE\u09B8 \u0986\u09AA\u09A1\u09C7\u099F \u0995\u09B0\u09C1\u09A8 \u2705');sE('cfe',d.message||'\u09A4\u09CD\u09B0\u09C1\u099F\u09BF\u0964')}}).catch(function(){setL('cfb','cft','cfs',false,'\u09B8\u09CD\u099F\u09CD\u09AF\u09BE\u099F\u09BE\u09B8 \u0986\u09AA\u09A1\u09C7\u099F \u0995\u09B0\u09C1\u09A8 \u2705');sE('cfe','\u0987\u09A8\u09CD\u099F\u09BE\u09B0\u09A8\u09C7\u099F \u09B8\u09AE\u09B8\u09CD\u09AF\u09BE\u0964')})});
 
 // ADMIN & BLOG LOGIC
 var adminTrigCount = 0;
@@ -850,23 +851,9 @@ document.getElementById('admin-login-btn').addEventListener('click', function() 
             sessionStorage.setItem('adminEmail', e);
             sessionStorage.setItem('adminPin', p);
             document.getElementById('admin-pop').classList.add('off');
-            document.getElementById('cfb').addEventListener('click',function(){
-    var f=document.getElementById('cff');
-    if(!f.checkValidity()){f.reportValidity();return}
-    setL('cfb','cft','cfs',true,''); hE('cfe');
-    var fd = new FormData(f);
-    fd.set('action', 'confirmDonation');
-    fetch(S,{method:'POST',body:fd}).then(r=>r.json()).then(d=>{
-        if(d.status==='Success'){
-            document.getElementById('cffs').style.display='none';
-            document.getElementById('cfok').style.display='block';
-        } else {
-            setL('cfb','cft','cfs',false,'আপডেট করুন'); sE('cfe',d.message||'ত্রুটি।');
-        }
-    }).catch(()=>{ setL('cfb','cft','cfs',false,'আপডেট করুন'); sE('cfe','ইন্টারনেট সমস্যা।'); });
-});
-checkAdmin();
+            checkAdmin();
             alert('সফলভাবে লগইন হয়েছে!');
+            loadBlogs(); // reload to show admin buttons
         } else {
             sE('admin-err', 'ভুল ইমেইল বা পিন!');
             this.textContent = 'লগইন করুন';
@@ -882,21 +869,6 @@ function checkAdmin() {
         document.getElementById('admin-panel').style.display = 'block';
     }
 }
-document.getElementById('cfb').addEventListener('click',function(){
-    var f=document.getElementById('cff');
-    if(!f.checkValidity()){f.reportValidity();return}
-    setL('cfb','cft','cfs',true,''); hE('cfe');
-    var fd = new FormData(f);
-    fd.set('action', 'confirmDonation');
-    fetch(S,{method:'POST',body:fd}).then(r=>r.json()).then(d=>{
-        if(d.status==='Success'){
-            document.getElementById('cffs').style.display='none';
-            document.getElementById('cfok').style.display='block';
-        } else {
-            setL('cfb','cft','cfs',false,'আপডেট করুন'); sE('cfe',d.message||'ত্রুটি।');
-        }
-    }).catch(()=>{ setL('cfb','cft','cfs',false,'আপডেট করুন'); sE('cfe','ইন্টারনেট সমস্যা।'); });
-});
 checkAdmin();
 
 function fixImg(url) {
@@ -1042,6 +1014,7 @@ document.getElementById('bl-btn').addEventListener('click', function() {
     });
 });
 
+// OTP SYSTEM
 let curProfileEmail = "";
 document.getElementById('dp-form1').addEventListener('submit', function(e) {
   e.preventDefault();
@@ -1081,7 +1054,7 @@ document.getElementById('dp-form2').addEventListener('submit', function(e) {
       document.getElementById('dp-step2').style.display = 'none';
       document.getElementById('dp-step3').style.display = 'block';
       document.getElementById('dp-name').value = d.donor.name;
-      document.getElementById('dp-phone').value = d.donor.phone;
+      document.getElementById('dp-phone').value = String(d.donor.phone || '').replace(/^'/, ''); // Remove quote if present
       document.getElementById('dp-district').value = d.donor.district;
       document.getElementById('dp-upazilla').value = d.donor.upazilla;
       document.getElementById('dp-bg').value = d.donor.bg;
@@ -1120,6 +1093,7 @@ document.getElementById('dp-form3').addEventListener('submit', function(e) {
   fetch(S, {method:'POST', body:fd}).then(r=>r.json()).then(d=>{
     if(d.status === 'Success') {
       document.getElementById('dp-ok3').style.display = 'block';
+      fetchStats();
     } else {
       sE('dp-err3', d.message);
     }
