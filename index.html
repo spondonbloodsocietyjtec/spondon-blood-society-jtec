@@ -368,7 +368,7 @@ details[open] summary{color:var(--r);border-bottom:1px solid var(--rbd)}
 <!-- HOME -->
 <div class="page on" id="p-home">
 <div class="hero">
-<img src="home-banner.png" alt="Spondon Group" class="hero-img" id="hero-img1" onerror="this.style.display='none'" style="max-width:100%; border-radius:16px; margin-bottom:16px; width:100%;">
+<img src="home-banner.jpg" alt="Spondon Group" class="hero-img" id="hero-img1" onerror="this.style.display='none'" style="max-width:100%; border-radius:16px; margin-bottom:16px; width:100%;">
 <h2 style="font-weight: bold; font-size: 24px;">Making a Difference Through Donation</h2>
 <p style="font-family: 'Hind Siliguri', sans-serif;">স্বেচ্ছায় রক্তদান করুন — একটি জীবন বাঁচান।<br>ঝিনাইদহ টেক্সটাইল ইঞ্জিনিয়ারিং কলেজের অরাজনৈতিক স্বেচ্ছাসেবী সংগঠন।</p>
 </div>
@@ -612,13 +612,13 @@ details[open] summary{color:var(--r);border-bottom:1px solid var(--rbd)}
 <div class="page" id="p-activities">
 <div class="ac">
 <div class="ac-h"><h2>আমাদের কার্যক্রম 🚀</h2><p>স্পন্দন ব্লাড সোসাইটির সর্বশেষ খবর ও কার্যক্রম</p></div>
-<img src="activity-banner.jpg" alt="Blood Donation" style="width:100%; border-bottom:1px solid rgba(0,0,0,0.05); margin-bottom: 20px; border-radius: 12px;" onerror="this.style.display='none'">
+<img src="activity-banner.png" alt="Blood Donation" style="width:100%; border-bottom:1px solid rgba(0,0,0,0.05); margin-bottom: 20px; border-radius: 12px;" onerror="this.style.display='none'">
 <div id="admin-panel">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;"><h4 style="color:var(--rd);font-size:16px;margin:0;">📝 নতুন পোস্ট যুক্ত করুন</h4><button onclick="sessionStorage.clear();location.reload()" style="background:#444;color:#fff;border:none;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;box-shadow:0 2px 5px rgba(0,0,0,0.2);">লগ আউট</button></div>
     <form id="add-blog-form">
         <div class="ig"><label>টাইটেল (Title) *</label><input type="text" id="bl-t" required placeholder="পোস্টের শিরোনাম"></div>
         <div class="ig"><label>বিস্তারিত (Description) *</label><textarea id="bl-d" required placeholder="বিস্তারিত লিখুন..."></textarea></div>
-        <div class="ig"><label>ছবির লিংক (Google Drive Link)</label><input type="url" id="bl-i" placeholder="https://drive.google.com/file/d/..."></div>
+        <div class="ig"><label>ছবি বা গুগল ড্রাইভ লিংক (একাধিক দিতে কমা (,) বা নতুন লাইন ব্যবহার করুন)</label><textarea id="bl-i" placeholder="https://drive.google.com/..., https://..."></textarea></div>
         <div class="ig"><label>ফেসবুক পোস্ট লিংক (ঐচ্ছিক)</label><input type="url" id="bl-fb" placeholder="https://facebook.com/..."></div>
         <button type="button" class="pok" id="bl-btn" style="padding:12px;font-size:14px;box-shadow:none;">পোস্ট করুন 🚀</button>
         <div class="err" id="bl-err"></div>
@@ -958,8 +958,19 @@ function loadBlogs() {
                 card += '<button class="bdel" style="right:85px;background:'+(b.pinned?'#1b5e20':'#ea4335')+';" onclick="togglePin('+b.id+', \''+b.pinned+'\')">'+(b.pinned?'📌 Pinned':'📌 Pin')+'</button>';
                 card += '<button class="bdel" onclick="delBlog('+b.id+')">ডিলিট 🗑️</button>';
             }
-            let img = fixImg(b.image);
-            if(img) card += '<img src="'+img+'" class="bimg" onerror="this.style.display=\'none\'">';
+            let images = b.image ? b.image.split(/[\n,]+/).map(s => s.trim()).filter(Boolean) : [];
+              if (images.length === 1) {
+                  let img = fixImg(images[0]);
+                  if(img) card += '<img src="'+img+'" class="bimg" onerror="this.style.display=\'none\'">';
+              } else if (images.length > 1) {
+                  card += '<div style="display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:0;scrollbar-width:none;border-bottom:1px solid #eee;">';
+                  images.forEach(imgUrl => {
+                      let img = fixImg(imgUrl);
+                      if(img) card += '<div style="flex:0 0 100%;scroll-snap-align:center;"><img src="'+img+'" class="bimg" style="width:100%;object-fit:cover;" onerror="this.parentElement.style.display=\'none\'"></div>';
+                  });
+                  card += '</div>';
+                  card += '<div style="text-align:center;font-size:12px;color:var(--tx4);background:#f5f7fa;padding:6px;font-weight:bold;">&#8592; ' + images.length + ' টি ছবি (স্লাইড করুন) &#8594;</div>';
+              }
             card += '<div class="bp">';
             card += '<div class="bmeta"><span>📅 '+b.date+'</span><span>👤 '+b.author+'</span></div>';
             card += '<div class="bt">'+b.title+'</div>';
@@ -1137,3 +1148,514 @@ document.getElementById('dp-form3').addEventListener('submit', function(e) {
 </script>
 </body>
 </html>
+
+
+Appscript: 
+// আপনার গুগল শিটের অরিজিনাল আইডি
+const SHEET_ID = '1uG7vkf9eFeJpxnxXlwyTmo_DGIDYMQlypJeB7BgpPZs';
+const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyp_lmF2T-oF9vv7YWo2dnqoWiwmdFwfPOeoxVFbfpBUfK4X_tgqC39Hv5TQlKlB7c-/exec';
+
+// ইমেইলের নিচে থাকা ফেসবুক বাটন (সব ইমেইলের জন্য কমন)
+const fbFooter = `
+  <div style="background: #202124; padding: 24px; text-align: center; color: white;">
+    <a href="https://www.facebook.com/spondon.jtec" target="_blank" style="display: inline-flex; align-items: center; justify-content: center; background: #1877F2; color: white; text-decoration: none; padding: 10px 24px; border-radius: 30px; font-size: 15px; font-weight: bold; box-shadow: 0 4px 10px rgba(24,119,242,0.3);">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/2021_Facebook_icon.svg/24px-2021_Facebook_icon.svg.png" style="width: 18px; height: 18px; margin-right: 8px; border-radius: 50%;" alt="FB"> 
+      আমাদের ফেসবুক পেজ
+    </a>
+    <p style="margin: 16px 0 0; font-size: 12px; color: #888;">© 2026 Spondon Blood Society, JTEC. All rights reserved.</p>
+  </div>
+`;
+
+// তারিখ ও সময় সুন্দর বাংলায় দেখানোর জন্য কাস্টম ফাংশন 
+function formatBanglaDateTime(dateStr) {
+  if (!dateStr) return '';
+  let d = new Date(dateStr);
+  let months = ["জানুয়ারি", "ফেব্রুয়ারি", "মার্চ", "এপ্রিল", "মে", "জুন", "জুলাই", "আগস্ট", "সেপ্টেম্বর", "অক্টোবর", "নভেম্বর", "ডিসেম্বর"];
+  let day = d.getDate();
+  let month = months[d.getMonth()];
+  let year = d.getFullYear();
+  let h = d.getHours();
+  let m = d.getMinutes();
+  
+  let period = "রাত";
+  if (h >= 5 && h < 12) period = "সকাল";
+  else if (h >= 12 && h < 15) period = "দুপুর";
+  else if (h >= 15 && h < 18) period = "বিকাল";
+  else if (h >= 18 && h < 20) period = "সন্ধ্যা";
+  
+  let h12 = h % 12 || 12;
+  let bnDay = day.toString().replace(/\d/g, x => '০১২৩৪৫৬৭৮৯'[x]);
+  let bnYear = year.toString().replace(/\d/g, x => '০১২৩৪৫৬৭৮৯'[x]);
+  let bnM = m.toString().padStart(2, '0').replace(/\d/g, x => '০১২৩৪৫৬৭৮৯'[x]);
+  let bnH = h12.toString().replace(/\d/g, x => '০১২৩৪৫৬৭৮৯'[x]);
+  
+  return `${bnDay} ${month}, ${bnYear} — ${period} ${bnH}:${bnM} টা`;
+}
+
+function doGet(e) {
+  let action = e.parameter.action;
+  let dist = e.parameter.district || '';
+  let ss = SpreadsheetApp.openById(SHEET_ID);
+  
+  if (action === 'getLiveStats') {
+    let donorSheet = ss.getSheetByName('Donor_DB');
+    let reqSheet = ss.getSheetByName('Request_DB');
+    let stats = { totalDonations: 0, availableDonors: 0, newDonorsToday: 0, pendingRequests: 0, bloodGroups: {} };
+    if(donorSheet){
+      let dData = donorSheet.getDataRange().getValues();
+      let todayStr = Utilities.formatDate(new Date(), 'GMT+6', 'yyyy-MM-dd');
+      for(let i=1; i<dData.length; i++){
+         let status = (dData[i][9]||'').toString().trim();
+         let bg = (dData[i][6]||'').toString().trim().toUpperCase().replace(/\s+/g, '');
+         let dDate = dData[i][0] ? Utilities.formatDate(new Date(dData[i][0]), 'GMT+6', 'yyyy-MM-dd') : '';
+         if(status === 'Active'){
+            stats.availableDonors++;
+            if(bg) stats.bloodGroups[bg] = (stats.bloodGroups[bg] || 0) + 1;
+         }
+         if(dDate === todayStr) stats.newDonorsToday++;
+      }
+    }
+    if(reqSheet){
+      let rData = reqSheet.getDataRange().getValues();
+      for(let i=1; i<rData.length; i++){
+         let status = (rData[i][11]||'').toString().trim();
+         if(status === 'Pending') stats.pendingRequests++;
+         if(status === 'Completed') stats.totalDonations++;
+      }
+    }
+    return ContentService.createTextOutput(JSON.stringify({status:'Success', ...stats})).setMimeType(ContentService.MimeType.JSON);
+  }
+  
+  if (action === 'getNotices') {
+    let reqSheet = ss.getSheetByName('Request_DB');
+    let notices = [];
+    if(reqSheet){
+      let rData = reqSheet.getDataRange().getValues();
+      for(let i=1; i<rData.length; i++){
+         if(rData[i][11] === 'Pending' && rData[i][5] === dist){
+            notices.push("🚨 " + rData[i][5] + " জেলায় " + rData[i][3] + " রক্তের " + rData[i][4] + " ব্যাগ জরুরি প্রয়োজন!");
+         }
+      }
+    }
+    return ContentService.createTextOutput(JSON.stringify({status:'Success', notices:notices})).setMimeType(ContentService.MimeType.JSON);
+  }
+  
+  if (action === 'getBlogs') {
+    let blogSheet = ss.getSheetByName('Blog_DB');
+    let blogs = [];
+    if(blogSheet && blogSheet.getLastRow() > 1){
+      let bData = blogSheet.getDataRange().getValues();
+      for(let i=1; i<bData.length; i++){
+        blogs.push({ id: bData[i][0], title: bData[i][1], desc: bData[i][2], author: bData[i][3], date: bData[i][4], image: bData[i][5], pinned: bData[i][6], fbLink: bData[i][7] });
+      }
+      blogs.reverse(); 
+    }
+    return ContentService.createTextOutput(JSON.stringify({status:'Success', blogs:blogs})).setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function doPost(e) {
+  try {
+    let action = e.parameter.action || e.parameter.formType;
+    let ss = SpreadsheetApp.openById(SHEET_ID);
+    
+    // 🩸 DONOR REGISTRATION
+    if (action === 'donorRegistration') {
+      let sheet = ss.getSheetByName('Donor_DB');
+      let nextDate = '';
+      let status = 'Active';
+      if(e.parameter.lastDate){
+         let d = new Date(e.parameter.lastDate);
+         d.setDate(d.getDate() + 120);
+         nextDate = Utilities.formatDate(d, 'GMT+6', 'yyyy-MM-dd');
+         if(d > new Date()) status = 'Resting';
+      }
+      sheet.appendRow([new Date(), e.parameter.name, "'" + e.parameter.phone, e.parameter.email, e.parameter.district, e.parameter.upazilla, e.parameter.bg, e.parameter.lastDate, nextDate, status]);
+      return res('Success', '✅ অভিনন্দন! আপনার তথ্য সংরক্ষিত হয়েছে।');
+    }
+    
+    // 🆘 BLOOD REQUEST
+    if (action === 'addRequest') {
+      let reqSheet = ss.getSheetByName('Request_DB');
+      let donorSheet = ss.getSheetByName('Donor_DB');
+      let fileUrl = 'No File';
+      if(e.parameter.prescriptionFile){
+         let blob = Utilities.newBlob(Utilities.base64Decode(e.parameter.prescriptionFile), e.parameter.mimeType, e.parameter.fileName);
+         let file = DriveApp.createFile(blob);
+         file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+         fileUrl = file.getUrl();
+      }
+      
+      reqSheet.appendRow([new Date(), e.parameter.patientName, "'" + e.parameter.phone, e.parameter.bg, e.parameter.units, e.parameter.district, e.parameter.email, e.parameter.hospital, e.parameter.problem, fileUrl, e.parameter.dateTime, 'Pending', '', '', 0]);
+      
+      let dData = donorSheet.getDataRange().getValues();
+      let matched = [];
+      let sBg = e.parameter.bg.toString().trim().toUpperCase().replace(/\s+/g, '');
+      let sDist = e.parameter.district.toString().trim();
+      
+      for(let i=1; i<dData.length; i++){
+        let dbBg = (dData[i][6]||'').toString().trim().toUpperCase().replace(/\s+/g, '');
+        let dbStatus = (dData[i][9]||'').toString().trim();
+        if(dbBg === sBg && dData[i][4] === sDist && dbStatus === 'Active'){
+           matched.push({ name: dData[i][1], phone: dData[i][2], upazilla: dData[i][5] });
+        }
+      }
+      return ContentService.createTextOutput(JSON.stringify({status:'Success', matchedDonors:matched})).setMimeType(ContentService.MimeType.JSON);
+    }
+    
+    // 🤝 MATCH SECURED 
+    if (action === 'secureMatch') {
+      let reqSheet = ss.getSheetByName('Request_DB');
+      let donorSheet = ss.getSheetByName('Donor_DB');
+      let matchSheet = ss.getSheetByName('Match_Secured_DB');
+      if(!matchSheet) matchSheet = ss.insertSheet('Match_Secured_DB');
+      
+      let rData = reqSheet.getDataRange().getValues();
+      let dData = donorSheet.getDataRange().getValues();
+      
+      let reqRow = -1; let donorRow = -1;
+      for(let i=rData.length-1; i>0; i--){
+        if(rData[i][2].toString() === e.parameter.reqPhone && rData[i][11] === 'Pending'){ reqRow = i+1; break; }
+      }
+      for(let i=dData.length-1; i>0; i--){
+        if(dData[i][2].toString() === e.parameter.donorPhone){ donorRow = i+1; break; }
+      }
+      if(reqRow === -1 || donorRow === -1) return res('Error', 'তথ্য মেলানো যায়নি।');
+      
+      let donorEmail = donorSheet.getRange(donorRow, 4).getValue();
+      let donorName = donorSheet.getRange(donorRow, 2).getValue();
+      
+      reqSheet.getRange(reqRow, 12).setValue('Assigned');
+      reqSheet.getRange(reqRow, 13).setValue(donorEmail);
+      reqSheet.getRange(reqRow, 14).setValue(new Date()); 
+      
+      matchSheet.appendRow([new Date(), "'" + e.parameter.reqPhone, "'" + e.parameter.donorPhone]);
+      
+      let htmlBody = `
+      <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; background: #fafafa; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+        <div style="background: linear-gradient(135deg, #d32f2f, #b71c1c); padding: 24px; text-align: center; color: white;">
+          <div style="font-size: 40px; margin-bottom: 10px;">🚨</div>
+          <h2 style="margin: 0; font-size: 24px; font-weight: bold;">জরুরি রক্তদানের অনুরোধ</h2>
+          <p style="margin: 5px 0 0; font-size: 14px; opacity: 0.9;">স্পন্দন ব্লাড সোসাইটি, ঝিনাইদহ</p>
+        </div>
+        <div style="padding: 30px 24px; background: white;">
+          <p style="font-size: 16px; color: #333; margin-top: 0;">শ্রদ্ধেয় <b>${donorName}</b>,</p>
+          <p style="font-size: 15px; color: #555; line-height: 1.6;">একজন মুমূর্ষু রোগীর জীবন বাঁচাতে আপনার দেওয়া <b>${rData[reqRow-1][3]}</b> রক্তের অত্যন্ত প্রয়োজন। নিচে রোগীর বিস্তারিত তথ্য দেওয়া হলো:</p>
+          
+          <table style="width: 100%; border-collapse: separate; border-spacing: 0; margin: 24px 0; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;">
+            <tr>
+              <td style="padding: 14px 16px; border-bottom: 1px solid #e0e0e0; border-right: 1px solid #e0e0e0; font-weight: bold; width: 35%; color: #555; background: #f8f9fa;">👤 রোগীর নাম</td>
+              <td style="padding: 14px 16px; border-bottom: 1px solid #e0e0e0; color: #222; font-weight: bold; background: #fff;">${rData[reqRow-1][1]}</td>
+            </tr>
+            <tr>
+              <td style="padding: 14px 16px; border-bottom: 1px solid #e0e0e0; border-right: 1px solid #e0e0e0; font-weight: bold; color: #555; background: #f8f9fa;">🩸 রক্তের গ্রুপ</td>
+              <td style="padding: 14px 16px; border-bottom: 1px solid #e0e0e0; color: #d32f2f; font-weight: bold; font-size: 18px; background: #fff;">${rData[reqRow-1][3]}</td>
+            </tr>
+            <tr>
+              <td style="padding: 14px 16px; border-bottom: 1px solid #e0e0e0; border-right: 1px solid #e0e0e0; font-weight: bold; color: #555; background: #f8f9fa;">🏥 হাসপাতাল</td>
+              <td style="padding: 14px 16px; border-bottom: 1px solid #e0e0e0; color: #222; font-weight: bold; background: #fff;">${rData[reqRow-1][7]}</td>
+            </tr>
+            <tr>
+              <td style="padding: 14px 16px; border-bottom: 1px solid #e0e0e0; border-right: 1px solid #e0e0e0; font-weight: bold; color: #555; background: #f8f9fa;">⏰ সময়</td>
+              <td style="padding: 14px 16px; border-bottom: 1px solid #e0e0e0; color: #222; font-weight: bold; background: #fff;">${formatBanglaDateTime(rData[reqRow-1][10])}</td>
+            </tr>
+            <tr>
+              <td style="padding: 14px 16px; border-right: 1px solid #e0e0e0; font-weight: bold; color: #555; background: #f8f9fa;">📞 স্বজনের নাম্বার</td>
+              <td style="padding: 14px 16px; color: #222; font-weight: bold; background: #fff;">
+                <a href="tel:${e.parameter.reqPhone}" style="color: #1a73e8; text-decoration: none; font-size: 16px;">${e.parameter.reqPhone}</a>
+              </td>
+            </tr>
+          </table>
+          
+          <p style="font-size: 14px; color: #666; background: #e8f5e9; padding: 16px; border-left: 4px solid #4CAF50; border-radius: 6px; line-height: 1.5;">✅ রক্তদান সম্পন্ন হলে অনুগ্রহ করে আমাদের ওয়েবসাইটে গিয়ে <b>Donation Confirmation</b> অপশন থেকে স্ট্যাটাস আপডেট করুন।</p>
+        </div>
+        ${fbFooter}
+      </div>
+      `;
+      MailApp.sendEmail({to: donorEmail, subject: "🩸 জরুরি রক্তদানের অনুরোধ — Spondon Blood Society", htmlBody: htmlBody});
+      
+      return ContentService.createTextOutput(JSON.stringify({status:'Success', donorName:donorName})).setMimeType(ContentService.MimeType.JSON);
+    }
+    
+    // ✅ DONATION CONFIRMATION 
+    if (action === 'confirmDonation') {
+      let confSheet = ss.getSheetByName('Confirmation_DB');
+      if(!confSheet) confSheet = ss.insertSheet('Confirmation_DB');
+      let donorSheet = ss.getSheetByName('Donor_DB');
+      let reqSheet = ss.getSheetByName('Request_DB');
+      
+      confSheet.appendRow([new Date(), e.parameter.donorEmail, e.parameter.donationStatus, e.parameter.donationDate]);
+      
+      if(e.parameter.donationStatus === 'Donated'){
+         let donorName = "সম্মানিত ডোনার";
+         let dData = donorSheet.getDataRange().getValues();
+         for(let i=dData.length-1; i>0; i--){
+           if(dData[i][3] === e.parameter.donorEmail){
+             donorName = dData[i][1];
+             let d = new Date(e.parameter.donationDate);
+             d.setDate(d.getDate() + 120);
+             donorSheet.getRange(i+1, 8).setValue(e.parameter.donationDate);
+             donorSheet.getRange(i+1, 9).setValue(Utilities.formatDate(d, 'GMT+6', 'yyyy-MM-dd'));
+             donorSheet.getRange(i+1, 10).setValue('Resting');
+             break;
+           }
+         }
+         let rData = reqSheet.getDataRange().getValues();
+         for(let i=rData.length-1; i>0; i--){
+           if(rData[i][12] === e.parameter.donorEmail && rData[i][11] === 'Assigned'){
+             reqSheet.getRange(i+1, 12).setValue('Completed');
+             break;
+           }
+         }
+         
+         let confirmHtml = `
+         <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; background: #fafafa; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+           <div style="background: linear-gradient(135deg, #4CAF50, #2E7D32); padding: 24px; text-align: center; color: white;">
+             <div style="font-size: 44px; margin-bottom: 10px;">🎉</div>
+             <h2 style="margin: 0; font-size: 24px; font-weight: bold;">রক্তদান সম্পন্ন!</h2>
+             <p style="margin: 5px 0 0; font-size: 14px; opacity: 0.9;">স্পন্দন ব্লাড সোসাইটি, ঝিনাইদহ</p>
+           </div>
+           <div style="padding: 30px 24px; background: white;">
+             <p style="font-size: 16px; color: #333; margin-top: 0; font-weight: bold;">শ্রদ্ধেয় <b>${donorName}</b>,</p>
+             <p style="font-size: 15px; color: #555; line-height: 1.6;">আলহামদুলিল্লাহ! আপনার মহৎ অবদানে আজ একটি মুমূর্ষু রোগীর প্রাণ বাঁচল। স্পন্দন ব্লাড সোসাইটি এবং রোগীর পরিবারের পক্ষ থেকে আপনাকে জানাই গভীর কৃতজ্ঞতা ও বুকভরা ভালোবাসা।</p>
+             <div style="background: #e8f5e9; border-left: 4px solid #4CAF50; padding: 16px; border-radius: 6px; margin: 24px 0;">
+               <p style="margin: 0; font-size: 15px; color: #2E7D32; font-weight: bold; line-height: 1.5;">✅ আগামী ১২০ দিনের (৪ মাস) জন্য আপনাকে আর কোনো রক্তদানের অনুরোধ পাঠানো হবে না। আপনি এখন সিস্টেমে "Resting" অবস্থায় আছেন।</p>
+             </div>
+             <p style="font-size: 15px; color: #666; font-weight: bold; text-align: center; margin-top: 30px;">রক্তদানের পর বেশি করে তরল খাবার খান এবং পর্যাপ্ত বিশ্রাম নিন।<br><span style="color: #d32f2f;">মহান আল্লাহ আপনাকে উত্তম প্রতিদান দিন।</span></p>
+           </div>
+           ${fbFooter}
+         </div>
+         `;
+         MailApp.sendEmail({to: e.parameter.donorEmail, subject: "🎉 রক্তদানের জন্য অসংখ্য ধন্যবাদ! — Spondon Blood Society", htmlBody: confirmHtml});
+      }
+      return res('Success', '✅ স্ট্যাটাস আপডেট সম্পন্ন! অসংখ্য ধন্যবাদ।');
+    }
+
+    // 🔒 OTP & PROFILE UPDATE (Donor_DB তেই সেভ হবে)
+    if (action === 'requestOtp') {
+       let donorSheet = ss.getSheetByName('Donor_DB');
+       let dData = donorSheet.getDataRange().getValues();
+       let rowIndex = -1;
+       
+       for(let i=dData.length-1; i>0; i--){
+         if(dData[i][3] === e.parameter.email){ 
+           rowIndex = i + 1; 
+           break; 
+         }
+       }
+       
+       if(rowIndex === -1) return res('Error', 'এই ইমেইলটি ডাটাবেসে নেই। আপনি কি আগে রেজিস্ট্রেশন করেছিলেন?');
+       
+       let otp = Math.floor(1000 + Math.random() * 9000).toString();
+       let now = new Date();
+       
+       // কলাম ১১ (K) তে OTP এবং কলাম ১২ (L) তে Time সেভ করা হচ্ছে
+       donorSheet.getRange(rowIndex, 11).setValue(otp);
+       donorSheet.getRange(rowIndex, 12).setValue(now);
+       
+       let otpHtml = `
+       <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 500px; margin: auto; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; background: #fafafa; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+         <div style="background: linear-gradient(135deg, #1a73e8, #0a66c2); padding: 24px; color: white;">
+           <div style="font-size: 36px; margin-bottom: 10px;">🔑</div>
+           <h2 style="margin: 0; font-size: 22px; font-weight: bold;">প্রোফাইল ভেরিফিকেশন পিন</h2>
+         </div>
+         <div style="padding: 30px 24px; background: white;">
+           <p style="font-size: 16px; color: #333; margin-top: 0; font-weight: 500;">আপনার প্রোফাইল আপডেট করার জন্য নিচের পিন (OTP) টি ব্যবহার করুন:</p>
+           <div style="font-size: 38px; font-weight: bold; color: #1a73e8; letter-spacing: 6px; margin: 24px 0; padding: 15px; background: #e8f0fe; border-radius: 8px; display: inline-block; border: 1px dashed #aecbfa;">${otp}</div>
+           <p style="font-size: 14px; color: #d32f2f; font-weight: bold; background: #fff5f5; padding: 10px; border-radius: 6px;">⚠️ এই পিনটির মেয়াদ ১০ মিনিট। এটি কারো সাথে শেয়ার করবেন না।</p>
+         </div>
+         ${fbFooter}
+       </div>`;
+       MailApp.sendEmail({to: e.parameter.email, subject: "🔑 স্পন্দন প্রোফাইল ভেরিফিকেশন পিন", htmlBody: otpHtml});
+       return res('Success', 'OTP পাঠানো হয়েছে।');
+    }
+    
+    if (action === 'verifyOtp') {
+       let donorSheet = ss.getSheetByName('Donor_DB');
+       let dData = donorSheet.getDataRange().getValues();
+       let rowIndex = -1;
+       
+       for(let i=dData.length-1; i>0; i--){
+         if(dData[i][3] === e.parameter.email){
+           rowIndex = i + 1;
+           break;
+         }
+       }
+       
+       if(rowIndex === -1) return res('Error', 'ডোনার পাওয়া যায়নি।');
+       
+       let savedOtp = dData[rowIndex-1][10]; // কলাম ১১ (Index 10)
+       let generateTime = dData[rowIndex-1][11]; // কলাম ১২ (Index 11)
+       
+       if(!savedOtp || savedOtp.toString() !== e.parameter.otp.toString()){
+           return res('Error', 'ভুল OTP প্রদান করেছেন।');
+       }
+       
+       // ১০ মিনিটের মেয়াদ চেক
+       let diffMins = (new Date().getTime() - new Date(generateTime).getTime()) / 60000;
+       if(diffMins > 10) {
+           return res('Error', 'OTP এর মেয়াদ (১০ মিনিট) শেষ হয়ে গেছে। আবার নতুন করে রিকোয়েস্ট করুন।');
+       }
+       
+       // ভেরিফাই হলে ডোনারের পুরনো ডাটা ওয়েবসাইটের ফর্মে পাঠানো হচ্ছে
+       let donor = { 
+           name: dData[rowIndex-1][1], 
+           phone: dData[rowIndex-1][2], 
+           district: dData[rowIndex-1][4], 
+           upazilla: dData[rowIndex-1][5], 
+           bg: dData[rowIndex-1][6], 
+           lastDate: dData[rowIndex-1][7] 
+       };
+       return ContentService.createTextOutput(JSON.stringify({status:'Success', donor:donor})).setMimeType(ContentService.MimeType.JSON);
+    }
+    
+    if (action === 'updateProfile') {
+       let donorSheet = ss.getSheetByName('Donor_DB');
+       let dData = donorSheet.getDataRange().getValues();
+       
+       for(let i=dData.length-1; i>0; i--){
+         if(dData[i][3] === e.parameter.email){
+           let rowIndex = i + 1;
+           
+           // পুরনো ডাটার উপরে নতুন ডাটা Overwrite করা হচ্ছে
+           donorSheet.getRange(rowIndex, 2).setValue(e.parameter.name);
+           donorSheet.getRange(rowIndex, 3).setValue("'" + e.parameter.phone);
+           donorSheet.getRange(rowIndex, 5).setValue(e.parameter.district);
+           donorSheet.getRange(rowIndex, 6).setValue(e.parameter.upazilla);
+           donorSheet.getRange(rowIndex, 7).setValue(e.parameter.bg);
+           
+           // যদি রক্তের ডেট আপডেট করে
+           if(e.parameter.lastDate){
+             donorSheet.getRange(rowIndex, 8).setValue(e.parameter.lastDate);
+             let d = new Date(e.parameter.lastDate);
+             d.setDate(d.getDate() + 120); // পরবর্তী ডেট
+             donorSheet.getRange(rowIndex, 9).setValue(Utilities.formatDate(d, 'GMT+6', 'yyyy-MM-dd'));
+             
+             if(d > new Date()) donorSheet.getRange(rowIndex, 10).setValue('Resting');
+             else donorSheet.getRange(rowIndex, 10).setValue('Active');
+           }
+           
+           // আপডেট শেষে নিরাপত্তার জন্য OTP এবং Time ডিলেট করে দেওয়া হচ্ছে
+           donorSheet.getRange(rowIndex, 11).clearContent();
+           donorSheet.getRange(rowIndex, 12).clearContent();
+           
+           return res('Success', 'আপডেট সফল!');
+         }
+       }
+       return res('Error', 'ডোনার পাওয়া যায়নি।');
+    }
+
+    // 👨💻 ADMIN & BLOG SYSTEM
+    let ADMIN_EMAIL = "spondon@gmail.com";
+    let ADMIN_PIN = "1234";
+    
+    if (action === 'adminLogin') {
+      if(e.parameter.email === ADMIN_EMAIL && e.parameter.pin === ADMIN_PIN) return res('Success', 'Admin logged in');
+      else return res('Error', 'Invalid credentials');
+    }
+    
+    if (['addBlog', 'deleteBlog', 'togglePinBlog'].includes(action)) {
+       if(e.parameter.email !== ADMIN_EMAIL || e.parameter.pin !== ADMIN_PIN) return res('Error', 'Unauthorized');
+       let blogSheet = ss.getSheetByName('Blog_DB');
+       if(!blogSheet) blogSheet = ss.insertSheet('Blog_DB');
+       
+       if (action === 'addBlog') {
+         let newId = new Date().getTime();
+         let dateStr = Utilities.formatDate(new Date(), 'GMT+6', 'dd MMM, yyyy');
+         blogSheet.appendRow([newId, e.parameter.title, e.parameter.desc, "Admin", dateStr, e.parameter.image || "", false, e.parameter.fbLink || ""]);
+         return res('Success', 'Post Added');
+       }
+       
+       if (action === 'deleteBlog' || action === 'togglePinBlog') {
+         let bData = blogSheet.getDataRange().getValues();
+         for(let i=1; i<bData.length; i++){
+           if(bData[i][0].toString() === e.parameter.rowId.toString()){
+             if(action === 'deleteBlog'){ blogSheet.deleteRow(i+1); }
+             if(action === 'togglePinBlog'){ blogSheet.getRange(i+1, 7).setValue(e.parameter.pinState === 'true'); }
+             return res('Success', 'Done');
+           }
+         }
+         return res('Error', 'Not found');
+       }
+    }
+    
+  } catch(err) {
+    return res('Error', err.toString());
+  }
+}
+
+// 📌 Helper Function
+function res(status, msg){ return ContentService.createTextOutput(JSON.stringify({status:status, message:msg})).setMimeType(ContentService.MimeType.JSON); }
+
+// ⏰ TIME DRIVEN TRIGGERS (24h & 48h Reminder)
+function hourlyReminder() {
+  let ss = SpreadsheetApp.openById(SHEET_ID);
+  let reqSheet = ss.getSheetByName('Request_DB');
+  if(!reqSheet) return;
+  let rData = reqSheet.getDataRange().getValues();
+  let now = new Date().getTime();
+  
+  for(let i=1; i<rData.length; i++){
+    if(rData[i][11] === 'Assigned'){
+      let assignTime = new Date(rData[i][13]).getTime();
+      let diffHours = (now - assignTime) / (1000*60*60);
+      let count = rData[i][14] || 0;
+      
+      let remHtml = `
+      <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; background: #fafafa; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+        <div style="background: linear-gradient(135deg, #f57c00, #e65100); padding: 24px; text-align: center; color: white;">
+          <div style="font-size: 40px; margin-bottom: 10px;">⏰</div>
+          <h2 style="margin: 0; font-size: 22px; font-weight: bold;">রক্তদান স্ট্যাটাস আপডেট রিমাইন্ডার</h2>
+          <p style="margin: 5px 0 0; font-size: 14px; opacity: 0.9;">স্পন্দন ব্লাড সোসাইটি, ঝিনাইদহ</p>
+        </div>
+        <div style="padding: 30px 24px; background: white;">
+          <p style="font-size: 16px; color: #333; margin-top: 0; font-weight: bold;">শ্রদ্ধেয় ডোনার,</p>
+          <p style="font-size: 15px; color: #555; line-height: 1.6;">আপনাকে কিছুদিন আগে একটি রক্তদানের অনুরোধে <b>"Assigned"</b> করা হয়েছিল। যদি আপনি ইতোমধ্যে রক্তদান সম্পন্ন করে থাকেন, তবে অনুগ্রহ করে ওয়েবসাইটের <b>Donation Confirmation</b> অপশন থেকে আপনার স্ট্যাটাসটি আপডেট করুন।</p>
+          
+          <div style="background: #fff3e0; border-left: 4px solid #ff9800; padding: 16px; border-radius: 6px; margin: 24px 0;">
+            <p style="margin: 0; font-size: 15px; color: #e65100; font-weight: bold; line-height: 1.5;">✅ স্ট্যাটাস আপডেট করলে আগামী ১২০ দিনের জন্য আপনাকে আর কোনো রক্তদানের অনুরোধ পাঠানো হবে না।</p>
+          </div>
+          
+          <div style="text-align: center; margin: 30px 0 10px;">
+            <a href="${WEB_APP_URL}" target="_blank" style="display: inline-block; background: #e65100; color: white; text-decoration: none; padding: 14px 28px; border-radius: 30px; font-size: 15px; font-weight: bold; box-shadow: 0 4px 10px rgba(230,81,0,0.3);">ওয়েবসাইটে যান ➔</a>
+          </div>
+        </div>
+        ${fbFooter}
+      </div>`;
+      
+      if(diffHours >= 24 && count === 0){
+        MailApp.sendEmail({to: rData[i][12], subject: "⏰ রক্তদান স্ট্যাটাস রিমাইন্ডার — Spondon Blood Society", htmlBody: remHtml});
+        reqSheet.getRange(i+1, 15).setValue(1);
+      } else if(diffHours >= 48 && count === 1){
+        MailApp.sendEmail({to: rData[i][12], subject: "⏰ রক্তদান স্ট্যাটাস রিমাইন্ডার — Spondon Blood Society", htmlBody: remHtml});
+        reqSheet.getRange(i+1, 15).setValue(2);
+      }
+    }
+  }
+}
+
+function dailyReset() {
+  let ss = SpreadsheetApp.openById(SHEET_ID);
+  let donorSheet = ss.getSheetByName('Donor_DB');
+  if(!donorSheet) return;
+  let dData = donorSheet.getDataRange().getValues();
+  let todayStr = Utilities.formatDate(new Date(), 'GMT+6', 'yyyy-MM-dd');
+  
+  for(let i=1; i<dData.length; i++){
+    if(dData[i][9] === 'Resting' && dData[i][8]){
+      let nextStr = Utilities.formatDate(new Date(dData[i][8]), 'GMT+6', 'yyyy-MM-dd');
+      if(todayStr >= nextStr){
+        donorSheet.getRange(i+1, 10).setValue('Active');
+      }
+    }
+  }
+}
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-09-08T12:12:00+06:00.
+
+The user has uploaded 2 image(s):
+- C:/Users/Hotspot/.gemini/antigravity/brain/3f900896-5dee-43fa-98b5-7719ebebc7c5/.user_uploaded/media_1788847212359.jpg
+- C:/Users/Hotspot/.gemini/antigravity/brain/3f900896-5dee-43fa-98b5-7719ebebc7c5/.user_uploaded/media_1788847222848.png
+You can embed these images in an artifact if you need the USER to review them.
+</ADDITIONAL_METADATA>
