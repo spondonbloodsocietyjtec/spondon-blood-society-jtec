@@ -1,3 +1,4 @@
+``html
 <!DOCTYPE html>
 <html lang="bn">
 <head>
@@ -251,7 +252,7 @@ details[open] summary{color:var(--r);border-bottom:1px solid var(--rbd)}
 .bimg { width:100%; max-height:250px; object-fit:contain; background:#f5f7fa; }
 .bp { padding:18px; }
 .bt { font-size:18px; font-weight:800; color:var(--tx); margin-bottom:10px; line-height:1.4; font-family:'Poppins',sans-serif;}
-.bd { font-size:14px; color:var(--tx3); line-height:1.6; font-weight:500; }
+.bd { font-size:14px; color:var(--tx3); line-height:1.6; font-weight:500; white-space: pre-wrap; text-align: justify; }
 .bmeta { font-size:12px; color:var(--tx4); font-weight:600; margin-bottom:10px; display:flex; justify-content:space-between; }
 .bdel { position:absolute; top:12px; right:12px; background:rgba(211,47,47,0.9); color:white; border:none; padding:6px 12px; border-radius:8px; font-size:12px; font-weight:bold; cursor:pointer; z-index:10; }
 .bfb { display:block; text-align:center; background:#1877f2; color:#fff; padding:12px; border-radius:10px; text-decoration:none; font-weight:700; margin-top:14px; font-size:14px; }
@@ -967,8 +968,13 @@ function loadBlogs() {
                 card += '<button class="bdel" style="right:85px;background:'+(b.pinned?'#1b5e20':'#ea4335')+';" onclick="togglePin('+b.id+', \''+b.pinned+'\')">'+(b.pinned?'📌 Pinned':'📌 Pin')+'</button>';
                 card += '<button class="bdel" onclick="delBlog('+b.id+')">ডিলিট 🗑️</button>';
             }
-            let img = fixImg(b.image);
-            if(img) card += '<img src="'+img+'" class="bimg" onerror="this.style.display=\'none\'">';
+            let urls = b.image ? b.image.split(/[\n,]+/) : [];
+            let imgHTML = '';
+            urls.forEach(u => {
+                let img = fixImg(u.trim());
+                if(img) imgHTML += '<img src="'+img+'" class="bimg" onerror="this.style.display=\'none\'">';
+            });
+            if(imgHTML) card += '<div style="display:flex; flex-direction:column; gap:8px;">' + imgHTML + '</div>';
             card += '<div class="bp">';
             card += '<div class="bmeta"><span>📅 '+b.date+'</span><span>👤 '+b.author+'</span></div>';
             card += '<div class="bt">'+b.title+'</div>';
@@ -998,7 +1004,7 @@ function loadBlogs() {
         document.getElementById('blog-list').innerHTML = '<div style="text-align:center;padding:20px;color:red;font-size:14px;font-weight:600;">লোড করতে সমস্যা হয়েছে।</div>';
     });
 }
-setTimeout(loadBlogs, 1000);
+loadBlogs();
 
 const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
@@ -1147,3 +1153,4 @@ document.getElementById('dp-form3').addEventListener('submit', function(e) {
 </script>
 </body>
 </html>
+``
