@@ -349,7 +349,7 @@ details[open] summary{color:var(--r);border-bottom:1px solid var(--rbd)}
   <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
     <div style="width: 40px;"></div>
     
-    <div class="h-txt" style="text-align: center; flex: 1;">
+    <div class="h-txt" style="text-align: center; flex: 1; cursor: pointer;" onclick="go('home')">
       <h1 style="font-family: Impact, sans-serif; font-size: 25px; letter-spacing: 1px; font-weight: bold; white-space: nowrap;">SPONDON BLOOD SOCIETY</h1>
       <p style="font-size: 11px; margin-top: 2px;">Jhenaidah Textile Engineering College</p>
     </div>
@@ -666,14 +666,23 @@ document.querySelectorAll('.page').forEach(function(p){ p.insertAdjacentHTML('be
 // PAGE ROUTER with URL Param Support
 var pm={'home':'p-home','donor-reg':'p-donor-reg','donor-profile':'p-donor-profile','blood-request':'p-blood-request','match-secured':'p-match-secured','confirm-donation':'p-confirm-donation','confirm':'p-confirm','activities':'p-activities','about':'p-about'};
 var nm={'home':'n-home','donor-reg':'n-donor-reg','donor-profile':'n-donor-profile','activities':'n-activities','about':'n-about'};
-function go(n){
+function go(n, push = true){
   if(!pm[n]) n = "home";
   document.querySelectorAll('.page').forEach(function(p){p.classList.remove('on')});
   document.querySelectorAll('.ni').forEach(function(b){b.classList.remove('on')});
   var p=document.getElementById(pm[n]);if(p)p.classList.add('on');
   if(nm[n]){var nb=document.getElementById(nm[n]);if(nb)nb.classList.add('on');}
   window.scrollTo({top:0, behavior: 'smooth'});
+  if(push) {
+    if(history.state === null) history.replaceState({page: n}, '', '?page=' + n);
+    else history.pushState({page: n}, '', '?page=' + n);
+  }
 }
+
+window.addEventListener('popstate', function(e) {
+  if (e.state && e.state.page) go(e.state.page, false);
+  else go('home', false);
+});
 
 // Check URL param on load
 var urlParams = new URLSearchParams(window.location.search);
