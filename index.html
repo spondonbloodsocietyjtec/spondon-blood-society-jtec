@@ -724,12 +724,12 @@ if(requestedPage && pm[requestedPage]) {
 function hsk(){document.getElementById('tsk').style.display='none'}
 function sman(){hsk();document.getElementById('tdt').classList.remove('show');document.getElementById('tman').classList.add('show')}
 function stk(a,d){hsk();document.getElementById('tman').classList.remove('show');if(d){document.getElementById('tdn').textContent=d;document.getElementById('tdt').classList.add('show')}var m=document.getElementById('tmsg'),t=a.join('  \u{1F534}  ');m.textContent=t;m.style.animationDuration=Math.max(15,t.length*.16)+'s';m.className='t-msg on'}
-function ldN(d){autoSetDist(d);stk(['à¦¡à§‡à¦Ÿà¦¾ à¦²à§‹à¦¡ à¦¹à¦šà§à¦›à§‡...'], d);fetch(S+'?action=getNotices&district='+encodeURIComponent(d)).then(function(r){return r.json()}).then(function(j){stk(j.notices&&j.notices.length>0?j.notices:[d+' \u099C\u09C7\u09B2\u09BE\u09AF\u09BC \u098F\u0996\u09A8 \u0995\u09CB\u09A8\u09CB \u099C\u09B0\u09C1\u09B0\u09BF \u09B0\u0995\u09CD\u09A4\u09C7\u09B0 \u099A\u09BE\u09B9\u09BF\u09A6\u09BE \u09A8\u09C7\u0987\u0964 \u09B0\u0995\u09CD\u09A4\u09A6\u09BE\u09A8 \u0995\u09B0\u09C1\u09A8! \u2764\uFE0F'],d);sv(d)}).catch(function(){stk(['\u09B8\u09CD\u09AA\u09A8\u09CD\u09A6\u09A8 \u09AC\u09CD\u09B2\u09BE\u09A1 \u09B8\u09CB\u09B8\u09BE\u0987\u099F\u09BF, \u099D\u09BF\u09A8\u09BE\u0987\u09A6\u09B9\u0964'],d)})}
+function ldN(d){autoSetDist(d);stk(['\u09A1\u09C7\u099F\u09BE \u09B2\u09CB\u09A1 \u09B9\u099A\u09CD\u099B\u09C7...'], d);fetch(S+'?action=getNotices&district='+encodeURIComponent(d)).then(function(r){return r.json()}).then(function(j){stk(j.notices&&j.notices.length>0?j.notices:[d+' \u099C\u09C7\u09B2\u09BE\u09AF\u09BC \u098F\u0996\u09A8 \u0995\u09CB\u09A8\u09CB \u099C\u09B0\u09C1\u09B0\u09BF \u09B0\u0995\u09CD\u09A4\u09C7\u09B0 \u099A\u09BE\u09B9\u09BF\u09A6\u09BE \u09A8\u09C7\u0987\u0964 \u09B0\u0995\u09CD\u09A4\u09A6\u09BE\u09A8 \u0995\u09B0\u09C1\u09A8! \u2764\uFE0F'],d);sv(d)}).catch(function(){stk(['\u09B8\u09CD\u09AA\u09A8\u09CD\u09A6\u09A8 \u09AC\u09CD\u09B2\u09BE\u09A1 \u09B8\u09CB\u09B8\u09BE\u0987\u099F\u09BF, \u099D\u09BF\u09A8\u09BE\u0987\u09A6\u09B9\u0964'],d)})}
 document.getElementById('tdt').addEventListener('click',function(){try{localStorage.removeItem('sbs_d');localStorage.removeItem('sbs_t')}catch(x){}document.getElementById('tdt').classList.remove('show');document.getElementById('tmsg').className='t-msg';document.getElementById('tsk').style.display='block';sman()});
 document.getElementById('mdb').addEventListener('click',function(){var d=document.getElementById('mds').value;if(!d)return;document.getElementById('tman').classList.remove('show');ldN(d)});
 function tryGPS(ok,fail){if(!navigator.geolocation){fail();return}document.getElementById('pdm').textContent='\u{1F4CD} \u0986\u09AA\u09A8\u09BE\u09B0 \u0985\u09AC\u09B8\u09CD\u09A5\u09BE\u09A8 \u09B6\u09A8\u09BE\u0995\u09CD\u09A4 \u0995\u09B0\u09BE \u09B9\u099A\u09CD\u099B\u09C7...';navigator.geolocation.getCurrentPosition(function(p){document.getElementById('pdm').textContent='\u2705 GPS \u09AA\u09BE\u0993\u09AF\u09BC\u09BE \u0997\u09C7\u099B\u09C7\u0964';fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat='+p.coords.latitude+'&lon='+p.coords.longitude+'&addressdetails=1&accept-language=en',{headers:{'User-Agent':'SBS/1.0'}}).then(function(r){return r.json()}).then(function(d){var a=d.address||{},raw=Object.values(a).join(' '),dist=mD(raw);if(dist)ok(dist);else fail()}).catch(fail)},function(){fail()},{timeout:7000,maximumAge:0,enableHighAccuracy:false})}
 function tryIP(ok,fail){document.getElementById('pdm').textContent='\u{1F310} \u0985\u09A8\u09C1\u09AE\u09BE\u09A8\u09BF\u0995 \u0985\u09AC\u09B8\u09CD\u09A5\u09BE\u09A8 \u0996\u09CB\u0981\u099C\u09BE \u09B9\u099A\u09CD\u099B\u09C7...';var done=false;function got(raw){if(done)return;var d=mD(raw);if(d){done=true;ok(d)}else if(!done){done=true;fail()}}function nope(){if(!done){done=true;fail()}}fetch('https://ipapi.co/json/?nocache=true&_='+Date.now()).then(function(r){return r.json()}).then(function(d){got(d.city||d.region||'')}).catch(nope);fetch('https://ip-api.com/json/?fields=city,regionName').then(function(r){return r.json()}).then(function(d){got(d.city||d.regionName||'')}).catch(nope);setTimeout(function(){if(!done){done=true;fail()}},5000)}
-document.getElementById('pok').addEventListener('click',function(){this.disabled=true;this.textContent='\u09B6\u09A8\u09BE\u0995\u09CD\u09A4 \u0995\u09B0\u09BE \u09B9\u099A\u09CD\u099B\u09C7...';tryGPS(function(d){document.getElementById('pop').classList.add('off');ldN(d)},function(){tryIP(function(d){document.getElementById('pop').classList.add('off');ldN(d)},function(){document.getElementById('pdm').textContent='';document.getElementById('pop').classList.add('off');sman()})})});
+document.getElementById('pok').addEventListener('click',function(){document.getElementById('pop').classList.add('off');stk(['\u09A1\u09C7\u099F\u09BE \u09B2\u09CB\u09A1 \u09B9\u099A\u09CD\u099B\u09C7...'],'');tryGPS(function(d){ldN(d)},function(){tryIP(function(d){ldN(d)},function(){sman()})})});
 (function(){var sd='',st=0;try{sd=localStorage.getItem('sbs_d')||'';st=parseInt(localStorage.getItem('sbs_t')||'0')}catch(x){}if(sd&&(Date.now()-st)<1800000){document.getElementById('pop').classList.add('off');ldN(sd)}})();
 
 // ═══ STATS & AUTO UPDATE ═══
@@ -968,8 +968,8 @@ function loadBlogs() {
     
     function renderBlogs(d) {
         if(!d.blogs || d.blogs.length === 0) {
-            bl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--tx4);font-size:14px;font-weight:600;">à¦•à§‹à¦¨à§‹ à¦•à¦¾à¦°à§à¦¯à¦•à§à¦°à¦® à¦ªà¦¾à¦“à§Ÿà¦¾ à¦¯à¦¾à§Ÿà¦¨à¦¿à¥¤</div>';
-            if(ta) ta.innerHTML = '<div style="text-align:center;color:var(--tx4);font-size:14px;grid-column: 1/-1;">à¦•à§‹à¦¨à§‹ à¦Ÿà¦ª à¦•à¦¾à¦°à§à¦¯à¦•à§à¦°à¦® à¦¨à§‡à¦‡à¥¤</div>';
+            bl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--tx4);font-size:14px;font-weight:600;">কোনো কার্যক্রম পাওয়া যায়নি।</div>';
+            if(ta) ta.innerHTML = '<div style="text-align:center;color:var(--tx4);font-size:14px;grid-column: 1/-1;">কোনো টপ কার্যক্রম নেই।</div>';
             return;
         }
         var h = '';
@@ -980,12 +980,12 @@ function loadBlogs() {
         d.blogs.forEach(function(b, i) {
             var card = '<div class="bcard animate-on-scroll">';
             if(isAdmin) {
-                card += '<button class="bdel" style="right:85px;background:'+(b.pinned?'#1b5e20':'#ea4335')+';" onclick="togglePin('+b.id+', \''+b.pinned+'\')">'+(b.pinned?'ðŸ“Œ Pinned':'ðŸ“Œ Pin')+'</button>';
-                card += '<button class="bdel" onclick="delBlog('+b.id+')">à¦¡à¦¿à¦²à¦¿à¦Ÿ ðŸ—‘ï¸</button>';
+                card += '<button class="bdel" style="right:85px;background:'+(b.pinned?'#1b5e20':'#ea4335')+';" onclick="togglePin('+b.id+', \''+b.pinned+'\')">'+(b.pinned?'📌 Pinned':'📌 Pin')+'</button>';
+                card += '<button class="bdel" onclick="delBlog('+b.id+')">ডিলিট 🗑️</button>';
             }
             
             // Header
-            card += '<div class="b-hdr"><div class="b-ava">ðŸ©¸</div><div class="b-hinfo"><div class="b-auth">'+b.author+'</div><div class="b-date">'+b.date+'</div></div></div>';
+            card += '<div class="b-hdr"><div class="b-ava">A</div><div class="b-hinfo"><div class="b-auth">'+b.author+'</div><div class="b-date">'+b.date+'</div></div></div>';
             
             // Content
             card += '<div class="bp">';
@@ -993,7 +993,7 @@ function loadBlogs() {
             var isLong = b.desc.length > 150;
             card += '<div class="bd" id="bd-'+i+'">'+b.desc+'</div>';
             if(isLong) {
-                card += '<div class="b-readmore" onclick="this.style.display=\'none\'; document.getElementById(\'bd-'+i+'\').classList.add(\'expanded\');">...à¦†à¦°à§‹ à¦ªà§œà§à¦¨</div>';
+                card += '<div class="b-readmore" onclick="this.style.display=\'none\'; document.getElementById(\'bd-'+i+'\').classList.add(\'expanded\');">...আরো পড়ুন</div>';
             }
             card += '</div>';
 
@@ -1002,10 +1002,11 @@ function loadBlogs() {
             if(urls.length > 0) {
                 let cnt = urls.length;
                 let attr = cnt > 4 ? 'more' : cnt.toString();
+                window['gl_'+b.id] = urls;
                 card += '<div class="b-photos" data-count="'+attr+'">';
                 for(let j=0; j<Math.min(cnt, 4); j++) {
                     let img = fixImg(urls[j].trim());
-                    card += '<div class="b-ph-item" onclick="window.open(\''+urls[j].trim()+'\',\'_blank\')"><img src="'+img+'" loading="lazy" onerror="this.style.display=\'none\'">';
+                    card += '<div class="b-ph-item" onclick="openGallery('+b.id+', '+j+')"><img src="'+img+'" loading="lazy" onerror="this.style.display=\'none\'">';
                     if(j === 3 && cnt > 4) {
                         card += '<div class="b-ph-more">+' + (cnt - 4) + '</div>';
                     }
@@ -1014,7 +1015,7 @@ function loadBlogs() {
                 card += '</div>';
             }
             
-            if(b.fbLink) card += '<a href="'+b.fbLink+'" target="_blank" class="bfb">à¦«à§‡à¦¸à¦¬à§à¦•à§‡ à¦¬à¦¿à¦¸à§à¦¤à¦¾à¦°à¦¿à¦¤ à¦¦à§‡à¦–à§à¦¨ ðŸ”—</a>';
+            if(b.fbLink) card += '<a href="'+b.fbLink+'" target="_blank" class="bfb">See more details from Facebook...</a>';
             card += '</div>';
             
             h += card;
@@ -1032,7 +1033,7 @@ function loadBlogs() {
             }
         });
         bl.innerHTML = h;
-        if(ta) ta.innerHTML = hTop || '<div style="text-align:center;color:var(--tx4);font-size:14px;grid-column: 1/-1;">à¦•à§‹à¦¨à§‹ à¦Ÿà¦ª à¦•à¦¾à¦°à§à¦¯à¦•à§à¦°à¦® à¦ªà¦¿à¦¨ à¦•à¦°à¦¾ à¦¨à§‡à¦‡à¥¤</div>';
+        if(ta) ta.innerHTML = hTop || '<div style="text-align:center;color:var(--tx4);font-size:14px;grid-column: 1/-1;">কোনো টপ কার্যক্রম পিন করা নেই।</div>';
         
         setTimeout(initAnimations, 100);
     }
@@ -1060,7 +1061,7 @@ function loadBlogs() {
         }
     }).catch(e => {
         if(!isCacheValid) {
-            bl.innerHTML = '<div style="text-align:center;padding:20px;color:#c62828;font-size:14px;font-weight:600;">à¦²à§‹à¦¡ à¦•à¦°à¦¤à§‡ à¦¸à¦®à¦¸à§à¦¯à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦‡à¦¨à§à¦Ÿà¦¾à¦°à¦¨à§‡à¦Ÿ à¦•à¦¾à¦¨à§‡à¦•à¦¶à¦¨ à¦šà§‡à¦• à¦•à¦°à§à¦¨à¥¤</div>';
+            bl.innerHTML = '<div style="text-align:center;padding:20px;color:#c62828;font-size:14px;font-weight:600;">লোড করতে সমস্যা হয়েছে। ইন্টারনেট কানেকশন চেক করুন।</div>';
         }
     });
 }
@@ -1210,6 +1211,72 @@ document.getElementById('dp-form3').addEventListener('submit', function(e) {
     b.textContent = "পরিবর্তন সেভ করুন";
   });
 });
+
+/* NATIVE LIGHTBOX GALLERY */
+var lbUrls = [];
+var lbIdx = 0;
+function openGallery(blogId, idx) {
+    if(!window['gl_' + blogId]) return;
+    lbUrls = window['gl_' + blogId].map(u => u.trim()).filter(u => u !== '');
+    if(lbUrls.length === 0) return;
+    lbIdx = idx;
+    var lb = document.getElementById('lightbox');
+    if(!lb) {
+        lb = document.createElement('div');
+        lb.id = 'lightbox';
+        lb.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);';
+        
+        var cls = document.createElement('button');
+        cls.innerHTML = '✕';
+        cls.style.cssText = 'position:absolute;top:20px;right:20px;background:none;border:none;color:#fff;font-size:30px;cursor:pointer;padding:10px;line-height:1;z-index:10001;';
+        cls.onclick = function(){ lb.style.display='none'; };
+        lb.appendChild(cls);
+
+        var img = document.createElement('img');
+        img.id = 'lb-img';
+        img.style.cssText = 'max-width:90%;max-height:80vh;object-fit:contain;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,0.5);';
+        lb.appendChild(img);
+
+        var cnt = document.createElement('div');
+        cnt.id = 'lb-cnt';
+        cnt.style.cssText = 'color:#fff;margin-top:15px;font-size:16px;font-weight:700;letter-spacing:1px;';
+        lb.appendChild(cnt);
+        
+        var prev = document.createElement('button');
+        prev.innerHTML = '❮';
+        prev.style.cssText = 'position:absolute;left:20px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:30px;padding:15px 20px;cursor:pointer;border-radius:50%;backdrop-filter:blur(4px);';
+        prev.onclick = function(){
+            lbIdx = (lbIdx - 1 + lbUrls.length) % lbUrls.length;
+            updateLb();
+        };
+        lb.appendChild(prev);
+
+        var next = document.createElement('button');
+        next.innerHTML = '❯';
+        next.style.cssText = 'position:absolute;right:20px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:30px;padding:15px 20px;cursor:pointer;border-radius:50%;backdrop-filter:blur(4px);';
+        next.onclick = function(){
+            lbIdx = (lbIdx + 1) % lbUrls.length;
+            updateLb();
+        };
+        lb.appendChild(next);
+        
+        document.body.appendChild(lb);
+    }
+    lb.style.display = 'flex';
+    updateLb();
+}
+function updateLb() {
+    var img = document.getElementById('lb-img');
+    var rawUrl = lbUrls[lbIdx];
+    var hiRes = rawUrl;
+    let m = rawUrl.match(/drive\.google\.com\/.*[?&]id=([^&]+)|drive\.google\.com\/file\/d\/([^/]+)/);
+    let id = m ? (m[1] || m[2]) : null;
+    if(id) {
+        hiRes = 'https://drive.google.com/uc?id=' + id + '&export=view';
+    }
+    img.src = hiRes;
+    document.getElementById('lb-cnt').textContent = (lbIdx + 1) + ' / ' + lbUrls.length;
+}
 </script>
 </body>
 </html>
