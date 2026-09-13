@@ -632,13 +632,17 @@ details[open] summary{color:var(--r);border-bottom:1px solid var(--rbd)}
 <div class="ac-h"><h2>আমাদের কার্যক্রম 🚀</h2><p>স্পন্দন ব্লাড সোসাইটির সর্বশেষ খবর ও কার্যক্রম</p></div>
 <img src="activity-banner.png" alt="Blood Donation" style="width:100%; border-bottom:1px solid rgba(0,0,0,0.05); margin-bottom: 20px; border-radius: 12px;" onerror="this.style.display='none'">
 <div id="admin-panel">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;"><h4 style="color:var(--rd);font-size:16px;margin:0;">📝 নতুন পোস্ট যুক্ত করুন</h4><button onclick="sessionStorage.clear();location.reload()" style="background:#444;color:#fff;border:none;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;box-shadow:0 2px 5px rgba(0,0,0,0.2);">লগ আউট</button></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;"><h4 id="bl-form-title" style="color:var(--rd);font-size:16px;margin:0;">📝 নতুন পোস্ট যুক্ত করুন</h4><button onclick="sessionStorage.clear();location.reload()" style="background:#444;color:#fff;border:none;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;box-shadow:0 2px 5px rgba(0,0,0,0.2);">লগ আউট</button></div>
     <form id="add-blog-form">
+        <input type="hidden" id="bl-id" value="">
         <div class="ig"><label>টাইটেল (Title) *</label><input type="text" id="bl-t" required placeholder="পোস্টের শিরোনাম"></div>
         <div class="ig"><label>বিস্তারিত (Description) *</label><textarea id="bl-d" required placeholder="বিস্তারিত লিখুন..."></textarea></div>
         <div class="ig"><label>ছবির লিংক (Google Drive Link)</label><textarea id="bl-i" placeholder="https://drive.google.com/file/d/... (একাধিক ছবির লিংক কমা বা নতুন লাইনে দিন)" style="min-height:60px;"></textarea></div>
         <div class="ig"><label>ফেসবুক পোস্ট লিংক (ঐচ্ছিক)</label><input type="url" id="bl-fb" placeholder="https://facebook.com/..."></div>
-        <button type="button" class="pok" id="bl-btn" style="padding:12px;font-size:14px;box-shadow:none;">পোস্ট করুন 🚀</button>
+        <div class="g2">
+            <button type="button" class="pok" id="bl-btn" style="padding:12px;font-size:14px;box-shadow:none;">পোস্ট করুন 🚀</button>
+            <button type="button" class="pok" id="bl-cancel-btn" style="padding:12px;font-size:14px;box-shadow:none;background:#5f6368;display:none;" onclick="cancelEdit()">বাতিল করুন ✖️</button>
+        </div>
         <div class="err" id="bl-err"></div>
     </form>
 </div>
@@ -982,6 +986,7 @@ function loadBlogs() {
         d.blogs.forEach(function(b, i) {
             var card = '<div class="bcard animate-on-scroll">';
             if(isAdmin) {
+                card += '<button class="bdel" style="right:155px;background:#1a73e8;" onclick="editBlog('+b.id+')">এডিট ✏️</button>';
                 card += '<button class="bdel" style="right:85px;background:'+(b.pinned?'#1b5e20':'#ea4335')+';" onclick="togglePin('+b.id+', \''+b.pinned+'\')">'+(b.pinned?'📌 Pinned':'📌 Pin')+'</button>';
                 card += '<button class="bdel" onclick="delBlog('+b.id+')">ডিলিট 🗑️</button>';
             }
@@ -1086,16 +1091,48 @@ function initAnimations() {
 window.addEventListener('DOMContentLoaded', initAnimations);
 
 
+window.editBlog = function(id) {
+    var cached = localStorage.getItem('sbs_blogs');
+    if(!cached) return;
+    var d = JSON.parse(cached);
+    var b = d.blogs.find(x => x.id == id);
+    if(!b) return;
+    
+    document.getElementById('bl-id').value = b.id;
+    document.getElementById('bl-t').value = b.title;
+    document.getElementById('bl-d').value = b.desc;
+    document.getElementById('bl-i').value = b.image || '';
+    document.getElementById('bl-fb').value = b.fbLink || '';
+    
+    document.getElementById('bl-form-title').textContent = '✏️ পোস্ট এডিট করুন';
+    document.getElementById('bl-btn').textContent = 'আপডেট করুন 🔄';
+    document.getElementById('bl-cancel-btn').style.display = 'block';
+    
+    window.scrollTo({top: document.getElementById('admin-panel').offsetTop - 80, behavior: 'smooth'});
+};
+
+window.cancelEdit = function() {
+    document.getElementById('bl-id').value = '';
+    document.getElementById('add-blog-form').reset();
+    document.getElementById('bl-form-title').textContent = '📝 নতুন পোস্ট যুক্ত করুন';
+    document.getElementById('bl-btn').textContent = 'পোস্ট করুন 🚀';
+    document.getElementById('bl-cancel-btn').style.display = 'none';
+};
+
 document.getElementById('bl-btn').addEventListener('click', function() {
     var t = document.getElementById('bl-t').value;
     var d = document.getElementById('bl-d').value;
     var i = document.getElementById('bl-i').value;
+    var editId = document.getElementById('bl-id').value;
+    
     if(!t || !d) { alert('টাইটেল এবং ডেস্ক্রিপশন দিন!'); return; }
     
-    this.textContent = 'পোস্ট হচ্ছে...';
+    this.textContent = editId ? 'আপডেট হচ্ছে...' : 'পোস্ট হচ্ছে...';
     var fd = new FormData();
     var fb = document.getElementById('bl-fb').value;
-    fd.append('formType', 'addBlog');
+    fd.append('formType', editId ? 'updateBlog' : 'addBlog');
+    if(editId) fd.append('rowId', editId);
+    
     fd.append('email', sessionStorage.getItem('adminEmail'));
     fd.append('pin', sessionStorage.getItem('adminPin'));
     fd.append('title', t);
@@ -1107,20 +1144,16 @@ document.getElementById('bl-btn').addEventListener('click', function() {
     .then(r => r.json())
     .then(res => {
         if(res.status === 'Success') {
-            alert('সফলভাবে পোস্ট হয়েছে!');
-            document.getElementById('bl-t').value = '';
-            document.getElementById('bl-d').value = '';
-            document.getElementById('bl-i').value = '';
-            document.getElementById('bl-fb').value = '';
-            this.textContent = 'পোস্ট করুন 🚀';
+            alert(editId ? 'সফলভাবে আপডেট হয়েছে!' : 'সফলভাবে পোস্ট হয়েছে!');
+            cancelEdit();
             loadBlogs(); 
         } else {
             alert('সমস্যা: ' + res.message);
-            this.textContent = 'পোস্ট করুন 🚀';
+            this.textContent = editId ? 'আপডেট করুন 🔄' : 'পোস্ট করুন 🚀';
         }
     }).catch(err => {
         alert('নেটওয়ার্ক সমস্যা!');
-        this.textContent = 'পোস্ট করুন 🚀';
+        this.textContent = editId ? 'আপডেট করুন 🔄' : 'পোস্ট করুন 🚀';
     });
 });
 
