@@ -958,14 +958,13 @@ window.togglePin = function(id, curState) {
 };
 
 function loadBlogs() {
-    fetch(S + '?action=getBlogs')
-    .then(r => r.json())
-    .then(d => {
-        var bl = document.getElementById('blog-list');
-        var ta = document.getElementById('top-activities');
+    var bl = document.getElementById('blog-list');
+    var ta = document.getElementById('top-activities');
+    
+    function renderBlogs(d) {
         if(!d.blogs || d.blogs.length === 0) {
-            bl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--tx4);font-size:14px;font-weight:600;">à¦•à§‹à¦¨à§‹ à¦•à¦¾à¦°à§à¦¯à¦•à§à¦°à¦® à¦ªà¦¾à¦“à§Ÿà¦¾ à¦¯à¦¾à§Ÿà¦¨à¦¿à¥¤</div>';
-            if(ta) ta.innerHTML = '<div style="text-align:center;color:var(--tx4);font-size:14px;grid-column: 1/-1;">à¦•à§‹à¦¨à§‹ à¦•à¦¾à¦°à§à¦¯à¦•à§à¦°à¦® à¦¨à§‡à¦‡à¥¤</div>';
+            bl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--tx4);font-size:14px;font-weight:600;">কোনো কার্যক্রম পাওয়া যায়নি।</div>';
+            if(ta) ta.innerHTML = '<div style="text-align:center;color:var(--tx4);font-size:14px;grid-column: 1/-1;">কোনো টপ কার্যক্রম নেই।</div>';
             return;
         }
         var h = '';
@@ -974,35 +973,38 @@ function loadBlogs() {
         var pinnedCount = 0;
         
         d.blogs.forEach(function(b) {
+            var isPinned = (b.pinned === true || String(b.pinned).toLowerCase() === 'true');
+            
             var createCard = function(isTop) {
-                var card = '<div class="bcard animate-on-scroll" ' + (isTop ? 'style="cursor:pointer; padding-top:4px;" onclick="go(\'activities\')"' : 'style="padding-top:4px;"') + '>';
+                var card = '<div class="bcard animate-on-scroll show" ' + (isTop ? 'style="cursor:pointer; padding-top:4px;" onclick="go(\'activities\')"' : 'style="padding-top:4px;"') + '>';
                 
                 if(isAdmin && !isTop) {
-                    card += '<button class="bdel" style="right:85px;background:'+(b.pinned?'#1b5e20':'#ea4335')+';" onclick="togglePin('+b.id+', \''+b.pinned+'\')">'+(b.pinned?'ðŸ“Œ Pinned':'ðŸ“Œ Pin')+'</button>';
-                    card += '<button class="bdel" onclick="delBlog('+b.id+')">à¦¡à¦¿à¦²à¦¿à¦Ÿ ðŸ—‘ï¸</button>';
+                    card += '<button class="bdel" style="right:85px;background:'+(isPinned?'#1b5e20':'#ea4335')+';" onclick="togglePin('+b.id+', \''+isPinned+'\')">'+(isPinned?'📌 Pinned':'📌 Pin')+'</button>';
+                    card += '<button class="bdel" onclick="delBlog('+b.id+')">ডিলিট 🗑️</button>';
                 }
                 
                 card += '<div class="bp-hdr" style="padding:16px 16px 8px; display:flex; align-items:center; gap:10px;">';
-                card += '<div style="width:40px;height:40px;border-radius:50%;background:var(--rbg);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">ðŸ©¸</div>';
+                card += '<div style="width:40px;height:40px;border-radius:50%;background:var(--rbg);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🩸</div>';
                 card += '<div><div style="font-weight:700;color:var(--tx);font-size:15px;font-family:\'Poppins\',sans-serif;">' + (b.author || 'Spondon Admin') + '</div>';
-                card += '<div style="font-size:12px;color:var(--tx4);font-weight:500;">ðŸ“… ' + b.date + ' â€¢ ðŸŒ</div></div>';
+                card += '<div style="font-size:12px;color:var(--tx4);font-weight:500;">📅 ' + (b.date || 'No Date') + ' • 🌍</div></div>';
                 card += '</div>';
 
                 card += '<div class="bp-txt" style="padding:0 16px 12px;">';
-                card += '<div class="bt" style="font-size:16px; margin-bottom:6px;">' + b.title + '</div>';
+                card += '<div class="bt" style="font-size:16px; margin-bottom:6px;">' + (b.title || 'Untitled') + '</div>';
                 
                 let descId = 'bdesc-' + (isTop ? 't' : '') + b.id;
                 let rmId = 'brm-' + (isTop ? 't' : '') + b.id;
+                let textDesc = b.desc || '';
                 
-                card += '<div class="bd collapsed" id="'+descId+'">' + b.desc + '</div>';
-                if (b.desc.length > 150) {
+                card += '<div class="bd collapsed" id="'+descId+'">' + textDesc + '</div>';
+                if (textDesc.length > 150) {
                     if (!isTop) {
-                        card += '<div class="read-more-btn" id="'+rmId+'" onclick="expandBlog('+b.id+', event)">... à¦†à¦°à¦“ à¦ªà§œà§à¦¨</div>';
+                        card += '<div class="read-more-btn" id="'+rmId+'" onclick="expandBlog('+b.id+', event)">... আরও পড়ুন</div>';
                     }
                 }
                 card += '</div>';
 
-                let urls = b.image ? b.image.split(/[\n,]+/).map(u => fixImg(u.trim())).filter(u => u) : [];
+                let urls = b.image ? String(b.image).split(/[\n,]+/).map(u => fixImg(u.trim())).filter(u => u) : [];
                 if(urls.length > 0) {
                     let cntClass = urls.length >= 4 ? 4 : urls.length;
                     card += '<div class="b-imgs cnt-' + cntClass + '" id="bimg-'+(isTop?'t':'')+b.id+'">';
@@ -1021,7 +1023,7 @@ function loadBlogs() {
                 }
                 
                 if(b.fbLink) {
-                    card += '<div style="padding:12px 16px;"><a href="'+b.fbLink+'" target="_blank" class="bfb">à¦«à§‡à¦¸à¦¬à§à¦•à§‡ à¦¬à¦¿à¦¸à§à¦¤à¦¾à¦°à¦¿à¦¤ à¦ªà§œà§à¦¨ ðŸ”—</a></div>';
+                    card += '<div style="padding:12px 16px;"><a href="'+b.fbLink+'" target="_blank" class="bfb">ফেসবুকে বিস্তারিত পড়ুন 🔗</a></div>';
                 } else {
                     card += '<div style="height:12px;"></div>';
                 }
@@ -1032,18 +1034,36 @@ function loadBlogs() {
 
             h += createCard(false);
             
-            if(b.pinned && pinnedCount < 4) {
+            if(isPinned && pinnedCount < 4) {
                 hTop += createCard(true);
                 pinnedCount++;
             }
         });
         
         bl.innerHTML = h;
-        if(ta) ta.innerHTML = hTop || '<div style="text-align:center;color:var(--tx4);font-size:14px;grid-column: 1/-1;">à¦•à§‹à¦¨à§‹ à¦Ÿà¦ª à¦•à¦¾à¦°à§à¦¯à¦•à§à¦°à¦® à¦ªà¦¿à¦¨ à¦•à¦°à¦¾ à¦¨à§‡à¦‡à¥¤</div>';
+        if(ta) ta.innerHTML = hTop || '<div style="text-align:center;color:var(--tx4);font-size:14px;grid-column: 1/-1;">কোনো টপ কার্যক্রম পিন করা নেই।</div>';
         
         setTimeout(initAnimations, 100);
+    }
+    
+    var cached = null;
+    try {
+        var c = localStorage.getItem('sbs_blogs');
+        if(c) {
+            cached = JSON.parse(c);
+            renderBlogs(cached);
+        }
+    } catch(e) {}
+    
+    fetch(S + '?action=getBlogs')
+    .then(r => r.json())
+    .then(d => {
+        try { localStorage.setItem('sbs_blogs', JSON.stringify(d)); } catch(e) {}
+        renderBlogs(d);
     }).catch(e => {
-        document.getElementById('blog-list').innerHTML = '<div style="text-align:center;padding:20px;color:red;font-size:14px;font-weight:600;">à¦²à§‹à¦¡ à¦•à¦°à¦¤à§‡ à¦¸à¦®à¦¸à§à¦¯à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤</div>';
+        if(!cached) {
+            bl.innerHTML = '<div style="text-align:center;padding:20px;color:red;font-size:14px;font-weight:600;">লোড করতে সমস্যা হয়েছে। ইন্টারনেট চেক করুন।</div>';
+        }
     });
 }
 window.expandBlog = function(id, e) {
@@ -1066,7 +1086,8 @@ window.expandBlog = function(id, e) {
         }
     }
 };
-loadBlogs();</script>
+loadBlogs();
+
 </body>
 </html>
 ``
