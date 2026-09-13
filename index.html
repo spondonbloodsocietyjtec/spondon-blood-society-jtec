@@ -249,14 +249,25 @@ details[open] summary{color:var(--r);border-bottom:1px solid var(--rbd)}
 .blog-list { padding: 0 16px 16px; display:flex; flex-direction:column; gap:16px; }
 .bcard { background:#fff; border:1px solid rgba(0,0,0,0.05); border-radius:16px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.05); transition:var(--ease); position:relative; }
 .bcard:hover { transform:translateY(-5px); box-shadow:0 10px 25px rgba(0,0,0,0.1); }
-.bimg { width:100%; max-height:250px; object-fit:contain; background:#f5f7fa; }
-.bp { padding:18px; }
-.bt { font-size:18px; font-weight:800; color:var(--tx); margin-bottom:10px; line-height:1.4; font-family:'Poppins',sans-serif;}
 .bd { font-size:14px; color:var(--tx3); line-height:1.6; font-weight:500; white-space: pre-wrap; text-align: justify; }
+.bd.collapsed { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.read-more-btn { color: var(--r); font-weight: bold; cursor: pointer; display: inline-block; margin-top: 2px; font-size: 14px; }
+.b-imgs { display: grid; gap: 4px; overflow: hidden; background: #fff; border-top: 1px solid rgba(0,0,0,0.05); border-bottom: 1px solid rgba(0,0,0,0.05); }
+.b-imgs.cnt-1 { grid-template-columns: 1fr; }
+.b-imgs.cnt-2 { grid-template-columns: 1fr 1fr; }
+.b-imgs.cnt-3 { grid-template-columns: 1fr 1fr; }
+.b-imgs.cnt-3 .b-img-w:first-child { grid-column: 1 / -1; aspect-ratio: 16/9; }
+.b-imgs.cnt-4 { grid-template-columns: 1fr 1fr; }
+.b-img-w { position: relative; aspect-ratio: 1; overflow: hidden; cursor: pointer; }
+.b-imgs.cnt-1 .b-img-w { aspect-ratio: auto; max-height: 400px; }
+.b-img-w img { width: 100%; height: 100%; object-fit: cover; display: block; background: #f5f7fa; }
+.b-img-more { position: absolute; inset: 0; background: rgba(0,0,0,0.5); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; }
+.b-imgs.cnt-expanded { grid-template-columns: 1fr; }
+.b-imgs.cnt-expanded .b-img-w { aspect-ratio: auto; max-height: none; }
+.b-imgs.cnt-expanded .b-img-w img { height: auto; max-height: 800px; }
 .bmeta { font-size:12px; color:var(--tx4); font-weight:600; margin-bottom:10px; display:flex; justify-content:space-between; }
 .bdel { position:absolute; top:12px; right:12px; background:rgba(211,47,47,0.9); color:white; border:none; padding:6px 12px; border-radius:8px; font-size:12px; font-weight:bold; cursor:pointer; z-index:10; }
-.bfb { display:block; text-align:center; background:#1877f2; color:#fff; padding:12px; border-radius:10px; text-decoration:none; font-weight:700; margin-top:14px; font-size:14px; }
-
+.bfb { display:block; text-align:center; background:#1877f2; color:#fff; padding:10px; border-radius:10px; text-decoration:none; font-weight:700; margin-top:8px; font-size:14px; }
 /* Admin Login & Form */
 #admin-panel { padding: 20px; background:var(--rbg); border-radius:16px; margin: 16px; border:2px dashed var(--r); display:none; }
 .admin-trigger { cursor:pointer; user-select:none; }
@@ -714,7 +725,7 @@ document.getElementById('mdb').addEventListener('click',function(){var d=documen
 function tryGPS(ok,fail){if(!navigator.geolocation){fail();return}document.getElementById('pdm').textContent='\u{1F4CD} \u0986\u09AA\u09A8\u09BE\u09B0 \u0985\u09AC\u09B8\u09CD\u09A5\u09BE\u09A8 \u09B6\u09A8\u09BE\u0995\u09CD\u09A4 \u0995\u09B0\u09BE \u09B9\u099A\u09CD\u099B\u09C7...';navigator.geolocation.getCurrentPosition(function(p){document.getElementById('pdm').textContent='\u2705 GPS \u09AA\u09BE\u0993\u09AF\u09BC\u09BE \u0997\u09C7\u099B\u09C7\u0964';fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat='+p.coords.latitude+'&lon='+p.coords.longitude+'&addressdetails=1&accept-language=en',{headers:{'User-Agent':'SBS/1.0'}}).then(function(r){return r.json()}).then(function(d){var a=d.address||{},raw=Object.values(a).join(' '),dist=mD(raw);if(dist)ok(dist);else fail()}).catch(fail)},function(){fail()},{timeout:7000,maximumAge:0,enableHighAccuracy:false})}
 function tryIP(ok,fail){document.getElementById('pdm').textContent='\u{1F310} \u0985\u09A8\u09C1\u09AE\u09BE\u09A8\u09BF\u0995 \u0985\u09AC\u09B8\u09CD\u09A5\u09BE\u09A8 \u0996\u09CB\u0981\u099C\u09BE \u09B9\u099A\u09CD\u099B\u09C7...';var done=false;function got(raw){if(done)return;var d=mD(raw);if(d){done=true;ok(d)}else if(!done){done=true;fail()}}function nope(){if(!done){done=true;fail()}}fetch('https://ipapi.co/json/?nocache=true&_='+Date.now()).then(function(r){return r.json()}).then(function(d){got(d.city||d.region||'')}).catch(nope);fetch('https://ip-api.com/json/?fields=city,regionName').then(function(r){return r.json()}).then(function(d){got(d.city||d.regionName||'')}).catch(nope);setTimeout(function(){if(!done){done=true;fail()}},5000)}
 document.getElementById('pok').addEventListener('click',function(){this.disabled=true;this.textContent='\u09B6\u09A8\u09BE\u0995\u09CD\u09A4 \u0995\u09B0\u09BE \u09B9\u099A\u09CD\u099B\u09C7...';tryGPS(function(d){document.getElementById('pop').classList.add('off');ldN(d)},function(){tryIP(function(d){document.getElementById('pop').classList.add('off');ldN(d)},function(){document.getElementById('pdm').textContent='';document.getElementById('pop').classList.add('off');sman()})})});
-(function(){var sd='',st=0;try{sd=localStorage.getItem('sbs_d')||'';st=parseInt(localStorage.getItem('sbs_t')||'0')}catch(x){}if(sd&&(Date.now()-st)<1800000){document.getElementById('pop').classList.add('off');ldN(sd)}})();
+(function(){var sd='',st=0;try{sd=localStorage.getItem('sbs_d')||'';st=parseInt(localStorage.getItem('sbs_t')||'0')}catch(x){}if(sd&&(Date.now()-st)<(30*24*60*60*1000)){document.getElementById('pop').classList.add('off');ldN(sd)}})();
 
 // ═══ STATS & AUTO UPDATE ═══
 function fetchStats() {
@@ -953,8 +964,8 @@ function loadBlogs() {
         var bl = document.getElementById('blog-list');
         var ta = document.getElementById('top-activities');
         if(!d.blogs || d.blogs.length === 0) {
-            bl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--tx4);font-size:14px;font-weight:600;">কোনো কার্যক্রম পাওয়া যায়নি।</div>';
-            if(ta) ta.innerHTML = '<div style="text-align:center;color:var(--tx4);font-size:14px;grid-column: 1/-1;">কোনো কার্যক্রম নেই।</div>';
+            bl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--tx4);font-size:14px;font-weight:600;">à¦•à§‹à¦¨à§‹ à¦•à¦¾à¦°à§à¦¯à¦•à§à¦°à¦® à¦ªà¦¾à¦“à§Ÿà¦¾ à¦¯à¦¾à§Ÿà¦¨à¦¿à¥¤</div>';
+            if(ta) ta.innerHTML = '<div style="text-align:center;color:var(--tx4);font-size:14px;grid-column: 1/-1;">à¦•à§‹à¦¨à§‹ à¦•à¦¾à¦°à§à¦¯à¦•à§à¦°à¦® à¦¨à§‡à¦‡à¥¤</div>';
             return;
         }
         var h = '';
@@ -963,194 +974,99 @@ function loadBlogs() {
         var pinnedCount = 0;
         
         d.blogs.forEach(function(b) {
-            var card = '<div class="bcard animate-on-scroll">';
-            if(isAdmin) {
-                card += '<button class="bdel" style="right:85px;background:'+(b.pinned?'#1b5e20':'#ea4335')+';" onclick="togglePin('+b.id+', \''+b.pinned+'\')">'+(b.pinned?'📌 Pinned':'📌 Pin')+'</button>';
-                card += '<button class="bdel" onclick="delBlog('+b.id+')">ডিলিট 🗑️</button>';
-            }
-            let urls = b.image ? b.image.split(/[\n,]+/) : [];
-            let imgHTML = '';
-            urls.forEach(u => {
-                let img = fixImg(u.trim());
-                if(img) imgHTML += '<img src="'+img+'" class="bimg" onerror="this.style.display=\'none\'">';
-            });
-            if(imgHTML) card += '<div style="display:flex; flex-direction:column; gap:8px;">' + imgHTML + '</div>';
-            card += '<div class="bp">';
-            card += '<div class="bmeta"><span>📅 '+b.date+'</span><span>👤 '+b.author+'</span></div>';
-            card += '<div class="bt">'+b.title+'</div>';
-            card += '<div class="bd">'+b.desc+'</div>';
-            if(b.fbLink) card += '<a href="'+b.fbLink+'" target="_blank" class="bfb">ফেসবুকে বিস্তারিত পড়ুন 🔗</a>';
-            card += '</div></div>';
-            
-            h += card;
+            var createCard = function(isTop) {
+                var card = '<div class="bcard animate-on-scroll" ' + (isTop ? 'style="cursor:pointer; padding-top:4px;" onclick="go(\'activities\')"' : 'style="padding-top:4px;"') + '>';
+                
+                if(isAdmin && !isTop) {
+                    card += '<button class="bdel" style="right:85px;background:'+(b.pinned?'#1b5e20':'#ea4335')+';" onclick="togglePin('+b.id+', \''+b.pinned+'\')">'+(b.pinned?'ðŸ“Œ Pinned':'ðŸ“Œ Pin')+'</button>';
+                    card += '<button class="bdel" onclick="delBlog('+b.id+')">à¦¡à¦¿à¦²à¦¿à¦Ÿ ðŸ—‘ï¸</button>';
+                }
+                
+                card += '<div class="bp-hdr" style="padding:16px 16px 8px; display:flex; align-items:center; gap:10px;">';
+                card += '<div style="width:40px;height:40px;border-radius:50%;background:var(--rbg);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">ðŸ©¸</div>';
+                card += '<div><div style="font-weight:700;color:var(--tx);font-size:15px;font-family:\'Poppins\',sans-serif;">' + (b.author || 'Spondon Admin') + '</div>';
+                card += '<div style="font-size:12px;color:var(--tx4);font-weight:500;">ðŸ“… ' + b.date + ' â€¢ ðŸŒ</div></div>';
+                card += '</div>';
+
+                card += '<div class="bp-txt" style="padding:0 16px 12px;">';
+                card += '<div class="bt" style="font-size:16px; margin-bottom:6px;">' + b.title + '</div>';
+                
+                let descId = 'bdesc-' + (isTop ? 't' : '') + b.id;
+                let rmId = 'brm-' + (isTop ? 't' : '') + b.id;
+                
+                card += '<div class="bd collapsed" id="'+descId+'">' + b.desc + '</div>';
+                if (b.desc.length > 150) {
+                    if (!isTop) {
+                        card += '<div class="read-more-btn" id="'+rmId+'" onclick="expandBlog('+b.id+', event)">... à¦†à¦°à¦“ à¦ªà§œà§à¦¨</div>';
+                    }
+                }
+                card += '</div>';
+
+                let urls = b.image ? b.image.split(/[\n,]+/).map(u => fixImg(u.trim())).filter(u => u) : [];
+                if(urls.length > 0) {
+                    let cntClass = urls.length >= 4 ? 4 : urls.length;
+                    card += '<div class="b-imgs cnt-' + cntClass + '" id="bimg-'+(isTop?'t':'')+b.id+'">';
+                    for(let i=0; i<urls.length; i++) {
+                        let isHidden = i >= 4;
+                        let style = isHidden ? 'display:none;' : '';
+                        card += '<div class="b-img-w" style="' + style + '">';
+                        let clickAction = !isTop ? 'onclick="expandBlog('+b.id+', event)"' : '';
+                        card += '<img src="' + urls[i] + '" loading="lazy" onerror="this.style.display=\'none\'" ' + clickAction + '>';
+                        if(i === 3 && urls.length > 4) {
+                            card += '<div class="b-img-more" id="bmore-'+(isTop?'t':'')+b.id+'" ' + clickAction + '>+' + (urls.length - 4) + '</div>';
+                        }
+                        card += '</div>';
+                    }
+                    card += '</div>';
+                }
+                
+                if(b.fbLink) {
+                    card += '<div style="padding:12px 16px;"><a href="'+b.fbLink+'" target="_blank" class="bfb">à¦«à§‡à¦¸à¦¬à§à¦•à§‡ à¦¬à¦¿à¦¸à§à¦¤à¦¾à¦°à¦¿à¦¤ à¦ªà§œà§à¦¨ ðŸ”—</a></div>';
+                } else {
+                    card += '<div style="height:12px;"></div>';
+                }
+                
+                card += '</div>';
+                return card;
+            };
+
+            h += createCard(false);
             
             if(b.pinned && pinnedCount < 4) {
-                var topCard = '<div class="bcard animate-on-scroll" style="cursor:pointer;" onclick="go(\'about\')">';
-                let firstImg = b.image ? fixImg(b.image.split(/[\n,]+/)[0].trim()) : null;
-                if(firstImg) topCard += '<img src="'+firstImg+'" class="bimg" style="max-height:160px" onerror="this.style.display=\'none\'">';
-                topCard += '<div class="bp" style="padding:12px;">';
-                topCard += '<div class="bt" style="font-size:15px; margin-bottom:4px;">'+b.title+'</div>';
-                topCard += '<div class="bd" style="font-size:13px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">'+b.desc+'</div>';
-                topCard += '</div></div>';
-                hTop += topCard;
+                hTop += createCard(true);
                 pinnedCount++;
             }
         });
+        
         bl.innerHTML = h;
-        if(ta) ta.innerHTML = hTop || '<div style="text-align:center;color:var(--tx4);font-size:14px;grid-column: 1/-1;">কোনো টপ কার্যক্রম পিন করা নেই।</div>';
+        if(ta) ta.innerHTML = hTop || '<div style="text-align:center;color:var(--tx4);font-size:14px;grid-column: 1/-1;">à¦•à§‹à¦¨à§‹ à¦Ÿà¦ª à¦•à¦¾à¦°à§à¦¯à¦•à§à¦°à¦® à¦ªà¦¿à¦¨ à¦•à¦°à¦¾ à¦¨à§‡à¦‡à¥¤</div>';
         
         setTimeout(initAnimations, 100);
     }).catch(e => {
-        document.getElementById('blog-list').innerHTML = '<div style="text-align:center;padding:20px;color:red;font-size:14px;font-weight:600;">লোড করতে সমস্যা হয়েছে।</div>';
+        document.getElementById('blog-list').innerHTML = '<div style="text-align:center;padding:20px;color:red;font-size:14px;font-weight:600;">à¦²à§‹à¦¡ à¦•à¦°à¦¤à§‡ à¦¸à¦®à¦¸à§à¦¯à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤</div>';
     });
 }
-loadBlogs();
-
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if(entry.isIntersecting) {
-            entry.target.classList.add('show');
-            observer.unobserve(entry.target);
-        }
-    });
-}, { threshold: 0.1, rootMargin: "0px 0px -20px 0px" });
-
-function initAnimations() {
-    document.querySelectorAll('.animate-on-scroll:not(.show)').forEach(el => {
-        observer.observe(el);
-    });
-}
-window.addEventListener('DOMContentLoaded', initAnimations);
-
-
-document.getElementById('bl-btn').addEventListener('click', function() {
-    var t = document.getElementById('bl-t').value;
-    var d = document.getElementById('bl-d').value;
-    var i = document.getElementById('bl-i').value;
-    if(!t || !d) { alert('টাইটেল এবং ডেস্ক্রিপশন দিন!'); return; }
+window.expandBlog = function(id, e) {
+    if(e) e.stopPropagation();
+    let desc = document.getElementById('bdesc-'+id);
+    if(desc) desc.classList.remove('collapsed');
+    let rm = document.getElementById('brm-'+id);
+    if(rm) rm.style.display = 'none';
     
-    this.textContent = 'পোস্ট হচ্ছে...';
-    var fd = new FormData();
-    var fb = document.getElementById('bl-fb').value;
-    fd.append('formType', 'addBlog');
-    fd.append('email', sessionStorage.getItem('adminEmail'));
-    fd.append('pin', sessionStorage.getItem('adminPin'));
-    fd.append('title', t);
-    fd.append('desc', d);
-    fd.append('image', i);
-    fd.append('fbLink', fb);
-
-    fetch(S, {method:'POST', body: fd})
-    .then(r => r.json())
-    .then(res => {
-        if(res.status === 'Success') {
-            alert('সফলভাবে পোস্ট হয়েছে!');
-            document.getElementById('bl-t').value = '';
-            document.getElementById('bl-d').value = '';
-            document.getElementById('bl-i').value = '';
-            document.getElementById('bl-fb').value = '';
-            this.textContent = 'পোস্ট করুন 🚀';
-            loadBlogs(); 
-        } else {
-            alert('সমস্যা: ' + res.message);
-            this.textContent = 'পোস্ট করুন 🚀';
+    let moreOverlay = document.getElementById('bmore-'+id);
+    if(moreOverlay) moreOverlay.style.display = 'none';
+    
+    let imgCont = document.getElementById('bimg-'+id);
+    if(imgCont) {
+        imgCont.classList.remove('cnt-1', 'cnt-2', 'cnt-3', 'cnt-4');
+        imgCont.classList.add('cnt-expanded');
+        let children = imgCont.children;
+        for(let i=0; i<children.length; i++) {
+            children[i].style.display = 'block';
         }
-    }).catch(err => {
-        alert('নেটওয়ার্ক সমস্যা!');
-        this.textContent = 'পোস্ট করুন 🚀';
-    });
-});
-
-// OTP SYSTEM
-let curProfileEmail = "";
-document.getElementById('dp-form1').addEventListener('submit', function(e) {
-  e.preventDefault();
-  let b = document.getElementById('dp-b1');
-  b.textContent = "পাঠানো হচ্ছে...";
-  let email = document.getElementById('dp-email').value;
-  let fd = new FormData();
-  fd.append('formType', 'requestOtp');
-  fd.append('email', email);
-  
-  fetch(S, {method:'POST', body:fd}).then(r=>r.json()).then(d=>{
-    if(d.status === 'Success') {
-      curProfileEmail = email;
-      document.getElementById('dp-step1').style.display = 'none';
-      document.getElementById('dp-step2').style.display = 'block';
-    } else {
-      sE('dp-err1', d.message);
     }
-    b.textContent = "OTP পাঠান";
-  }).catch(err=>{
-    sE('dp-err1', 'ইন্টারনেট সমস্যা।');
-    b.textContent = "OTP পাঠান";
-  });
-});
-document.getElementById('dp-form2').addEventListener('submit', function(e) {
-  e.preventDefault();
-  let b = document.getElementById('dp-b2');
-  b.textContent = "ভেরিফাই হচ্ছে...";
-  let otp = document.getElementById('dp-otp').value;
-  let fd = new FormData();
-  fd.append('formType', 'verifyOtp');
-  fd.append('email', curProfileEmail);
-  fd.append('otp', otp);
-  
-  fetch(S, {method:'POST', body:fd}).then(r=>r.json()).then(d=>{
-    if(d.status === 'Success') {
-      document.getElementById('dp-step2').style.display = 'none';
-      document.getElementById('dp-step3').style.display = 'block';
-      document.getElementById('dp-name').value = d.donor.name;
-      document.getElementById('dp-phone').value = String(d.donor.phone || '').replace(/^'/, ''); // Remove quote if present
-      document.getElementById('dp-district').value = d.donor.district;
-      document.getElementById('dp-upazilla').value = d.donor.upazilla;
-      document.getElementById('dp-bg').value = d.donor.bg;
-      if(d.donor.lastDate) {
-        let ld = new Date(d.donor.lastDate);
-        if(!isNaN(ld.getTime())) {
-          document.getElementById('dp-lastdate').value = ld.toISOString().split('T')[0];
-        }
-      }
-    } else {
-      sE('dp-err2', d.message);
-    }
-    b.textContent = "ভেরিফাই করুন";
-  }).catch(err=>{
-    sE('dp-err2', 'ইন্টারনেট সমস্যা।');
-    b.textContent = "ভেরিফাই করুন";
-  });
-});
-document.getElementById('dp-form3').addEventListener('submit', function(e) {
-  e.preventDefault();
-  let b = document.getElementById('dp-b3');
-  b.textContent = "সেভ হচ্ছে...";
-  hE('dp-err3');
-  document.getElementById('dp-ok3').style.display = 'none';
-  
-  let fd = new FormData();
-  fd.append('formType', 'updateProfile');
-  fd.append('email', curProfileEmail);
-  fd.append('name', document.getElementById('dp-name').value);
-  fd.append('phone', document.getElementById('dp-phone').value);
-  fd.append('district', document.getElementById('dp-district').value);
-  fd.append('upazilla', document.getElementById('dp-upazilla').value);
-  fd.append('bg', document.getElementById('dp-bg').value);
-  fd.append('lastDate', document.getElementById('dp-lastdate').value);
-  
-  fetch(S, {method:'POST', body:fd}).then(r=>r.json()).then(d=>{
-    if(d.status === 'Success') {
-      document.getElementById('dp-ok3').style.display = 'block';
-      fetchStats();
-    } else {
-      sE('dp-err3', d.message);
-    }
-    b.textContent = "পরিবর্তন সেভ করুন";
-  }).catch(err=>{
-    sE('dp-err3', 'ইন্টারনেট সমস্যা।');
-    b.textContent = "পরিবর্তন সেভ করুন";
-  });
-});
-</script>
+};
+loadBlogs();</script>
 </body>
 </html>
 ``
