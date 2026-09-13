@@ -414,7 +414,8 @@ details[open] summary{color:var(--r);border-bottom:1px solid var(--rbd)}
 <div class="section-title">আমাদের টপ কার্যক্রম</div>
 <div class="top-act-grid" id="top-activities">
 <!-- Top activities will load here -->
-<div style="text-align:center; color:var(--tx4); font-size:14px; grid-column: 1/-1;">লোড হচ্ছে...</div>
+<div class="bcard"><div class="b-ph-item" style="padding-top:55%;"><div class="skr" style="position:absolute;inset:0"></div></div><div class="bp" style="padding:14px;"><div class="skr skb" style="width:70%;margin:0 0 8px;height:14px"></div><div class="skr skl" style="width:100%;margin:0 0 6px"></div><div class="skr skl" style="width:60%;margin:0"></div></div></div>
+<div class="bcard"><div class="b-ph-item" style="padding-top:55%;"><div class="skr" style="position:absolute;inset:0"></div></div><div class="bp" style="padding:14px;"><div class="skr skb" style="width:50%;margin:0 0 8px;height:14px"></div><div class="skr skl" style="width:90%;margin:0 0 6px"></div><div class="skr skl" style="width:80%;margin:0"></div></div></div>
 </div>
 </div>
 <div class="isec">
@@ -642,7 +643,8 @@ details[open] summary{color:var(--r);border-bottom:1px solid var(--rbd)}
     </form>
 </div>
 <div class="blog-list" id="blog-list">
-    <div style="text-align:center;padding:20px;color:var(--tx4);font-size:14px;font-weight:600;">লোড হচ্ছে...</div>
+    <div class="bcard"><div class="b-hdr"><div class="b-ava" style="background:#eee"></div><div class="b-hinfo"><div class="skr skb" style="width:120px;margin:0;height:14px"></div><div class="skr skl" style="width:80px;margin:6px 0 0;height:10px"></div></div></div><div class="bp"><div class="skr skb" style="margin-left:0;width:80%"></div><div class="skr skl" style="margin-left:0;width:100%"></div><div class="skr skl" style="margin-left:0;width:60%"></div><div class="skr" style="width:100%;height:200px;border-radius:12px;margin-top:12px"></div></div></div>
+    <div class="bcard"><div class="b-hdr"><div class="b-ava" style="background:#eee"></div><div class="b-hinfo"><div class="skr skb" style="width:100px;margin:0;height:14px"></div><div class="skr skl" style="width:70px;margin:6px 0 0;height:10px"></div></div></div><div class="bp"><div class="skr skb" style="margin-left:0;width:70%"></div><div class="skr skl" style="margin-left:0;width:95%"></div><div class="skr skl" style="margin-left:0;width:50%"></div></div></div>
 </div>
 <!-- Admin trigger (Clicking text 3 times opens login) -->
 <div style="text-align:center;padding:12px;opacity:0.4;font-size:11px;font-weight:700;" class="admin-trigger" id="admin-trig">App Version: 11.6 (Click to Login)</div>
@@ -1272,7 +1274,7 @@ function updateLb() {
     let m = rawUrl.match(/drive\.google\.com\/.*[?&]id=([^&]+)|drive\.google\.com\/file\/d\/([^/]+)/);
     let id = m ? (m[1] || m[2]) : null;
     if(id) {
-        hiRes = 'https://drive.google.com/uc?id=' + id + '&export=view';
+        hiRes = 'https://drive.google.com/thumbnail?id=' + id + '&sz=w2000';
     }
     img.src = hiRes;
     document.getElementById('lb-cnt').textContent = (lbIdx + 1) + ' / ' + lbUrls.length;
