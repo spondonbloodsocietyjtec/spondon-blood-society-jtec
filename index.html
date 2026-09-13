@@ -995,7 +995,7 @@ function loadBlogs() {
             var isLong = b.desc.length > 150;
             card += '<div class="bd" id="bd-'+i+'">'+b.desc+'</div>';
             if(isLong) {
-                card += '<div class="b-readmore" onclick="this.style.display=\'none\'; document.getElementById(\'bd-'+i+'\').classList.add(\'expanded\');">...আরো পড়ুন</div>';
+                card += '<div class="b-readmore" onclick="var bd=document.getElementById(\'bd-'+i+'\'); if(bd.classList.contains(\'expanded\')){bd.classList.remove(\'expanded\'); this.innerText=\'...আরো পড়ুন\';}else{bd.classList.add(\'expanded\'); this.innerText=\'কম পড়ুন\';}">...আরো পড়ুন</div>';
             }
             card += '</div>';
 
