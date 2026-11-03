@@ -1064,6 +1064,28 @@ img, video, iframe, canvas { max-width: 100%; }
   border: 1px solid rgba(255,255,255,0.2);
 }
 
+
+/* ═══ ULTRA-SMOOTH 60FPS SPRING ANIMATIONS & INSTANT ABOVE-THE-FOLD RENDER ═══ */
+@keyframes pageSpringIn {
+  0% { opacity: 0; transform: translate3d(0, 10px, 0); }
+  100% { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+.page.on {
+  animation: pageSpringIn 0.34s cubic-bezier(0.16, 1, 0.3, 1) both !important;
+}
+.qa, .sc, .ben-card, .ben-elig-box, .ii, .fbk-card, .fr-card, .bcard, .dc-v2, .fc, .ac, .gc {
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease !important;
+}
+.reveal-item {
+  opacity: 0;
+  transform: translate3d(0, 16px, 0);
+  transition: opacity 0.42s cubic-bezier(0.16, 1, 0.3, 1), transform 0.42s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+.reveal-item.visible {
+  opacity: 1 !important;
+  transform: translate3d(0, 0, 0) !important;
+}
+
 </style>
 </head>
 <body>
@@ -1626,7 +1648,7 @@ img, video, iframe, canvas { max-width: 100%; }
 </div>
 <div class="fc" style="border-top-color:#c62828">
 <div id="cffs">
-<div class="fh"><span class="fi">🩺</span><div class="ft">Donation Confirmation</div><div class="fs">স্পন্দন ব্লাড সোসাইটি, ঝিনাইদহ</div></div>
+<div class="fh"><span class="fi">🩺</span><div class="ft">Donation Confirmation</div><div class="fs">স্পন্দন ব্লাড সোসাইটি, ঝিনাইদহ টেক্সটাইল ইঞ্জিনিয়ারিং কলেজ</div></div>
 <div class="fb">
 <p class="fd">রক্তদানের আপডেট দিন। আগামী ৪ মাস আর কোনো অনুরোধ পাঠানো হবে না।</p>
 <form id="cff"><input type="hidden" name="formType" value="donationConfirmation">
@@ -2151,7 +2173,7 @@ function ldN(d){
     stk(list, d);
   })
   .catch(function(){
-    stk(['📍 ' + d + ' — স্পন্দন ব্লাড সোসাইটি, ঝিনাইদহ। জরুরি রক্তদানে এগিয়ে আসুন! ❤️'], d);
+    stk(['📍 ' + d + ' — স্পন্দন ব্লাড সোসাইটি, ঝিনাইদহ টেক্সটাইল ইঞ্জিনিয়ারিং কলেজ। জরুরি রক্তদানে এগিয়ে আসুন! ❤️'], d);
   });
 }
 
@@ -2402,37 +2424,92 @@ try { localStorage.removeItem("sbs_d"); localStorage.removeItem("sbs_t"); localS
   });
 })();
 
-// ═══ STATS & AUTO UPDATE ═══
+// ═══ ULTRA-FAST GOOGLE SHEET SYNC & INSTANT CACHE ENGINE ═══
+function renderStatsData(d) {
+  if(!d) return;
+  document.getElementById('stsk').hidden = true;
+  document.getElementById('stdt').hidden = false;
+  document.getElementById('s-td').textContent = toBn(d.totalDonations || 0);
+  document.getElementById('s-ad').textContent = toBn(d.availableDonors || 0);
+  document.getElementById('s-nd').textContent = toBn(d.newDonorsToday || 0);
+  document.getElementById('s-pr').textContent = toBn(d.pendingRequests || 0);
+  var g = ['A+','B+','O+','AB+','A-','B-','O-','AB-'], h = '';
+  for(var i = 0; i < 8; i++){
+    var c = (d.bloodGroups && d.bloodGroups[g[i]] !== undefined) ? d.bloodGroups[g[i]] : 0;
+    h += '<div class="bgc">' + g[i] + '<span>' + toBn(c) + '</span></div>';
+  }
+  document.getElementById('s-bg').innerHTML = h;
+  var today = new Date();
+  var opts = { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true };
+  var dateString = today.toLocaleDateString('bn-BD', opts);
+  document.getElementById('s-up').textContent = 'সর্বশেষ আপডেট: ' + dateString;
+}
+
+// ওয়েবসাইটে ঢোকার সাথে সাথে ০ মিলিসেকেন্ডে ক্যাশ থেকে ডাটা দেখাবে এবং ব্যাকগ্রাউন্ডে গুগল শিট থেকে ১ কলে সব ডাটা আপডেট করবে!
+(function instantRenderCachedStats(){
+  try {
+    var cachedSt = localStorage.getItem('sbs_fast_stats');
+    if (cachedSt) {
+      renderStatsData(JSON.parse(cachedSt));
+    }
+  } catch(e){}
+})();
+
 function fetchStats() {
-  fetch(S+'?action=getLiveStats')
+  var curDist = '';
+  try { curDist = document.getElementById('tdn') ? document.getElementById('tdn').textContent.trim() : ''; } catch(e){}
+  // প্রথমে দ্রুতগতির getInitialBundle কল করে এক ট্রিপেই শিট থেকে সব ডাটা নিয়ে আসবে (ফলব্যাক হিসেবে getLiveStats)
+  fetch(S + '?action=getInitialBundle&district=' + encodeURIComponent(curDist) + '&_t=' + Date.now())
   .then(r => r.json())
   .then(d => {
-    if(d.status !== 'Success') throw 0;
-    document.getElementById('stsk').hidden = true;
-    document.getElementById('stdt').hidden = false;
-    document.getElementById('s-td').textContent = toBn(d.totalDonations);
-    document.getElementById('s-ad').textContent = toBn(d.availableDonors);
-    document.getElementById('s-nd').textContent = toBn(d.newDonorsToday);
-    document.getElementById('s-pr').textContent = toBn(d.pendingRequests);
-    var g = ['A+','B+','O+','AB+','A-','B-','O-','AB-'], h = '';
-    for(var i = 0; i < 8; i++){
-      var c = (d.bloodGroups && d.bloodGroups[g[i]] !== undefined) ? d.bloodGroups[g[i]] : 0;
-      h += '<div class="bgc">' + g[i] + '<span>' + toBn(c) + '</span></div>';
+    if(!d || d.status !== 'Success') throw 0;
+    if (d.stats) {
+      try { localStorage.setItem('sbs_fast_stats', JSON.stringify(d.stats)); } catch(e){}
+      renderStatsData(d.stats);
+    } else if (d.totalDonations !== undefined) {
+      try { localStorage.setItem('sbs_fast_stats', JSON.stringify(d)); } catch(e){}
+      renderStatsData(d);
     }
-    document.getElementById('s-bg').innerHTML = h;
-    var today = new Date();
-    var opts = { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true };
-    var dateString = today.toLocaleDateString('bn-BD', opts);
-    document.getElementById('s-up').textContent = 'সর্বশেষ আপডেট: ' + dateString;
+    if (curDist && Array.isArray(d.notices)) {
+      var list = d.notices.length > 0
+        ? d.notices
+        : ['📍 ' + curDist + ' জেলায় এখন কোনো জরুরি রক্তের চাহিদা নেই। স্বেচ্ছায় রক্তদান করুন, জীবন বাঁচান! ❤️'];
+      stk(list, curDist);
+    }
+    if (Array.isArray(d.feedbacks) && typeof renderFeedbackCards === 'function') {
+      var localFb = [];
+      try { localFb = JSON.parse(localStorage.getItem('sbs_real_fbk') || '[]'); } catch(e){}
+      var serverKeys = {};
+      d.feedbacks.forEach(function(f){ serverKeys[(f.name || '') + '_' + (f.message || '')] = true; });
+      var unsynced = localFb.filter(function(l){ return !serverKeys[(l.name || '') + '_' + (l.message || '')]; });
+      var merged = unsynced.concat(d.feedbacks);
+      try { localStorage.setItem('sbs_real_fbk', JSON.stringify(merged)); } catch(e){}
+      renderFeedbackCards(merged);
+    }
+    if (Array.isArray(d.reports) && typeof rebuildFraudMap === 'function' && typeof renderFraudCards === 'function') {
+      var localEx = [];
+      try { localEx = JSON.parse(localStorage.getItem('sbs_own_fraud_reports') || '[]'); } catch(e){}
+      var sKey = {};
+      d.reports.forEach(function(r){ sKey[normPhone(r.phone) + '_' + (r.details || '')] = true; });
+      var comb = d.reports.concat(localEx.filter(function(l){ return !sKey[normPhone(l.phone) + '_' + (l.details || '')]; }));
+      window.allFraudReports = comb;
+      rebuildFraudMap(comb);
+      renderFraudCards(document.getElementById('fr-search-input') ? document.getElementById('fr-search-input').value : '');
+    }
   })
   .catch(() => {
-    document.getElementById('stsk').hidden = true;
-    document.getElementById('stdt').hidden = false;
-    document.getElementById('s-up').textContent = 'ডেটা লোড ব্যর্থ। রিফ্রেশ করুন।';
+    fetch(S + '?action=getLiveStats&_t=' + Date.now())
+    .then(r => r.json())
+    .then(d => {
+      if(d.status === 'Success') {
+        try { localStorage.setItem('sbs_fast_stats', JSON.stringify(d)); } catch(e){}
+        renderStatsData(d);
+      }
+    }).catch(() => {});
   });
 }
 fetchStats();
-setInterval(fetchStats, 60000);
+setInterval(fetchStats, 20000);
 
 // UPAZILLA
 document.getElementById('dd').addEventListener('change',function(){var u=document.getElementById('du'),h=document.getElementById('uh'),d=this.value;if(!d){u.innerHTML='<option value="">\u0986\u0997\u09C7 \u099C\u09C7\u09B2\u09BE \u09A8\u09BF\u09B0\u09CD\u09AC\u09BE\u099A\u09A8 \u0995\u09B0\u09C1\u09A8</option>';u.disabled=true;h.style.display='block';return}var l=UZ[d]||[],s='<option value="">\u0989\u09AA\u099C\u09C7\u09B2\u09BE \u09A8\u09BF\u09B0\u09CD\u09AC\u09BE\u099A\u09A8 \u0995\u09B0\u09C1\u09A8</option>';for(var i=0;i<l.length;i++)s+='<option value="'+l[i]+'">'+l[i]+'</option>';u.innerHTML=s;u.disabled=false;h.style.display='none'});
@@ -4212,6 +4289,7 @@ window.addEventListener('DOMContentLoaded', initAnimations);
 function setupSmoothScrollAnimations() {
   var selectors = '.qa, .sc, .ben-card, .ben-elig-box, .ii, .fbk-card, .fr-card, .bcard, .fc, .ac, .gc, .pc-top-form, .pc-ctrl-card, .dp-hub-card';
   var els = document.querySelectorAll(selectors);
+  var vh = window.innerHeight || document.documentElement.clientHeight || 800;
   if (!('IntersectionObserver' in window)) {
     els.forEach(function(el){ el.classList.add('visible'); });
     return;
@@ -4223,14 +4301,19 @@ function setupSmoothScrollAnimations() {
         revObs.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.08, rootMargin: '0px 0px -15px 0px' });
+  }, { threshold: 0.04, rootMargin: '0px 0px 40px 0px' });
 
   els.forEach(function(el, idx) {
-    if (!el.classList.contains('reveal-item')) {
-      el.classList.add('reveal-item');
-      el.style.transitionDelay = ((idx % 4) * 0.05) + 's';
+    var rect = el.getBoundingClientRect();
+    if (rect.top < vh + 40) {
+      el.classList.add('reveal-item', 'visible');
+    } else {
+      if (!el.classList.contains('reveal-item')) {
+        el.classList.add('reveal-item');
+        el.style.transitionDelay = ((idx % 3) * 0.04) + 's';
+      }
+      revObs.observe(el);
     }
-    revObs.observe(el);
   });
 }
 window.addEventListener('DOMContentLoaded', function(){
