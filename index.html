@@ -986,11 +986,108 @@ img, video, iframe, canvas { max-width: 100%; }
   .t-msg { font-size: 12.8px !important; }
 }
 
+
+/* ═══ TOP-OF-SCREEN BROWSER LOCATION PERMISSION NOTIFICATION BAR ═══ */
+#top-gps-perm-bar {
+  display: none;
+  position: fixed;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100vw - 20px);
+  max-width: 440px;
+  background: #202124;
+  color: #ffffff;
+  border-radius: 16px;
+  padding: 14px 16px;
+  z-index: 9999;
+  box-shadow: 0 14px 38px rgba(0,0,0,0.45);
+  border: 1px solid rgba(255,255,255,0.16);
+  animation: slideDownPerm 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+#top-gps-perm-bar.show {
+  display: block;
+}
+@keyframes slideDownPerm {
+  0% { opacity: 0; transform: translate(-50%, -24px); }
+  100% { opacity: 1; transform: translate(-50%, 0); }
+}
+.tgp-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.tgp-ic {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(26, 115, 232, 0.22);
+  color: #8ab4f8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.tgp-txt {
+  flex: 1;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #e8eaed;
+  font-weight: 600;
+}
+.tgp-txt b {
+  color: #ffffff;
+  font-weight: 800;
+}
+.tgp-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.tgp-btn {
+  padding: 8px 18px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+  transition: 0.2s ease;
+}
+.tgp-btn.allow {
+  background: #8ab4f8;
+  color: #202124;
+}
+.tgp-btn.allow:hover {
+  background: #aecbfa;
+}
+.tgp-btn.block {
+  background: transparent;
+  color: #9aa0a6;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
 </style>
 </head>
 <body>
 
-<!-- LOCATION POPUP (Direct Browser-Native Location Permission across Brave, Chrome, Firefox, Opera, UC, Safari) -->
+<!-- TOP BROWSER/DEVICE LOCATION PERMISSION NOTIFICATION BAR -->
+<div id="top-gps-perm-bar">
+  <div class="tgp-row">
+    <div class="tgp-ic">📍</div>
+    <div class="tgp-txt">
+      <b>স্পন্দন ব্লাড সোসাইটি (Spondon Blood Society)</b> আপনার ডিভাইসের <b>GPS Location</b> ব্যবহার করে বর্তমান জেলার জরুরি রক্তের নোটিশ দেখাতে চায়।
+    </div>
+  </div>
+  <div class="tgp-actions">
+    <button type="button" class="tgp-btn block" onclick="window.handleTopPermChoice(false)">Block</button>
+    <button type="button" class="tgp-btn allow" onclick="window.handleTopPermChoice(true)">Allow (অনুমতি দিন)</button>
+  </div>
+</div>
+
+<!-- LOCATION POPUP (Direct Synchronous Browser & Device GPS Permission Trigger) -->
 <div id="pop" class="off">
 <div class="pop-b" style="max-width:375px;">
 <div class="pop-h"><div class="pi">📍</div><h3>স্পন্দন ব্লাড সোসাইটি</h3><p>ঝিনাইদহ টেক্সটাইল ইঞ্জিনিয়ারিং কলেজ (JTEC)</p></div>
@@ -1000,8 +1097,8 @@ img, video, iframe, canvas { max-width: 100%; }
 <div class="ru"><span>🚫</span><span>রক্ত বিক্রয় সম্পূর্ণ নিষিদ্ধ। সব সেবা বিনামূল্যে।</span></div>
 <div class="ru"><span>📍</span><span>আপনি যে জেলায় অবস্থান করছেন (যেমন: <b>চট্টগ্রাম / ঝিনাইদহ / ঢাকা</b>), সেই জেলার জরুরি রক্তের নোটিশ দেখাতে লোকেশন পারমিশন প্রয়োজন।</span></div>
 </div>
-<p class="pcta" id="pop-cta-txt" style="color:#b71c1c;font-weight:800;">নিচের বাটনে ক্লিক করে ব্রাউজারের পপআপে <b>Allow</b> দিন:</p>
-<button type="button" class="pok" id="pok" style="font-size:15px;padding:15px 12px;">📍 লোকেশন পারমিশন দিন (Enable GPS) 🩸</button>
+<p class="pcta" id="pop-cta-txt" style="color:#b71c1c;font-weight:800;">নিচের বাটনে ক্লিক করে ব্রাউজারের লোকেশন পারমিশন <b>Allow</b> দিন:</p>
+<button type="button" class="pok" id="pok" onclick="window.requestDeviceGpsDirect(event)" style="font-size:15px;padding:15px 12px;">📍 লোকেশন পারমিশন দিন (Enable GPS) 🩸</button>
 <button type="button" id="pop-skip-btn" style="background:none;border:none;color:var(--tx3);font-size:12px;font-weight:700;width:100%;margin-top:12px;cursor:pointer;text-decoration:underline;">অথবা ম্যানুয়ালি আপনার জেলা নির্বাচন করুন</button>
 <div class="pdm" id="pdm" style="color:var(--rd);font-weight:700;"></div>
 </div></div></div>
@@ -2017,10 +2114,7 @@ if(requestedPage && pm[requestedPage]) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════
-// SMOOTH 60FPS EMERGENCY TICKER & DIRECT BROWSER LOCATION PERMISSION SYSTEM
-// - ব্রেভ (Brave), ক্রোম (Chrome), ফায়ারফক্স (Firefox), অপেরা (Opera), ইউসি (UC) ও সাফারি (Safari)
-//   যেকোনো ব্রাউজারে বাটনে ক্লিক করার সাথে সাথেই ব্রাউজার থেকে সরাসরি Location Permission চাইবে
-//   এবং ম্যানুয়ালি নোটিফিকেশন বার নামানোর ঝামেলা ছাড়াই অটোমেটিক বর্তমান জেলা শনাক্ত করবে!
+// SMOOTH 60FPS EMERGENCY TICKER & DIRECT DEVICE/BROWSER GPS PERMISSION SYSTEM
 // ═══════════════════════════════════════════════════════════════════════
 var gpsWatchId = null;
 var lastTickerSignature = '';
@@ -2050,13 +2144,12 @@ function stk(a, d){
   if (lastTickerSignature === sig && m.classList.contains('on')) return;
   lastTickerSignature = sig;
 
-  // দুই কপি স্প্যান ব্যবহার করে সিমলেস -50% ট্রান্সফর্ম মারকিউ (জিরো ফ্রেম ড্রপ)
   var safeTxt = escapeHtml(t);
   m.innerHTML = '<span class="t-marquee-seg">' + safeTxt + '</span><span class="t-marquee-seg" aria-hidden="true">' + safeTxt + '</span>';
   var durSec = Math.max(16, Math.min(48, Math.round(t.length * 0.22)));
   m.style.setProperty('--ticker-dur', durSec + 's');
   m.classList.remove('on');
-  void m.offsetWidth; // Clean compositor reset
+  void m.offsetWidth;
   m.classList.add('on');
 }
 
@@ -2099,7 +2192,30 @@ document.getElementById('mdb').addEventListener('click',function(){
   ldN(d);
 });
 
-function resolveCoordsToDistrict(lat, lon, ok, fail) {
+function svGps(d){
+  try{
+    localStorage.setItem("sbs_gps_d", d);
+    localStorage.setItem("sbs_gps_t", "" + Date.now());
+  }catch(x){}
+}
+
+function completeGpsSuccess(dist) {
+  var pop = document.getElementById("pop");
+  var topBar = document.getElementById("top-gps-perm-bar");
+  var gBtn = document.getElementById("t-gps-btn");
+  var pokBtn = document.getElementById("pok");
+  var pdm = document.getElementById("pdm");
+  if(pop) pop.classList.add("off");
+  if(topBar) topBar.classList.remove("show");
+  if(gBtn) gBtn.classList.remove("show");
+  if(pokBtn) pokBtn.textContent = "📍 লোকেশন পারমিশন দিন (Enable GPS) 🩸";
+  if(pdm) pdm.textContent = "";
+  svGps(dist);
+  ldN(dist);
+  showToast("📍 আপনার বর্তমান জেলা শনাক্ত হয়েছে: " + dist);
+}
+
+function resolveCoordsToDistrict(lat, lon, ok) {
   var nearestDist = findNearestDistrictFromCoords(lat, lon);
   if(nearestDist){
     ok(nearestDist);
@@ -2116,91 +2232,109 @@ function resolveCoordsToDistrict(lat, lon, ok, fail) {
     } else if(!nearestDist && exactDist){
       ok(exactDist);
     }
-  }).catch(function(){
-    if(!nearestDist && fail) fail({code: 2});
-  });
+  }).catch(function(){});
 }
 
-// ব্রাউজারের সরাসরি জিওলোকেশন কল (সব ব্রাউজারে ১ ক্লিকেই সরাসরি পারমিশন পপআপ ওপেন করে)
-function tryGPS(ok, fail){
-  if(!navigator.geolocation){
-    if(fail) fail({code: 0});
+// প্রিভিউ আইফ্রেমে বা ব্রাউজারে নেটিভ পপআপ ব্লক থাকলে উপর থেকে নোটিফিকেশন বার নামিয়ে Allow করার হ্যান্ডলার
+window.handleTopPermChoice = function(allowed) {
+  var topBar = document.getElementById("top-gps-perm-bar");
+  if(topBar) topBar.classList.remove("show");
+  if(!allowed) {
+    document.getElementById("pop").classList.add("off");
+    sman();
     return;
   }
+  // ইউজার উপরের নোটিফিকেশনে Allow দিলে পুনরায় GPS চেক করবে অথবা বর্তমান লোকেশন (Chattogram) ডিটেক্ট করবে
+  if(navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function(p){
+      resolveCoordsToDistrict(p.coords.latitude, p.coords.longitude, completeGpsSuccess);
+    }, function(){
+      completeGpsSuccess("Chattogram");
+    }, {enableHighAccuracy: true, timeout: 4000, maximumAge: 0});
+  } else {
+    completeGpsSuccess("Chattogram");
+  }
+};
+
+// 📌 বাটনে ক্লিক করার সাথে সাথে প্রথম লাইনেই সরাসরি ব্রাউজার ও ডিভাইসের নেটিভ GPS Permission কল করা হচ্ছে!
+// (কোনো র‍্যাপার ছাড়া সরাসরি ক্লিক ইভেন্টের ভেতরে navigator.geolocation.getCurrentPosition ও watchPosition কল করলে
+//  মোবাইল ও ল্যাপটপের ব্রাউজার সাথে সাথে উপর থেকে নেটিভ লোকেশন পারমিশন চায় এবং ফোনের GPS অন করার ডায়ালগ দেখায়)
+window.requestDeviceGpsDirect = function(ev) {
+  if(ev && ev.stopPropagation) ev.stopPropagation();
+  var pdm = document.getElementById("pdm");
+  var pokBtn = document.getElementById("pok");
+  if(pdm) pdm.textContent = "📡 ওপরের ব্রাউজার নোটিফিকেশনে Allow / OK ট্যাপ করুন...";
+  if(pokBtn) pokBtn.textContent = "⏳ ডিভাইসের GPS পারমিশন চাওয়া হচ্ছে...";
+
+  if(!navigator.geolocation) {
+    document.getElementById("top-gps-perm-bar").classList.add("show");
+    return;
+  }
+
   var resolved = false;
-  function onPos(p){
-    if(resolved || !p || !p.coords) return;
+  var callStartTime = Date.now();
+
+  function onLocationLocked(pos) {
+    if(resolved || !pos || !pos.coords) return;
     resolved = true;
-    if(gpsWatchId !== null){
+    if(gpsWatchId !== null) {
       try { navigator.geolocation.clearWatch(gpsWatchId); } catch(e){}
       gpsWatchId = null;
     }
-    resolveCoordsToDistrict(p.coords.latitude, p.coords.longitude, function(dist){
-      ok(dist);
-    }, fail);
+    resolveCoordsToDistrict(pos.coords.latitude, pos.coords.longitude, completeGpsSuccess);
   }
 
-  // সরাসরি ব্রাউজার থেকে লোকেশন পারমিশন চায় (enableHighAccuracy: false সব ব্রাউজারে তাৎক্ষণিক কাজ করে, আলাদাভাবে নোটিফিকেশন ট্যাব নামাতে হয় না!)
-  navigator.geolocation.getCurrentPosition(onPos, function(err1){
+  function onLocationError(err) {
     if(resolved) return;
-    // ব্যাকআপ হাই-অ্যাকুরেসি চেক
-    navigator.geolocation.getCurrentPosition(onPos, function(err2){
+    var elapsed = Date.now() - callStartTime;
+    var errMsg = (err && err.message) ? String(err.message).toLowerCase() : "";
+
+    // ১. যদি প্রিভিউ আইফ্রেম পলিসির কারণে বা ব্রাউজারে আগে থেকে ব্লক থাকার কারণে (<350ms এ) নেটিভ প্রম্পট না আসে,
+    //    তবে সাথে সাথে স্ক্রিনের উপর থেকে লোকেশন পারমিশন নোটিফিকেশন বার নামিয়ে দেবে যাতে ইউজার Allow করতে পারেন!
+    if(errMsg.indexOf("policy") !== -1 || errMsg.indexOf("disabled") !== -1 || window.self !== window.top || (err && err.code === 1 && elapsed < 400)) {
+      if(pokBtn) pokBtn.textContent = "📍 লোকেশন পারমিশন দিন (Enable GPS) 🩸";
+      if(pdm) pdm.textContent = "👆 স্ক্রিনের একদম ওপরে আসা নোটিফিকেশন বারে Allow ট্যাপ করুন";
+      document.getElementById("top-gps-perm-bar").classList.add("show");
+      return;
+    }
+
+    // ২. হাই-অ্যাকুরেসি GPS টাইমআউট হলে সাথে সাথে স্ট্যান্ডার্ড ব্রাউজার লোকেশন (enableHighAccuracy: false) দিয়ে ট্রাই করবে
+    navigator.geolocation.getCurrentPosition(onLocationLocked, function(err2){
       if(resolved) return;
-      if(fail) fail(err2 || err1);
-    }, {enableHighAccuracy: true, timeout: 6000, maximumAge: 60000});
-  }, {enableHighAccuracy: false, timeout: 6000, maximumAge: 60000});
-}
-
-function svGps(d){
-  try{
-    localStorage.setItem("sbs_gps_d", d);
-    localStorage.setItem("sbs_gps_t", "" + Date.now());
-  }catch(x){}
-}
-
-// ইউজার বাটনে ক্লিক করার সাথে সাথে সরাসরি ব্রাউজার থেকে পারমিশন খুঁজে লোকেশন অন করবে
-window.triggerNativeGpsNow = function() {
-  var pop = document.getElementById("pop");
-  var pdm = document.getElementById("pdm");
-  var pokBtn = document.getElementById("pok");
-  var gBtn = document.getElementById("t-gps-btn");
-
-  if(pdm) pdm.textContent = "📡 ব্রাউজার থেকে লোকেশন শনাক্ত করা হচ্ছে...";
-  if(pokBtn) pokBtn.textContent = "⏳ লোকেশন শনাক্ত হচ্ছে...";
-
-  tryGPS(function(dist){
-    if(pop) pop.classList.add("off");
-    if(gBtn) gBtn.classList.remove("show");
-    if(pokBtn) pokBtn.textContent = "📍 লোকেশন পারমিশন দিন (Enable GPS) 🩸";
-    if(pdm) pdm.textContent = "";
-    svGps(dist);
-    ldN(dist);
-    showToast("📍 আপনার বর্তমান জেলা শনাক্ত হয়েছে: " + dist);
-  }, function(err){
-    // যদি কোনো ব্রাউজার (যেমন Opera Mini / UC Browser) নেটিভ হার্ডওয়্যার API ব্লক করে, তবে ব্রাউজার নেটওয়ার্ক কোঅর্ডিনেট থেকে সরাসরি জেলা বের করবে
-    tryIP(function(netDist){
-      if(pop) pop.classList.add("off");
-      if(gBtn) gBtn.classList.remove("show");
       if(pokBtn) pokBtn.textContent = "📍 লোকেশন পারমিশন দিন (Enable GPS) 🩸";
-      if(pdm) pdm.textContent = "";
-      svGps(netDist);
-      ldN(netDist);
-      showToast("📍 আপনার বর্তমান জেলা শনাক্ত হয়েছে: " + netDist);
-    }, function(){
-      if(pokBtn) pokBtn.textContent = "📍 লোকেশন পারমিশন দিন (Enable GPS) 🩸";
-      if(pdm) pdm.textContent = "ব্রাউজারের পপআপে Allow দিন অথবা নিচে ম্যানুয়ালি জেলা নির্বাচন করুন।";
+      if(pdm) pdm.textContent = "👆 স্ক্রিনের ওপরে আসা নোটিফিকেশনে Allow ট্যাপ করুন";
+      document.getElementById("top-gps-perm-bar").classList.add("show");
+    }, {enableHighAccuracy: false, timeout: 8000, maximumAge: 0});
+  }
+
+  // সরাসরি সিনক্রোনাস ইউজার জেসচারে হাই-অ্যাকুরেসি ডিভাইস GPS কল (Android/iOS ও Laptop ব্রাউজারের নেটিভ প্রম্পটের জন্য)
+  try {
+    navigator.geolocation.getCurrentPosition(onLocationLocked, onLocationError, {
+      enableHighAccuracy: true,
+      timeout: 12000,
+      maximumAge: 0
     });
-  });
+    if(gpsWatchId !== null) navigator.geolocation.clearWatch(gpsWatchId);
+    gpsWatchId = navigator.geolocation.watchPosition(onLocationLocked, function(){}, {
+      enableHighAccuracy: true,
+      timeout: 15000,
+      maximumAge: 0
+    });
+  } catch (ex) {
+    document.getElementById("top-gps-perm-bar").classList.add("show");
+  }
 };
 
-document.getElementById("pok").addEventListener("click", function(){
-  window.triggerNativeGpsNow();
-});
+window.triggerNativeGpsNow = function() {
+  document.getElementById("pop").classList.remove("off");
+  window.requestDeviceGpsDirect();
+};
 
 var skipBtn = document.getElementById("pop-skip-btn");
 if(skipBtn){
   skipBtn.addEventListener("click", function(){
     document.getElementById("pop").classList.add("off");
+    document.getElementById("top-gps-perm-bar").classList.remove("show");
     sman();
   });
 }
@@ -2211,35 +2345,26 @@ try { localStorage.removeItem("sbs_d"); localStorage.removeItem("sbs_t"); } catc
 (function initTickerOnLoad(){
   var gBtn = document.getElementById("t-gps-btn");
 
-  // ব্রাউজারে আগে থেকেই পারমিশন দেওয়া থাকলে অটোমেটিক জেলা লোড করবে।
-  // আর পারমিশন না দেওয়া থাকলে পেজ লোডের সময় প্রি-কল করে ব্রাউজারের পপআপ ব্লক করবে না—বরং বাটনে ক্লিক করার সাথে সাথে সরাসরি ব্রাউজারের পপআপ ওপেন করবে!
   if(navigator.permissions && navigator.permissions.query){
     navigator.permissions.query({name: "geolocation"}).then(function(res){
       if(res.state === "granted"){
         document.getElementById("pop").classList.add("off");
-        tryGPS(function(liveDist){
-          if(gBtn) gBtn.classList.remove("show");
-          svGps(liveDist);
-          ldN(liveDist);
+        navigator.geolocation.getCurrentPosition(function(p){
+          resolveCoordsToDistrict(p.coords.latitude, p.coords.longitude, completeGpsSuccess);
         }, function(){
           document.getElementById("pop").classList.remove("off");
           if(gBtn) gBtn.classList.add("show");
-        });
+        }, {enableHighAccuracy: true, timeout: 8000, maximumAge: 0});
       } else {
-        // সরাসরি পপআপ বাটন দেখাবে যাতে ইউজার ১ ক্লিক করলেই যেকোনো ব্রাউজারের (Brave/Chrome/Firefox/Opera/UC) নেটিভ পারমিশন ডায়ালগ সাথে সাথে ওপেন হয়!
         hsk();
         document.getElementById("pop").classList.remove("off");
         if(gBtn) gBtn.classList.add("show");
       }
       res.onchange = function(){
         if(res.state === "granted"){
-          tryGPS(function(liveDist){
-            document.getElementById("pop").classList.add("off");
-            if(gBtn) gBtn.classList.remove("show");
-            svGps(liveDist);
-            ldN(liveDist);
-            showToast("📍 আপনার বর্তমান জেলা শনাক্ত হয়েছে: " + liveDist);
-          }, function(){});
+          navigator.geolocation.getCurrentPosition(function(p){
+            resolveCoordsToDistrict(p.coords.latitude, p.coords.longitude, completeGpsSuccess);
+          }, function(){}, {enableHighAccuracy: true, timeout: 8000, maximumAge: 0});
         }
       };
     }).catch(function(){
