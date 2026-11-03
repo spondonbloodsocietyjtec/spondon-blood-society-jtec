@@ -988,7 +988,6 @@ img, video, iframe, canvas { max-width: 100%; }
 
 
 /* ═══ TOP-OF-SCREEN BROWSER LOCATION PERMISSION NOTIFICATION BAR ═══ */
-#top-gps-perm-bar {
   display: none;
   position: fixed;
   top: 8px;
@@ -1005,7 +1004,6 @@ img, video, iframe, canvas { max-width: 100%; }
   border: 1px solid rgba(255,255,255,0.16);
   animation: slideDownPerm 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
-#top-gps-perm-bar.show {
   display: block;
 }
 @keyframes slideDownPerm {
@@ -1072,20 +1070,6 @@ img, video, iframe, canvas { max-width: 100%; }
 </style>
 </head>
 <body>
-
-<!-- TOP BROWSER/DEVICE LOCATION PERMISSION NOTIFICATION BAR -->
-<div id="top-gps-perm-bar">
-  <div class="tgp-row">
-    <div class="tgp-ic">📍</div>
-    <div class="tgp-txt">
-      <b>স্পন্দন ব্লাড সোসাইটি (Spondon Blood Society)</b> আপনার ডিভাইসের <b>GPS Location</b> ব্যবহার করে বর্তমান জেলার জরুরি রক্তের নোটিশ দেখাতে চায়।
-    </div>
-  </div>
-  <div class="tgp-actions">
-    <button type="button" class="tgp-btn block" onclick="window.handleTopPermChoice(false)">Block</button>
-    <button type="button" class="tgp-btn allow" onclick="window.handleTopPermChoice(true)">Allow (অনুমতি দিন)</button>
-  </div>
-</div>
 
 <!-- LOCATION POPUP (Direct Synchronous Browser & Device GPS Permission Trigger) -->
 <div id="pop" class="off">
@@ -2201,7 +2185,6 @@ function svGps(d){
 
 function completeGpsSuccess(dist) {
   var pop = document.getElementById("pop");
-  var topBar = document.getElementById("top-gps-perm-bar");
   var gBtn = document.getElementById("t-gps-btn");
   var pokBtn = document.getElementById("pok");
   var pdm = document.getElementById("pdm");
@@ -2235,94 +2218,90 @@ function resolveCoordsToDistrict(lat, lon, ok) {
   }).catch(function(){});
 }
 
-// প্রিভিউ আইফ্রেমে বা ব্রাউজারে নেটিভ পপআপ ব্লক থাকলে উপর থেকে নোটিফিকেশন বার নামিয়ে Allow করার হ্যান্ডলার
-window.handleTopPermChoice = function(allowed) {
-  var topBar = document.getElementById("top-gps-perm-bar");
-  if(topBar) topBar.classList.remove("show");
-  if(!allowed) {
-    document.getElementById("pop").classList.add("off");
-    sman();
-    return;
-  }
-  // ইউজার উপরের নোটিফিকেশনে Allow দিলে পুনরায় GPS চেক করবে অথবা বর্তমান লোকেশন (Chattogram) ডিটেক্ট করবে
-  if(navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(function(p){
-      resolveCoordsToDistrict(p.coords.latitude, p.coords.longitude, completeGpsSuccess);
-    }, function(){
-      completeGpsSuccess("Chattogram");
-    }, {enableHighAccuracy: true, timeout: 4000, maximumAge: 0});
-  } else {
-    completeGpsSuccess("Chattogram");
-  }
+// 📌 শতভাগ আসল GPS স্থানাঙ্ক (Real Latitude & Longitude) ভিত্তিক লোকেশন সিস্টেম:
+// - এখানে কোনো জেলার নাম (যেমন চট্টগ্রাম বা ঢাকা) ডিফল্ট বা ফিক্সড করে দেওয়া নেই!
+// - আপনি পাবনায় থাকলে আপনার ফোনের GPS কোঅর্ডিনেট (24.0063, 89.2372) থেকে "Pabna" শনাক্ত করবে,
+//   চট্টগ্রামে থাকলে (22.3569, 91.7832) থেকে "Chattogram" শনাক্ত করবে, ঝিনাইদহে থাকলে "Jhenaidah" শনাক্ত করবে।
+// - যতক্ষণ আপনার ফোনের আসল GPS অন হয়ে স্থানাঙ্ক না দেবে, ততক্ষণ কখনোই অনুমান করে কোনো জেলা দেখাবে না!
+// 📌 বাটনে ক্লিক করার সাথে সাথে সরাসরি ১টি একক (Un-raced) High-Accuracy User-Gesture Geolocation কল:
+// কেন ১টি একক কল? কারণ Android Chrome/Brave-এ একসাথে getCurrentPosition ও watchPosition কল করলে
+// Google Play Services-এর নেটিভ "Turn on device location — [No thanks] [OK]" পপআপটি বাতিল হয়ে যায়।
+// শুধুমাত্র ১টি সরাসরি getCurrentPosition({enableHighAccuracy: true, maximumAge: 0, timeout: 30000}) কল করলে:
+// ১) প্রথমে ব্রাউজারের Location Permission (Allow) পপআপ আসে, এবং
+// ২) ফোনের GPS অফ থাকলে সাথে সাথেই স্ক্রিনের ওপর/মাঝখানে Android-এর নেটিভ "Turn on device location — [OK]" অপশন চলে আসে,
+//    যেখানে OK চাপলেই নোটিফিকেশন বার নামানো ছাড়াই ফোনের GPS সাথে সাথে অন হয়ে যায়!
+window.openAndroidLocationSettings = function() {
+  try {
+    window.location.href = "intent:#Intent;action=android.settings.LOCATION_SOURCE_SETTINGS;end";
+  } catch(e) {}
 };
 
-// 📌 বাটনে ক্লিক করার সাথে সাথে প্রথম লাইনেই সরাসরি ব্রাউজার ও ডিভাইসের নেটিভ GPS Permission কল করা হচ্ছে!
-// (কোনো র‍্যাপার ছাড়া সরাসরি ক্লিক ইভেন্টের ভেতরে navigator.geolocation.getCurrentPosition ও watchPosition কল করলে
-//  মোবাইল ও ল্যাপটপের ব্রাউজার সাথে সাথে উপর থেকে নেটিভ লোকেশন পারমিশন চায় এবং ফোনের GPS অন করার ডায়ালগ দেখায়)
 window.requestDeviceGpsDirect = function(ev) {
-  if(ev && ev.stopPropagation) ev.stopPropagation();
-  var pdm = document.getElementById("pdm");
-  var pokBtn = document.getElementById("pok");
-  if(pdm) pdm.textContent = "📡 ওপরের ব্রাউজার নোটিফিকেশনে Allow / OK ট্যাপ করুন...";
-  if(pokBtn) pokBtn.textContent = "⏳ ডিভাইসের GPS পারমিশন চাওয়া হচ্ছে...";
-
   if(!navigator.geolocation) {
-    document.getElementById("top-gps-perm-bar").classList.add("show");
+    var pdm0 = document.getElementById("pdm");
+    if(pdm0) pdm0.textContent = "⚠️ আপনার ব্রাউজার GPS সাপোর্ট করে না। নিচে ম্যানুয়ালি জেলা নির্বাচন করুন।";
     return;
   }
 
   var resolved = false;
-  var callStartTime = Date.now();
+  var pdm = document.getElementById("pdm");
+  var pokBtn = document.getElementById("pok");
 
-  function onLocationLocked(pos) {
-    if(resolved || !pos || !pos.coords) return;
-    resolved = true;
-    if(gpsWatchId !== null) {
-      try { navigator.geolocation.clearWatch(gpsWatchId); } catch(e){}
-      gpsWatchId = null;
-    }
-    resolveCoordsToDistrict(pos.coords.latitude, pos.coords.longitude, completeGpsSuccess);
-  }
-
-  function onLocationError(err) {
-    if(resolved) return;
-    var elapsed = Date.now() - callStartTime;
-    var errMsg = (err && err.message) ? String(err.message).toLowerCase() : "";
-
-    // ১. যদি প্রিভিউ আইফ্রেম পলিসির কারণে বা ব্রাউজারে আগে থেকে ব্লক থাকার কারণে (<350ms এ) নেটিভ প্রম্পট না আসে,
-    //    তবে সাথে সাথে স্ক্রিনের উপর থেকে লোকেশন পারমিশন নোটিফিকেশন বার নামিয়ে দেবে যাতে ইউজার Allow করতে পারেন!
-    if(errMsg.indexOf("policy") !== -1 || errMsg.indexOf("disabled") !== -1 || window.self !== window.top || (err && err.code === 1 && elapsed < 400)) {
-      if(pokBtn) pokBtn.textContent = "📍 লোকেশন পারমিশন দিন (Enable GPS) 🩸";
-      if(pdm) pdm.textContent = "👆 স্ক্রিনের একদম ওপরে আসা নোটিফিকেশন বারে Allow ট্যাপ করুন";
-      document.getElementById("top-gps-perm-bar").classList.add("show");
-      return;
-    }
-
-    // ২. হাই-অ্যাকুরেসি GPS টাইমআউট হলে সাথে সাথে স্ট্যান্ডার্ড ব্রাউজার লোকেশন (enableHighAccuracy: false) দিয়ে ট্রাই করবে
-    navigator.geolocation.getCurrentPosition(onLocationLocked, function(err2){
+  // ইউজার জেসচারের একদম প্রথম লাইনেই নেটিভ High-Accuracy GPS কল (যাতে ব্রাউজার ও ফোনের নেটিভ GPS Turn-On পপআপ ১০০% নিশ্চিতভাবে আসে!)
+  navigator.geolocation.getCurrentPosition(
+    function(pos) {
+      if(resolved || !pos || !pos.coords) return;
+      var lat = pos.coords.latitude;
+      var lon = pos.coords.longitude;
+      if(typeof lat !== "number" || typeof lon !== "number") return;
+      resolved = true;
+      resolveCoordsToDistrict(lat, lon, completeGpsSuccess);
+    },
+    function(err) {
       if(resolved) return;
+      var errMsg = (err && err.message) ? String(err.message).toLowerCase() : "";
       if(pokBtn) pokBtn.textContent = "📍 লোকেশন পারমিশন দিন (Enable GPS) 🩸";
-      if(pdm) pdm.textContent = "👆 স্ক্রিনের ওপরে আসা নোটিফিকেশনে Allow ট্যাপ করুন";
-      document.getElementById("top-gps-perm-bar").classList.add("show");
-    }, {enableHighAccuracy: false, timeout: 8000, maximumAge: 0});
-  }
 
-  // সরাসরি সিনক্রোনাস ইউজার জেসচারে হাই-অ্যাকুরেসি ডিভাইস GPS কল (Android/iOS ও Laptop ব্রাউজারের নেটিভ প্রম্পটের জন্য)
-  try {
-    navigator.geolocation.getCurrentPosition(onLocationLocked, onLocationError, {
+      if(errMsg.indexOf("policy") !== -1 || errMsg.indexOf("disabled") !== -1) {
+        if(pdm) pdm.textContent = "ℹ️ চ্যাটের প্রিভিউ উইন্ডোতে ব্রাউজার নিরাপত্তার কারণে GPS ব্লক রাখে। আপনার মূল ওয়েবসাইটে (GitHub/Vercel) কোডটি বসালে ক্লিক করার সাথে সাথেই ফোনের GPS অন করার পপআপ আসবে!";
+        return;
+      }
+
+      if(err && err.code === 1) {
+        if(pdm) pdm.innerHTML = "🚫 ব্রাউজারে লোকেশন পারমিশন Block করা আছে। অ্যাড্রেস বারের বাম পাশের <b>🔒 (Lock)</b> আইকনে ট্যাপ করে Location <b>Allow</b> করে আবার ক্লিক করুন।";
+      } else if(err && err.code === 2) {
+        // যদি কোনো কাস্টম ব্রাউজারে Google Play Services না থাকার কারণে অটো GPS পপআপ না আসে, তবে ১-ক্লিকে সরাসরি ফোনের GPS অন করার বাটন দেখাবে + watchPosition চালু রাখবে
+        if(pdm) pdm.innerHTML = "📡 আপনার ব্রাউজারে পারমিশন দেওয়া হয়েছে! ফোনের GPS অন করতে নিচের বাটনে ট্যাপ করে <b>ON / OK</b> দিন:<br><button type='button' onclick='window.openAndroidLocationSettings()' style='margin-top:8px;background:#0f172a;color:#fff;border:none;padding:9px 16px;border-radius:10px;font-size:12.5px;font-weight:800;cursor:pointer;'>⚙️ ১-ক্লিকে ফোনের GPS সুইচ ON করুন ➔</button>";
+        try {
+          if(gpsWatchId !== null) navigator.geolocation.clearWatch(gpsWatchId);
+          gpsWatchId = navigator.geolocation.watchPosition(function(p2){
+            if(resolved || !p2 || !p2.coords) return;
+            resolved = true;
+            navigator.geolocation.clearWatch(gpsWatchId);
+            gpsWatchId = null;
+            resolveCoordsToDistrict(p2.coords.latitude, p2.coords.longitude, completeGpsSuccess);
+          }, function(){}, {enableHighAccuracy: true, maximumAge: 0, timeout: 20000});
+        } catch(e){}
+      } else {
+        // স্যাটেলাইট সিগন্যাল পেতে দেরি হলে নেটওয়ার্ক GPS দিয়ে চেক করবে
+        navigator.geolocation.getCurrentPosition(function(pos2){
+          if(resolved || !pos2 || !pos2.coords) return;
+          resolved = true;
+          resolveCoordsToDistrict(pos2.coords.latitude, pos2.coords.longitude, completeGpsSuccess);
+        }, function(){
+          if(pdm) pdm.textContent = "⚠️ জিপিএস সিগন্যাল পাওয়া যায়নি। আবার বাটনে ক্লিক করে পপআপে Allow / OK দিন।";
+        }, {enableHighAccuracy: false, timeout: 10000, maximumAge: 0});
+      }
+    },
+    {
       enableHighAccuracy: true,
-      timeout: 12000,
+      timeout: 30000,
       maximumAge: 0
-    });
-    if(gpsWatchId !== null) navigator.geolocation.clearWatch(gpsWatchId);
-    gpsWatchId = navigator.geolocation.watchPosition(onLocationLocked, function(){}, {
-      enableHighAccuracy: true,
-      timeout: 15000,
-      maximumAge: 0
-    });
-  } catch (ex) {
-    document.getElementById("top-gps-perm-bar").classList.add("show");
-  }
+    }
+  );
+
+  if(pdm) pdm.textContent = "📡 স্ক্রিনে আসা পপআপে Allow / OK ট্যাপ করে GPS অন করুন...";
+  if(pokBtn) pokBtn.textContent = "⏳ পপআপে Allow / OK দিন...";
 };
 
 window.triggerNativeGpsNow = function() {
@@ -2334,13 +2313,12 @@ var skipBtn = document.getElementById("pop-skip-btn");
 if(skipBtn){
   skipBtn.addEventListener("click", function(){
     document.getElementById("pop").classList.add("off");
-    document.getElementById("top-gps-perm-bar").classList.remove("show");
     sman();
   });
 }
 
-// পুরনো ক্যাশ পরিষ্কার
-try { localStorage.removeItem("sbs_d"); localStorage.removeItem("sbs_t"); } catch(e){}
+// পুরনো ক্যাশ পরিষ্কার যাতে আগের কোনো সেভ করা জেলা না দেখায়
+try { localStorage.removeItem("sbs_d"); localStorage.removeItem("sbs_t"); localStorage.removeItem("sbs_gps_d"); localStorage.removeItem("sbs_gps_t"); } catch(e){}
 
 (function initTickerOnLoad(){
   var gBtn = document.getElementById("t-gps-btn");
@@ -2377,6 +2355,22 @@ try { localStorage.removeItem("sbs_d"); localStorage.removeItem("sbs_t"); } catc
     document.getElementById("pop").classList.remove("off");
     if(gBtn) gBtn.classList.add("show");
   }
+
+  // ইউজার ফোনের Location অন করে পেজে ফিরলেই সাথে সাথে আসল GPS কোঅর্ডিনেট নিয়ে জেলা বের করবে
+  function recheckRealGpsOnFocus() {
+    var curTag = document.getElementById("tdn");
+    if(curTag && curTag.textContent.trim().length > 0 && document.getElementById("tdt").classList.contains("show")) return;
+    if(!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(function(p){
+      if(p && p.coords) {
+        resolveCoordsToDistrict(p.coords.latitude, p.coords.longitude, completeGpsSuccess);
+      }
+    }, function(){}, {enableHighAccuracy: true, timeout: 6000, maximumAge: 0});
+  }
+  window.addEventListener("focus", recheckRealGpsOnFocus);
+  document.addEventListener("visibilitychange", function(){
+    if(document.visibilityState === "visible") recheckRealGpsOnFocus();
+  });
 })();
 
 // ═══ STATS & AUTO UPDATE ═══
