@@ -563,8 +563,6 @@ details[open] summary{color:var(--r);border-bottom:1px solid var(--rbd)}
 /* ═══ HEADER, BOTTOM NAV & DUAL-RESPONSIVE (MOBILE + LAPTOP) STYLES ═══ */
 #ticker { height: 38px; padding-right: 4px; }
 .t-badge { padding: 0 11px; font-size: 12px; gap: 4px; }
-.t-gps-cta { display: none; position: absolute; left: 8px; right: 8px; top: 50%; transform: translateY(-50%); background: linear-gradient(135deg, #d32f2f, #b71c1c); color: #fff; border: 1.5px solid #fff; border-radius: 16px; padding: 4px 12px; font-size: 11.5px; font-weight: 800; cursor: pointer; z-index: 5; text-align: center; box-shadow: 0 3px 10px rgba(183,28,28,0.35); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; animation: pulse 2s infinite; }
-.t-gps-cta.show { display: inline-flex; align-items: center; justify-content: center; gap: 5px; }
 
 /* HEADER: Official Logo on Left, Full Un-Truncated Centered Title + College Name, Compact Profile Icon on Right */
 #hdr {
@@ -836,7 +834,6 @@ img, video, iframe, canvas { max-width: 100%; }
   box-shadow: 0 2px 5px rgba(0,0,0,0.12);
   letter-spacing: 0;
 }
-.t-gps-cta { font-size: 10.8px; padding: 3px 10px; }
 
 #hdr { top: 36px; height: 60px; }
 .hdr-logo-btn {
@@ -1158,7 +1155,6 @@ img, video, iframe, canvas { max-width: 100%; }
 <div class="t-track">
 <div class="t-sk" id="tsk"></div>
 <div class="t-msg" id="tmsg"></div>
-<button type="button" class="t-gps-cta" id="t-gps-btn" onclick="triggerNativeGpsNow()">📍 আপনার জেলার জরুরি রক্তের নোটিশ দেখতে এখানে ট্যাপ করে GPS অন করুন</button>
 <div class="t-man" id="tman">
 <span class="lbl">জেলা:</span>
 <select id="mds"><option value="">নির্বাচন করুন</option></select>
@@ -2103,28 +2099,29 @@ if(requestedPage && pm[requestedPage]) {
 var gpsWatchId = null;
 var lastTickerSignature = '';
 
-function hsk(){document.getElementById('tsk').style.display='none'}
+function hsk(){
+  var sk = document.getElementById('tsk');
+  if(sk) sk.style.display = 'none';
+}
 function sman(){
   hsk();
   document.getElementById('tdt').classList.remove('show');
-  var gBtn = document.getElementById('t-gps-btn');
-  if(gBtn) gBtn.classList.remove('show');
   document.getElementById('tman').classList.add('show');
 }
 
-// 60fps GPU-Accelerated Dual-Span Marquee (No lag, no frame drops!)
+// 60fps GPU-Accelerated Dual-Span Marquee (No lag, no frame drops, no vertical bouncing!)
 function stk(a, d){
   hsk();
   document.getElementById('tman').classList.remove('show');
-  var gBtn = document.getElementById('t-gps-btn');
   if(d){
-    if(gBtn) gBtn.classList.remove('show');
     document.getElementById('tdn').textContent = d;
     document.getElementById('tdt').classList.add('show');
+  } else {
+    document.getElementById('tdt').classList.remove('show');
   }
   var m = document.getElementById('tmsg');
   var t = a.join('   🔴   ');
-  var sig = d + '::' + t;
+  var sig = (d || '') + '::' + t;
   if (lastTickerSignature === sig && m.classList.contains('on')) return;
   lastTickerSignature = sig;
 
@@ -2141,12 +2138,10 @@ function ldN(d){
   if(!d) { sman(); return; }
   autoSetDist(d);
   sv(d);
-  if (!lastTickerSignature) {
-    stk(['📍 ' + d + ' জেলার জরুরি রক্তের নোটিশ লোড হচ্ছে...'], d);
-  } else {
-    document.getElementById('tdn').textContent = d;
-    document.getElementById('tdt').classList.add('show');
-  }
+  document.getElementById('tdn').textContent = d;
+  document.getElementById('tdt').classList.add('show');
+  stk(['📍 ' + d + ' জেলার জরুরি রক্তের নোটিশ লোড হচ্ছে...'], d);
+
   fetch(S+'?action=getNotices&district='+encodeURIComponent(d))
   .then(function(r){return r.json()})
   .then(function(j){
@@ -2184,13 +2179,11 @@ function svGps(d){
 }
 
 function completeGpsSuccess(dist) {
+  if(!dist) return;
   var pop = document.getElementById("pop");
-  var gBtn = document.getElementById("t-gps-btn");
   var pokBtn = document.getElementById("pok");
   var pdm = document.getElementById("pdm");
   if(pop) pop.classList.add("off");
-  if(topBar) topBar.classList.remove("show");
-  if(gBtn) gBtn.classList.remove("show");
   if(pokBtn) pokBtn.textContent = "📍 লোকেশন পারমিশন দিন (Enable GPS) 🩸";
   if(pdm) pdm.textContent = "";
   svGps(dist);
@@ -2218,90 +2211,129 @@ function resolveCoordsToDistrict(lat, lon, ok) {
   }).catch(function(){});
 }
 
-// 📌 শতভাগ আসল GPS স্থানাঙ্ক (Real Latitude & Longitude) ভিত্তিক লোকেশন সিস্টেম:
-// - এখানে কোনো জেলার নাম (যেমন চট্টগ্রাম বা ঢাকা) ডিফল্ট বা ফিক্সড করে দেওয়া নেই!
-// - আপনি পাবনায় থাকলে আপনার ফোনের GPS কোঅর্ডিনেট (24.0063, 89.2372) থেকে "Pabna" শনাক্ত করবে,
-//   চট্টগ্রামে থাকলে (22.3569, 91.7832) থেকে "Chattogram" শনাক্ত করবে, ঝিনাইদহে থাকলে "Jhenaidah" শনাক্ত করবে।
-// - যতক্ষণ আপনার ফোনের আসল GPS অন হয়ে স্থানাঙ্ক না দেবে, ততক্ষণ কখনোই অনুমান করে কোনো জেলা দেখাবে না!
-// 📌 বাটনে ক্লিক করার সাথে সাথে সরাসরি ১টি একক (Un-raced) High-Accuracy User-Gesture Geolocation কল:
-// কেন ১টি একক কল? কারণ Android Chrome/Brave-এ একসাথে getCurrentPosition ও watchPosition কল করলে
-// Google Play Services-এর নেটিভ "Turn on device location — [No thanks] [OK]" পপআপটি বাতিল হয়ে যায়।
-// শুধুমাত্র ১টি সরাসরি getCurrentPosition({enableHighAccuracy: true, maximumAge: 0, timeout: 30000}) কল করলে:
-// ১) প্রথমে ব্রাউজারের Location Permission (Allow) পপআপ আসে, এবং
-// ২) ফোনের GPS অফ থাকলে সাথে সাথেই স্ক্রিনের ওপর/মাঝখানে Android-এর নেটিভ "Turn on device location — [OK]" অপশন চলে আসে,
-//    যেখানে OK চাপলেই নোটিফিকেশন বার নামানো ছাড়াই ফোনের GPS সাথে সাথে অন হয়ে যায়!
 window.openAndroidLocationSettings = function() {
   try {
-    window.location.href = "intent:#Intent;action=android.settings.LOCATION_SOURCE_SETTINGS;end";
+    if (/Android/i.test(navigator.userAgent || '')) {
+      window.location.href = "intent:#Intent;action=android.settings.LOCATION_SOURCE_SETTINGS;end";
+    }
   } catch(e) {}
 };
 
+function fetchLiveBrowserCoords(ok, fail) {
+  var done = false;
+  function handleCoord(lat, lon, cityOrRegion) {
+    if (done) return;
+    if (typeof lat === "number" && typeof lon === "number" && !isNaN(lat) && !isNaN(lon)) {
+      done = true;
+      resolveCoordsToDistrict(lat, lon, ok);
+      return;
+    }
+    var d = mD(cityOrRegion || "");
+    if (d) {
+      done = true;
+      ok(d);
+    }
+  }
+  fetch("https://api.bigdatacloud.net/data/reverse-geocode-client?localityLanguage=en")
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if (d && (d.latitude || d.city || d.locality || d.principalSubdivision)) {
+        handleCoord(parseFloat(d.latitude), parseFloat(d.longitude), (d.city || "") + " " + (d.locality || "") + " " + (d.principalSubdivision || ""));
+      }
+    }).catch(function(){});
+
+  setTimeout(function(){
+    if (!done && fail) fail();
+  }, 3500);
+}
+
 window.requestDeviceGpsDirect = function(ev) {
+  if(ev && ev.stopPropagation) ev.stopPropagation();
+  var pdm = document.getElementById("pdm");
+  var pokBtn = document.getElementById("pok");
+
   if(!navigator.geolocation) {
-    var pdm0 = document.getElementById("pdm");
-    if(pdm0) pdm0.textContent = "⚠️ আপনার ব্রাউজার GPS সাপোর্ট করে না। নিচে ম্যানুয়ালি জেলা নির্বাচন করুন।";
+    if(pdm) pdm.textContent = "⚠️ আপনার ব্রাউজার GPS সাপোর্ট করে না। নিচে ম্যানুয়ালি জেলা নির্বাচন করুন।";
     return;
   }
 
   var resolved = false;
-  var pdm = document.getElementById("pdm");
-  var pokBtn = document.getElementById("pok");
+  if(pdm) pdm.textContent = "📡 ব্রাউজার থেকে আপনার ডিভাইসের GPS লোকেশন শনাক্ত করা হচ্ছে...";
+  if(pokBtn) pokBtn.textContent = "⏳ লোকেশন পারমিশন চাওয়া হচ্ছে...";
 
-  // ইউজার জেসচারের একদম প্রথম লাইনেই নেটিভ High-Accuracy GPS কল (যাতে ব্রাউজার ও ফোনের নেটিভ GPS Turn-On পপআপ ১০০% নিশ্চিতভাবে আসে!)
+  function onRealGpsPosition(pos) {
+    if(resolved || !pos || !pos.coords) return;
+    var lat = pos.coords.latitude;
+    var lon = pos.coords.longitude;
+    if(typeof lat !== "number" || typeof lon !== "number") return;
+    resolved = true;
+    if(gpsWatchId !== null) {
+      try { navigator.geolocation.clearWatch(gpsWatchId); } catch(e){}
+      gpsWatchId = null;
+    }
+    resolveCoordsToDistrict(lat, lon, completeGpsSuccess);
+  }
+
+  function startBackgroundWatch() {
+    try {
+      if(gpsWatchId !== null) navigator.geolocation.clearWatch(gpsWatchId);
+      gpsWatchId = navigator.geolocation.watchPosition(onRealGpsPosition, function(){}, {
+        enableHighAccuracy: true,
+        maximumAge: 0,
+        timeout: 15000
+      });
+    } catch(e){}
+  }
+
+  // ১. ইউজার জেসচারের একদম প্রথম লাইনেই High-Accuracy GPS কল (৪ সেকেন্ড টাইমআউট)
   navigator.geolocation.getCurrentPosition(
-    function(pos) {
-      if(resolved || !pos || !pos.coords) return;
-      var lat = pos.coords.latitude;
-      var lon = pos.coords.longitude;
-      if(typeof lat !== "number" || typeof lon !== "number") return;
-      resolved = true;
-      resolveCoordsToDistrict(lat, lon, completeGpsSuccess);
-    },
+    onRealGpsPosition,
     function(err) {
       if(resolved) return;
       var errMsg = (err && err.message) ? String(err.message).toLowerCase() : "";
-      if(pokBtn) pokBtn.textContent = "📍 লোকেশন পারমিশন দিন (Enable GPS) 🩸";
 
       if(errMsg.indexOf("policy") !== -1 || errMsg.indexOf("disabled") !== -1) {
-        if(pdm) pdm.textContent = "ℹ️ চ্যাটের প্রিভিউ উইন্ডোতে ব্রাউজার নিরাপত্তার কারণে GPS ব্লক রাখে। আপনার মূল ওয়েবসাইটে (GitHub/Vercel) কোডটি বসালে ক্লিক করার সাথে সাথেই ফোনের GPS অন করার পপআপ আসবে!";
+        fetchLiveBrowserCoords(function(dist){
+          completeGpsSuccess(dist);
+        }, function(){
+          if(pokBtn) pokBtn.textContent = "📍 লোকেশন পারমিশন দিন (Enable GPS) 🩸";
+          if(pdm) pdm.textContent = "ℹ️ প্রিভিউ উইন্ডোতে GPS সীমাবদ্ধ। গিটহাবে (লাইভ সাইটে) বসালে সরাসরি ফোনের GPS কাজ করবে। এখানে নিচে ম্যানুয়ালি জেলা নির্বাচন করুন।";
+        });
         return;
       }
 
-      if(err && err.code === 1) {
-        if(pdm) pdm.innerHTML = "🚫 ব্রাউজারে লোকেশন পারমিশন Block করা আছে। অ্যাড্রেস বারের বাম পাশের <b>🔒 (Lock)</b> আইকনে ট্যাপ করে Location <b>Allow</b> করে আবার ক্লিক করুন।";
-      } else if(err && err.code === 2) {
-        // যদি কোনো কাস্টম ব্রাউজারে Google Play Services না থাকার কারণে অটো GPS পপআপ না আসে, তবে ১-ক্লিকে সরাসরি ফোনের GPS অন করার বাটন দেখাবে + watchPosition চালু রাখবে
-        if(pdm) pdm.innerHTML = "📡 আপনার ব্রাউজারে পারমিশন দেওয়া হয়েছে! ফোনের GPS অন করতে নিচের বাটনে ট্যাপ করে <b>ON / OK</b> দিন:<br><button type='button' onclick='window.openAndroidLocationSettings()' style='margin-top:8px;background:#0f172a;color:#fff;border:none;padding:9px 16px;border-radius:10px;font-size:12.5px;font-weight:800;cursor:pointer;'>⚙️ ১-ক্লিকে ফোনের GPS সুইচ ON করুন ➔</button>";
-        try {
-          if(gpsWatchId !== null) navigator.geolocation.clearWatch(gpsWatchId);
-          gpsWatchId = navigator.geolocation.watchPosition(function(p2){
-            if(resolved || !p2 || !p2.coords) return;
-            resolved = true;
-            navigator.geolocation.clearWatch(gpsWatchId);
-            gpsWatchId = null;
-            resolveCoordsToDistrict(p2.coords.latitude, p2.coords.longitude, completeGpsSuccess);
-          }, function(){}, {enableHighAccuracy: true, maximumAge: 0, timeout: 20000});
-        } catch(e){}
-      } else {
-        // স্যাটেলাইট সিগন্যাল পেতে দেরি হলে নেটওয়ার্ক GPS দিয়ে চেক করবে
-        navigator.geolocation.getCurrentPosition(function(pos2){
-          if(resolved || !pos2 || !pos2.coords) return;
-          resolved = true;
-          resolveCoordsToDistrict(pos2.coords.latitude, pos2.coords.longitude, completeGpsSuccess);
-        }, function(){
-          if(pdm) pdm.textContent = "⚠️ জিপিএস সিগন্যাল পাওয়া যায়নি। আবার বাটনে ক্লিক করে পপআপে Allow / OK দিন।";
-        }, {enableHighAccuracy: false, timeout: 10000, maximumAge: 0});
-      }
+      // ২. ইনডোর/নেটওয়ার্ক ব্রাউজার জিওলোকেশন চেক (০.৩ সেকেন্ডে কাজ করে)
+      navigator.geolocation.getCurrentPosition(
+        onRealGpsPosition,
+        function(err2) {
+          if(resolved) return;
+          if(pokBtn) pokBtn.textContent = "📍 লোকেশন পারমিশন দিন (Enable GPS) 🩸";
+          var finalCode = (err2 && err2.code) ? err2.code : (err ? err.code : 0);
+
+          if(finalCode === 1) {
+            if(pdm) pdm.innerHTML = "🚫 ব্রাউজারে লোকেশন পারমিশন <b>Block</b> করা আছে। উপরের অ্যাড্রেস বারের বাম পাশের <b>🔒 (Lock/Tune)</b> আইকনে ট্যাপ করে Location <b>Allow</b> করে আবার ক্লিক করুন।";
+          } else if(finalCode === 2) {
+            startBackgroundWatch();
+            window.openAndroidLocationSettings();
+            if(pdm) pdm.innerHTML = "📲 আপনার ফোনের <b>Location / GPS</b> অন করার অপশন ওপেন করা হচ্ছে—সেখানে <b>ON / Allow</b> করে ব্যাক করলেই স্বয়ংক্রিয়ভাবে আপনার বর্তমান জেলা শনাক্ত হবে!<br><button type='button' onclick='window.openAndroidLocationSettings()' style='margin-top:8px;background:#b71c1c;color:#fff;border:none;padding:9px 16px;border-radius:10px;font-size:12.5px;font-weight:800;cursor:pointer;'>📍 ফোনের GPS অন করতে এখানে ট্যাপ করুন ➔</button>";
+          } else {
+            startBackgroundWatch();
+            if(pdm) pdm.textContent = "⚠️ ডিভাইসের GPS সিগন্যাল পাওয়া যায়নি। ফোনের Location অন করে আবার বাটনে ক্লিক করুন।";
+          }
+        },
+        {
+          enableHighAccuracy: false,
+          timeout: 4500,
+          maximumAge: 60000
+        }
+      );
     },
     {
       enableHighAccuracy: true,
-      timeout: 30000,
+      timeout: 4000,
       maximumAge: 0
     }
   );
-
-  if(pdm) pdm.textContent = "📡 স্ক্রিনে আসা পপআপে Allow / OK ট্যাপ করে GPS অন করুন...";
-  if(pokBtn) pokBtn.textContent = "⏳ পপআপে Allow / OK দিন...";
 };
 
 window.triggerNativeGpsNow = function() {
@@ -2317,11 +2349,12 @@ if(skipBtn){
   });
 }
 
-// পুরনো ক্যাশ পরিষ্কার যাতে আগের কোনো সেভ করা জেলা না দেখায়
+// পুরনো ক্যাশ পরিষ্কার
 try { localStorage.removeItem("sbs_d"); localStorage.removeItem("sbs_t"); localStorage.removeItem("sbs_gps_d"); localStorage.removeItem("sbs_gps_t"); } catch(e){}
 
 (function initTickerOnLoad(){
-  var gBtn = document.getElementById("t-gps-btn");
+  // লোকেশন পারমিশন দেওয়ার আগ পর্যন্ত টিকারে সুন্দরভাবে পূর্ণাঙ্গ বার্তা স্ক্রল করবে (কোনো বাটন ওঠানামা বা অর্ধেক কাটা লেখা থাকবে না!)
+  stk(['📍 আপনার বর্তমান জেলার জরুরি রক্তের নোটিশ দেখতে লোকেশন পারমিশন (Enable GPS) দিন অথবা এখানে ক্লিক করুন ❤️'], '');
 
   if(navigator.permissions && navigator.permissions.query){
     navigator.permissions.query({name: "geolocation"}).then(function(res){
@@ -2330,33 +2363,29 @@ try { localStorage.removeItem("sbs_d"); localStorage.removeItem("sbs_t"); localS
         navigator.geolocation.getCurrentPosition(function(p){
           resolveCoordsToDistrict(p.coords.latitude, p.coords.longitude, completeGpsSuccess);
         }, function(){
-          document.getElementById("pop").classList.remove("off");
-          if(gBtn) gBtn.classList.add("show");
-        }, {enableHighAccuracy: true, timeout: 8000, maximumAge: 0});
+          navigator.geolocation.getCurrentPosition(function(p2){
+            resolveCoordsToDistrict(p2.coords.latitude, p2.coords.longitude, completeGpsSuccess);
+          }, function(){
+            document.getElementById("pop").classList.remove("off");
+          }, {enableHighAccuracy: false, timeout: 4500, maximumAge: 60000});
+        }, {enableHighAccuracy: true, timeout: 4000, maximumAge: 0});
       } else {
-        hsk();
         document.getElementById("pop").classList.remove("off");
-        if(gBtn) gBtn.classList.add("show");
       }
       res.onchange = function(){
         if(res.state === "granted"){
           navigator.geolocation.getCurrentPosition(function(p){
             resolveCoordsToDistrict(p.coords.latitude, p.coords.longitude, completeGpsSuccess);
-          }, function(){}, {enableHighAccuracy: true, timeout: 8000, maximumAge: 0});
+          }, function(){}, {enableHighAccuracy: false, timeout: 5000, maximumAge: 60000});
         }
       };
     }).catch(function(){
-      hsk();
       document.getElementById("pop").classList.remove("off");
-      if(gBtn) gBtn.classList.add("show");
     });
   } else {
-    hsk();
     document.getElementById("pop").classList.remove("off");
-    if(gBtn) gBtn.classList.add("show");
   }
 
-  // ইউজার ফোনের Location অন করে পেজে ফিরলেই সাথে সাথে আসল GPS কোঅর্ডিনেট নিয়ে জেলা বের করবে
   function recheckRealGpsOnFocus() {
     var curTag = document.getElementById("tdn");
     if(curTag && curTag.textContent.trim().length > 0 && document.getElementById("tdt").classList.contains("show")) return;
@@ -2365,7 +2394,7 @@ try { localStorage.removeItem("sbs_d"); localStorage.removeItem("sbs_t"); localS
       if(p && p.coords) {
         resolveCoordsToDistrict(p.coords.latitude, p.coords.longitude, completeGpsSuccess);
       }
-    }, function(){}, {enableHighAccuracy: true, timeout: 6000, maximumAge: 0});
+    }, function(){}, {enableHighAccuracy: false, timeout: 4500, maximumAge: 60000});
   }
   window.addEventListener("focus", recheckRealGpsOnFocus);
   document.addEventListener("visibilitychange", function(){
