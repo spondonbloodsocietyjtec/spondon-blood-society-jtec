@@ -6146,12 +6146,32 @@ var SPONDON_AI_KB = [
     ansEn: '🩺 <b>First Aid for Sudden High Blood Pressure:</b><br>1. Seat the person in a calm, quiet environment in a semi-reclined position and take slow, deep breaths.<br>2. If they missed their prescribed daily BP medication, give their regular dose (never give someone else\'s BP pills without a doctor\'s advice).<br>3. Avoid salt, caffeine, and smoking. If BP exceeds 180/120 mmHg or is accompanied by chest pain, severe headache, or numbness, rush to a hospital immediately.'
   },
   {
+    id: 'first_aid_cpr',
+    topic: 'প্রাথমিক চিকিৎসা: সিপিআর (CPR) দেওয়ার সঠিক নিয়ম (C-A-B গাইড)',
+    mustAny: ['cpr', 'সিপিআর', 'সি পি আর', 'কৃত্রিম শ্বাস', 'বুকে চাপ', 'chest compression', 'cardiopulmonary resuscitation'],
+    high: ['cpr', 'সিপিআর', 'how to give cpr', 'how to do cpr', 'how to perform cpr', 'cpr steps', 'cpr দেওয়ার নিয়ম', 'কীভাবে সিপিআর দিতে হয়', 'সিপিআর কীভাবে দেয়', 'কিভাবে cpr দিতে হয়', 'cpr দেয়ার নিয়ম'],
+    med: ['অজ্ঞান', 'শ্বাস বন্ধ', 'হার্টবিট বন্ধ', '৩০ বার', '১০০ থেকে ১২০', 'unconscious', 'not breathing', 'compression'],
+    neg: ['পার্থক্য', 'difference between'],
+    ans: '🫀 <b>সিপিআর (CPR — Cardiopulmonary Resuscitation) দেওয়ার সঠিক ধাপসমূহ (C-A-B পদ্ধতি):</b><br>' +
+         'যখন কোনো ব্যক্তি হঠাৎ অজ্ঞান হয়ে যান এবং তাঁর স্বাভাবিক শ্বাসপ্রশ্বাস বা নাড়ি (Pulse) বন্ধ হয়ে যায়, তখন মস্তিষ্কে ও হৃৎপিণ্ডে রক্তপ্রবাহ সচল রাখতে সাথে সাথে নিচের নিয়মে <b>CPR</b> শুরু করুন:<br>' +
+         '• <b>ধাপ ১ — নিরাপত্তা ও সাড়া যাচাই:</b> রোগীকে শক্ত ও সমান মেঝেতে চিত করে শোয়ান। কাঁধে মৃদু ধাক্কা দিয়ে ডাকুন এবং ১০ সেকেন্ডের মধ্যে শ্বাস নিচ্ছেন কি না দেখুন। পাশের কাউকে দ্রুত অ্যাম্বুলেন্স ডাকার জন্য বলুন।<br>' +
+         '• <b>ধাপ ২ — C (Chest Compressions / বুকে চাপ দেওয়া):</b><br>' +
+         '  — রোগীর পাশে হাঁটু গেড়ে বসুন। বুকের ঠিক মাঝখানে (দুই নিপলের মাঝ বরাবর Sternum হাড়ের নিচের অংশে) আপনার এক হাতের তালুর গোড়ালি রাখুন এবং তার ওপর অন্য হাতটি রেখে আঙুলগুলো লক করুন।<br>' +
+         '  — দুই হাতের কনুই একদম সোজা রেখে শরীরের ভর দিয়ে বুকে <b>প্রায় ২ ইঞ্চি (৫ সে.মি.) গভীরতায়</b> জোরে ও দ্রুত চাপ দিন।<br>' +
+         '  — চাপের গতি হবে <b>প্রতি মিনিটে ১০০ থেকে ১২০ বার</b> (প্রতি সেকেন্ডে প্রায় ২ বার)। প্রতিবার চাপের পর বুককে স্বাভাবিক অবস্থানে ওপরে উঠতে দিন।<br>' +
+         '• <b>ধাপ ৩ — A (Airway / শ্বাসনালি খোলা):</b> ৩০ বার বুকে চাপ দেওয়ার পর এক হাত কপালে রেখে মাথা হালকা পেছনে কাত করুন এবং অন্য হাত দিয়ে থুতনি উঁচু করুন (Head-tilt, Chin-lift)।<br>' +
+         '• <b>ধাপ ৪ — B (Breathing / কৃত্রিম শ্বাস):</b> রোগীর নাক চিমটি দিয়ে বন্ধ করে মুখের ওপর মুখ রেখে ১ সেকেন্ড করে <b>২ বার</b> শ্বাস ফুঁকে দিন যাতে বুক ফুলে ওঠে।<br>' +
+         '• <b>৩০:২ অনুপাত চলমান রাখা:</b> এভাবে <b>৩০ বার বুকে চাপ ও ২ বার কৃত্রিম শ্বাস (30:2)</b> একটানা চালিয়ে যান যতক্ষণ না রোগীর শ্বাস ফেরে বা চিকিৎসক পৌঁছান। (কৃত্রিম শ্বাস দিতে না পারলে না থেমে একটানা মিনিটে ১০০–১২০ বার শুধু বুকে চাপ বা <b>Hands-Only CPR</b> চালিয়ে যান)।',
+    topicEn: 'Step-by-Step Guide to Giving CPR (C-A-B Protocol)',
+    ansEn: '🫀 <b>How to Give CPR — Step-by-Step Clinical First Aid (C-A-B Protocol):</b><br>Perform CPR immediately if a person collapses, is <b>unresponsive</b>, and is <b>not breathing normally</b>:<br>• <b>1. Check Response & Call Emergency:</b> Lay the person flat on a firm surface. Tap their shoulders firmly and check for breathing for no more than 10 seconds.<br>• <b>2. C — Chest Compressions (Push Hard & Fast):</b><br>  — Kneel beside the chest. Place the heel of one hand in the <b>exact center of the chest</b> (lower half of the breastbone/sternum), place your other hand on top, and interlock your fingers.<br>  — Keep your arms straight and shoulders directly above your hands. Push straight down <b>at least 2 inches (5 cm) deep</b> at a rate of <b>100 to 120 compressions per minute</b>.<br>  — Allow the chest to recoil completely after each push.<br>• <b>3. A — Open the Airway:</b> After 30 compressions, gently tilt the head back and lift the chin (<i>Head-Tilt, Chin-Lift</i>).<br>• <b>4. B — Rescue Breaths (30:2 Ratio):</b> Pinch the nose shut and give <b>2 rescue breaths</b> (1 second each), watching the chest rise. Continue cycles of <b>30 compressions and 2 breaths</b> until breathing resumes or medical help arrives. (If untrained in rescue breathing, perform uninterrupted <b>Hands-Only CPR</b> at 100–120 pushes/min).'
+  },
+  {
     id: 'first_aid_heart_attack',
     topic: 'প্রাথমিক চিকিৎসা: হার্ট অ্যাটাক (Heart Attack) ও বুকে ব্যথা',
-    mustAny: ['হার্ট অ্যাটাক', 'হার্ট এটাক', 'বুকে ব্যথা', 'heart attack', 'cpr', 'সিপিআর', 'হৃদরোগে', 'heart attack', 'chest pain', 'cpr', 'cardiac arrest'],
-    high: ['হার্ট অ্যাটাক হলে প্রাথমিক চিকিৎসা কী', 'হঠাৎ বুকে তীব্র ব্যথা হলে করণীয় কী', 'হার্ট অ্যাটাকের লক্ষণ কী', 'first aid for heart attack and chest pain', 'how to perform cpr in emergency'],
-    med: ['হার্ট অ্যাটাক', 'বুকে ব্যথা', 'বাম হাত', 'অ্যাসপিরিন', 'cpr', 'heart attack', 'chest pain', 'aspirin', 'cpr'],
-    neg: [],
+    mustAny: ['হার্ট অ্যাটাক', 'হার্ট এটাক', 'বুকে ব্যথা', 'heart attack', 'হৃদরোগে', 'chest pain'],
+    high: ['হার্ট অ্যাটাক হলে প্রাথমিক চিকিৎসা কী', 'হঠাৎ বুকে তীব্র ব্যথা হলে করণীয় কী', 'হার্ট অ্যাটাকের লক্ষণ কী', 'first aid for heart attack', 'severe chest pain first aid', 'heart attack symptoms'],
+    med: ['হার্ট অ্যাটাক', 'বুকে ব্যথা', 'বাম হাত', 'অ্যাসপিরিন', 'heart attack', 'chest pain', 'aspirin'],
+    neg: ['cpr', 'সিপিআর', 'পার্থক্য', 'difference between'],
     ans: '🫀 <b>হার্ট অ্যাটাক (Heart Attack) বা বুকে তীব্র ব্যথা হলে প্রাথমিক চিকিৎসা:</b><br>' +
          '• <b>লক্ষণ:</b> বুকের মাঝখানে বা বাম পাশে প্রচণ্ড চাপ/ব্যথা, যা বাম হাত, কাঁধ, চোয়াল বা পিঠে ছড়িয়ে পড়ে, সাথে প্রচণ্ড ঘাম ও শ্বাসকষ্ট।<br>' +
          '• <b>তাৎক্ষণিক করণীয়:</b><br>' +
@@ -6717,11 +6737,25 @@ function analyzeAndAnswerSpondonAi(rawQuestion) {
   if(!q) return null;
   var isEn = isEnglishQuery(rawQuestion);
 
-  // 1. Check if the user is asking about a specific blood group's compatibility (e.g., B+, O-, AB+)
+  // ১. নির্দিষ্ট রক্তের গ্রুপের ডোনেশন কম্প্যাটিবিলিটি প্রশ্ন কি না চেক (যেমন: B+ কাকে রক্ত দিতে পারে?)
   var specificBgReply = checkSpecificBloodGroupQuery(rawQuestion, isEn);
   if(specificBgReply) return specificBgReply;
 
-  // 2. Score all 57+ Medical, Blood Science, First Aid & Spondon KB topics
+  // ২. যদি ইউজার এমন কোনো তুলনামূলক, জটিল বা বিশ্লেষণধর্মী প্রশ্ন করেন (যেমন: "difference between", "পার্থক্য কী", "কেন হয় বিস্তারিত", "খাদ্যতালিকা কেমন হওয়া উচিত"),
+  // তবে জোরপূর্বক ইন-বিল্ট কার্ড না দেখিয়ে সরাসরি Gemini API-তে পাঠাবে যাতে ১০০% প্রাসঙ্গিক উত্তর পাওয়া যায়!
+  var complexGeminiTriggers = [
+    'পার্থক্য', 'difference between', 'compare ', 'তুলনা', 'কেন হয় এবং কীভাবে',
+    'পাশাপাশি আর কী', 'কোন টেস্ট করানো', 'what happens if', 'why does ', 'how does ',
+    'বিস্তারিত ব্যাখ্যা', 'explain in detail', 'কোন ডাক্তার দেখাব', 'which specialist'
+  ];
+  for(var ct = 0; ct < complexGeminiTriggers.length; ct++) {
+    if(q.indexOf(normBnQuery(complexGeminiTriggers[ct])) !== -1) {
+      return null; // সরাসরি ব্যাকএন্ডের Gemini API ব্যবহার করবে
+    }
+  }
+
+  // ৩. ইন-বিল্ট ২০০+ টপিকের মধ্যে শুধুমাত্র তখনই ম্যাচ করবে যখন প্রশ্নের মূল বিষয়বস্তু (mustAny + high phrase) সুনির্দিষ্টভাবে মিলে যাবে!
+  // শুধুমাত্র একটি সাধারণ শব্দ (যেমন শুধু 'পানি' বা 'রক্ত' বা 'ব্যথা') মিলে যাওয়ার কারণে আর কখনোই অপ্রাসঙ্গিক ইন-বিল্ট উত্তর দেবে না।
   var bestEntry = null;
   var bestScore = 0;
 
@@ -6729,6 +6763,20 @@ function analyzeAndAnswerSpondonAi(rawQuestion) {
     var item = SPONDON_AI_KB[i];
     var score = 0;
 
+    // নেগেটিভ কিউওয়ার্ড থাকলে বাদ
+    var hasNeg = false;
+    if(item.neg && item.neg.length > 0) {
+      for(var n = 0; n < item.neg.length; n++) {
+        var nk = normBnQuery(item.neg[n]);
+        if(nk && q.indexOf(nk) !== -1) {
+          hasNeg = true;
+          break;
+        }
+      }
+    }
+    if(hasNeg) continue;
+
+    // mustAny চেক (সর্বোচ্চ ১ বার +6 পয়েন্ট যোগ হবে যাতে ডুপ্লিকেট শব্দের কারণে ভুল স্কোর না বাড়ে)
     var passedMust = false;
     if(item.mustAny && item.mustAny.length > 0) {
       for(var m = 0; m < item.mustAny.length; m++) {
@@ -6736,75 +6784,77 @@ function analyzeAndAnswerSpondonAi(rawQuestion) {
         if(mk && q.indexOf(mk) !== -1) {
           passedMust = true;
           score += 6;
+          break;
         }
       }
       if(!passedMust) continue;
     }
 
-    if(item.high) {
+    // high-confidence সুনির্দিষ্ট প্রশ্ন/টপিক ফ্রেজ চেক (ম্যাচ করার জন্য অন্তত ১টি high ফ্রেজ বা ২+ med শব্দসহ সুনির্দিষ্ট টপিক মিলতে হবে)
+    var passedHigh = false;
+    if(item.high && item.high.length > 0) {
       for(var h = 0; h < item.high.length; h++) {
         var hk = normBnQuery(item.high[h]);
         if(hk && q.indexOf(hk) !== -1) {
-          score += 14;
+          passedHigh = true;
+          score += 16;
         }
       }
     }
 
-    if(item.med) {
+    var medMatches = 0;
+    if(item.med && item.med.length > 0) {
       for(var d = 0; d < item.med.length; d++) {
         var dk = normBnQuery(item.med[d]);
         if(dk && q.indexOf(dk) !== -1) {
+          medMatches++;
           score += 4;
         }
       }
     }
 
-    if(item.neg) {
-      for(var n = 0; n < item.neg.length; n++) {
-        var nk = normBnQuery(item.neg[n]);
-        if(nk && q.indexOf(nk) !== -1) {
-          score -= 16;
-        }
+    // কঠোর প্রাসঙ্গিকতা শর্ত (Strict Relevance Filter):
+    // ইন-বিল্ট উত্তর দেওয়ার জন্য অবশ্যই সুনির্দিষ্ট `high` ফ্রেজ মিলতে হবে (score >= 22) অথবা অন্তত ২টি সুনির্দিষ্ট প্রাসঙ্গিক শব্দসহ টপিক মিলতে হবে (score >= 18)।
+    // অন্যথায় এটি জোরপূর্বক ইন-বিল্ট উত্তর না দিয়ে Gemini API-কে কল করবে!
+    if((passedHigh && score >= 22) || (passedMust && medMatches >= 2 && score >= 18)) {
+      if(score > bestScore) {
+        bestScore = score;
+        bestEntry = item;
       }
-    }
-
-    if(score > bestScore) {
-      bestScore = score;
-      bestEntry = item;
     }
   }
 
-  if(bestEntry && bestScore >= 6) {
+  if(bestEntry) {
     if(isEn && bestEntry.ansEn) {
       return '<div style="font-size:11.5px;color:#059669;font-weight:800;margin-bottom:6px;display:flex;align-items:center;gap:5px;">' +
-               '<span>✅ Verified Medical & Blood Info • ' + (bestEntry.topicEn || bestEntry.topic) + '</span>' +
+               '<span>✅ Verified In-Built Medical Database • ' + (bestEntry.topicEn || bestEntry.topic) + '</span>' +
              '</div>' + bestEntry.ansEn;
     }
     return '<div style="font-size:11.5px;color:#059669;font-weight:800;margin-bottom:6px;display:flex;align-items:center;gap:5px;">' +
-             '<span>✅ যাচাইকৃত মেডিকেল ও রক্তদান তথ্য • ' + bestEntry.topic + '</span>' +
+             '<span>✅ যাচাইকৃত ইন-বিল্ট মেডিকেল ডাটাবেজ • ' + bestEntry.topic + '</span>' +
            '</div>' + bestEntry.ans;
   }
 
-  // 3. Strict Bilingual Medical Safety Guardrail Fallback (Never guesses or outputs a wrong answer!)
-  if(isEn) {
-    return '🩺 <b>Medical Accuracy & Safety Notice:</b><br>' +
-           'To prevent any medical misinformation, our AI Assistant never guesses when a question is outside its verified clinical database.<br><br>' +
-           'Please rephrase your question clearly, or tap a verified topic below:<br>' +
-           '• <a class="ai-link" onclick="askSpondonAi(\'How much blood is in the human body?\')">How much blood is in the human body?</a><br>' +
-           '• <a class="ai-link" onclick="askSpondonAi(\'Who can donate blood? What is the age and weight limit?\')">Blood donation age & weight requirements</a><br>' +
-           '• <a class="ai-link" onclick="askSpondonAi(\'Blood group compatibility chart\')">Which blood group can donate to whom?</a><br>' +
-           '• <a class="ai-link" onclick="askSpondonAi(\'When is platelet transfusion needed in dengue?\')">Dengue fever & platelet transfusion guide</a><br>' +
-           '• <a class="ai-link" onclick="askSpondonAi(\'First aid for cuts and severe bleeding\')">Emergency First Aid (cuts, burns, snake bite, CPR)</a>';
-  }
+  // কোনো সুনির্দিষ্ট ইন-বিল্ট ম্যাচ না পাওয়া গেলে null রিটার্ন করবে, যাতে সাথে সাথে ব্যাকএন্ডের Gemini API ব্যবহৃত হয়!
+  return null;
+}
 
-  return '🩺 <b>স্বাস্থ্য ও তথ্য নিরাপত্তা বার্তা:</b><br>' +
-         'আপনার প্রশ্নটি সুনির্দিষ্টভাবে শনাক্ত করা যায়নি। স্বাস্থ্য ও রক্তদান সংক্রান্ত সংবেদনশীল বিষয়ে বিভ্রান্তি এড়াতে আমাদের এআই সহকারী কখনোই অনুমানভিত্তিক উত্তর দেয় না।<br><br>' +
-         'অনুগ্রহ করে প্রশ্নটি আরেকটু স্পষ্টভাবে লিখুন, যেমন:<br>' +
-         '• <a class="ai-link" onclick="askSpondonAi(\'একজন পুরুষ মানুষের শরীরে রক্তের পরিমাণ কত?\')">মানুষের শরীরে রক্তের পরিমাণ কত?</a><br>' +
+function getSpondonFallbackTemplate(isEn) {
+  if(isEn) {
+    return '🩺 <b>Medical Accuracy & AI Boundary Notice:</b><br>' +
+           'As an AI Health & Blood Donation Assistant, I cannot provide a verified answer to this specific query right now. Please make sure your Google Apps Script is deployed as a <b>New Version</b> so live Gemini AI answers are active, or tap a topic below:<br><br>' +
+           '• <a class="ai-link" onclick="askSpondonAi(\'How to give CPR?\')">How to give CPR step-by-step?</a><br>' +
+           '• <a class="ai-link" onclick="askSpondonAi(\'How much water should a human drink daily?\')">Daily water intake guide</a><br>' +
+           '• <a class="ai-link" onclick="askSpondonAi(\'Who can donate blood? What is the age and weight limit?\')">Blood donation age & weight requirements</a><br>' +
+           '• <a class="ai-link" onclick="askSpondonAi(\'When is platelet transfusion needed in dengue?\')">Dengue fever & platelet transfusion guide</a>';
+  }
+  return '🩺 <b>স্বাস্থ্য ও এআই নিরাপত্তা বার্তা:</b><br>' +
+         'আমরা যেহেতু একটি এআই (AI) স্বাস্থ্য সহকারী, তাই এই মুহূর্তে এই প্রশ্নটির শতভাগ যাচাইকৃত উত্তর আমাদের ইন-বিল্ট ডাটাবেজে পাওয়া যায়নি। (বিঃদ্রঃ আপনার Google Sheet-এর Apps Script-এ নতুন `Code.gs` পেস্ট করে <b>Manage deployments ➔ Edit ➔ New version ➔ Deploy</b> করলেই ইন-বিল্টের বাইরের সব প্রশ্নের উত্তর সরাসরি <b>Google Gemini API</b> থেকে আসবে!)<br><br>' +
+         'আপনি নিচের যেকোনো যাচাইকৃত বিষয়ে ক্লিক করেও জানতে পারেন:<br>' +
+         '• <a class="ai-link" onclick="askSpondonAi(\'কীভাবে সিপিআর দিতে হয়?\')">সিপিআর (CPR) দেওয়ার সঠিক নিয়ম কী?</a><br>' +
+         '• <a class="ai-link" onclick="askSpondonAi(\'মানবদেহে কত লিটার প্রতিদিন পানি খাইতে হবে?\')">প্রতিদিন কত লিটার পানি পান করতে হবে?</a><br>' +
          '• <a class="ai-link" onclick="askSpondonAi(\'কোন গ্রুপ কাকে রক্ত দিতে ও নিতে পারে?\')">কোন গ্রুপ কাকে রক্ত দিতে পারে?</a><br>' +
-         '• <a class="ai-link" onclick="askSpondonAi(\'হিমোগ্লোবিন কত থাকা দরকার ও কীভাবে বাড়বে?\')">হিমোগ্লোবিনের মাত্রা ও রক্ত বাড়ানোর খাবার কী?</a><br>' +
-         '• <a class="ai-link" onclick="askSpondonAi(\'ডেঙ্গু রোগীর প্লাটিলেট কত হলে রক্ত দিতে হয়?\')">ডেঙ্গুতে প্লাটিলেট ও করণীয় কী?</a><br>' +
-         '• <a class="ai-link" onclick="askSpondonAi(\'হাত পা কেটে গেলে প্রাথমিক চিকিৎসা কী?\')">কেটে গেলে বা দুর্ঘটনায় প্রাথমিক চিকিৎসা কী?</a>';
+         '• <a class="ai-link" onclick="askSpondonAi(\'ডেঙ্গু রোগীর প্লাটিলেট কত হলে রক্ত দিতে হয়?\')">ডেঙ্গুতে প্লাটিলেট ও করণীয় কী?</a>';
 }
 
 resetAiChat();
@@ -6940,65 +6990,28 @@ window.askSpondonAi = function(questionText) {
     return;
   }
 
-  // ধাপ ২: আমাদের ২০০+ ইন-বিল্ট মেডিকেল, পানি, খনিজ পদার্থ, ভিটামিন, প্রাথমিক স্বাস্থ্য ও রক্তদান ডাটাবেজ চেক করবে।
-  // এখানে মিল পাওয়া গেলে সরাসরি ইন-বিল্ট ডাটাবেজ থেকেই উত্তর দেবে—ফলে আপনার Gemini API-এর ১৫০০ মেসেজের কোটা একটুও খরচ হবে না!
+  // ধাপ ২: আমাদের ২০০+ ইন-বিল্ট ডাটাবেজে সুনির্দিষ্টভাবে প্রশ্নটি মিলে গেলে সেখান থেকে উত্তর দেবে (০% API কোটা খরচ)
   var verifiedLocalAns = analyzeAndAnswerSpondonAi(questionText);
-  var isVerifiedMatch = verifiedLocalAns && (
-    verifiedLocalAns.indexOf('যাচাইকৃত') !== -1 ||
-    verifiedLocalAns.indexOf('Verified ') !== -1
-  );
-
-  if(isVerifiedMatch) {
+  if(verifiedLocalAns) {
     recordLocalAndSheetAiStat('In-Built DB', questionText, 'InBuilt-200-KB');
     revealFinalAnswer(verifiedLocalAns);
     return;
   }
 
-  // ধাপ ৩: শুধুমাত্র যখন প্রশ্নটি আমাদের ২০০+ ইন-বিল্ট ডাটাবেজে থাকবে না, কেবল তখনই আপনার Gemini API ব্যবহার করে উত্তর আনবে!
-  function formatGeminiMarkdown(txt) {
+  // ধাপ ৩: প্রশ্নটি ইন-বিল্ট ডাটাবেজে না থাকলে (অথবা নতুন/বিশ্লেষণধর্মী প্রশ্ন হলে) সরাসরি ব্যাকএন্ড সার্ভারের (Code.gs)
+  // মাধ্যমে আপনার Google Gemini API ব্যবহার করে ১০০% প্রাসঙ্গিক উত্তর নিয়ে আসবে!
+  // নিরাপত্তা নোট: API Key শুধুমাত্র আপনার Google Apps Script সার্ভারে (Code.gs) লুকানো আছে; ব্রাউজারের HTML বা Inspect Element-এ কোনো API Key নেই!
+  function formatGeminiMarkdown(txt, modelName) {
     var safe = escapeHtml(txt || '');
     safe = safe.replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
     safe = safe.replace(/^\s*[\*\-]\s+/gm, '• ');
     safe = safe.replace(/\n/g, '<br>');
-    return '<div style="font-size:11.5px;color:#059669;font-weight:800;margin-bottom:6px;display:flex;align-items:center;gap:5px;">' +
-             '<span>✅ যাচাইকৃত স্পন্দন এআই ও স্বাস্থ্য সহকারী (Gemini AI)</span>' +
+    var badgeTxt = isEn
+      ? '✨ Verified Spondon AI Response • Powered by Google Gemini API'
+      : '✨ যাচাইকৃত স্পন্দন এআই উত্তর • Powered by Google Gemini API';
+    return '<div style="font-size:11.5px;color:#0284c7;font-weight:800;margin-bottom:6px;display:flex;align-items:center;gap:5px;background:#f0f9ff;padding:5px 10px;border-radius:8px;border:1px solid #bae6fd;">' +
+             '<span>' + badgeTxt + '</span>' +
            '</div>' + safe;
-  }
-
-  // যদি ব্যাকএন্ড স্ক্রিপ্ট এখনো রি-ডিপ্লয় না করা হয়ে থাকে, তবে ফ্রন্টএন্ড থেকে সরাসরি আপনার Gemini API Key দিয়ে উত্তর আনার ফলব্যাক
-  function callDirectGeminiFallback(qStr) {
-    var kParts = ['AIzaSyCr8n', 'CqYOTbI689', 'rGXsn3Qxka', 'jViN5ORmE'];
-    var apiKey = kParts.join('');
-    var sysPrompt = [
-      'You are the official Smart Medical, Primary Health & Blood Donation AI Assistant of "Spondon Blood Society, Jhenaidah Textile Engineering College (JTEC)".',
-      '1. ALLOWED TOPICS: Answer accurately and clearly ONLY if the question relates to human body, water/hydration, minerals, electrolytes, vitamins, food/nutrition, primary health, common illnesses, pathology/blood tests, first aid, blood science, blood donation, or Spondon Blood Society (JTEC).',
-      '2. OUT-OF-SCOPE TOPICS: If the question is outside medical, health, human body, nutrition, or blood donation, reply ONLY with: "দুঃখিত, এই প্রশ্নটি মেডিকেল, প্রাথমিক স্বাস্থ্যসেবা ও রক্তদান বিষয়ের বাইরে। আমরা যেহেতু একটি স্বাস্থ্য ও রক্তদান বিষয়ক এআই (AI) সহকারী, তাই এই বিষয়ের বাইরের প্রশ্নের উত্তর আমাদের পক্ষে দেওয়া সম্ভব নয়।"',
-      '3. OVERLY CRITICAL / PRESCRIPTION TOPICS: If the user asks for dangerous drug prescriptions or critical surgical decisions, reply ONLY with: "গুরুত্বপূর্ণ স্বাস্থ্য সতর্কবার্তা: আপনার প্রশ্নটি জটিল চিকিৎসা ও প্রেসক্রিপশন সংক্রান্ত। আমরা যেহেতু একটি এআই (AI) সহকারী, তাই কোনো জটিল রোগের সরাসরি ওষুধের প্রেসক্রিপশন বা চূড়ান্ত চিকিৎসা সিদ্ধান্ত আমাদের পক্ষে দেওয়া সম্ভব নয়। অনুগ্রহ করে দ্রুত একজন রেজিস্টার্ড বিশেষজ্ঞ চিকিৎসকের (MBBS Doctor) পরামর্শ নিন।"',
-      '4. If asked in Bangla or Banglish, reply in polite Bangla with bullet points (•) and **bold** key terms. If asked in English, reply in clear English.'
-    ].join('\n');
-
-    var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + encodeURIComponent(apiKey);
-    fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: sysPrompt + "\n\nব্যবহারকারীর প্রশ্ন: " + qStr }] }],
-        generationConfig: { temperature: 0.3, maxOutputTokens: 850 }
-      })
-    })
-    .then(function(r){ return r.json(); })
-    .then(function(json){
-      var ans = json && json.candidates && json.candidates[0] && json.candidates[0].content && json.candidates[0].content.parts && json.candidates[0].content.parts[0].text;
-      if(ans) {
-        recordLocalAndSheetAiStat('Gemini API', qStr, 'gemini-2.5-flash');
-        revealFinalAnswer(formatGeminiMarkdown(ans));
-      } else {
-        revealFinalAnswer(verifiedLocalAns);
-      }
-    })
-    .catch(function(){
-      revealFinalAnswer(verifiedLocalAns);
-    });
   }
 
   var fd = new FormData();
@@ -7009,16 +7022,25 @@ window.askSpondonAi = function(questionText) {
   .then(function(r){ return r.json(); })
   .then(function(d){
     if(d && d.status === 'Success' && d.answer){
+      try {
+        var todayKey = new Date().toISOString().split('T')[0];
+        var st = JSON.parse(localStorage.getItem('sbs_ai_stats_v1') || '{}');
+        if(st.date !== todayKey) { st.date = todayKey; st.geminiToday = 0; st.inbuiltToday = 0; }
+        st.geminiToday = (st.geminiToday || 0) + 1;
+        st.geminiTotal = (st.geminiTotal || 0) + 1;
+        st.geminiRemainingToday = Math.max(0, 1500 - st.geminiToday);
+        localStorage.setItem('sbs_ai_stats_v1', JSON.stringify(st));
+      } catch(e){}
       if(d.aiStats && typeof window.updateAdminAiStatsUI === 'function') {
         window.updateAdminAiStatsUI(d.aiStats);
       }
-      revealFinalAnswer(formatGeminiMarkdown(d.answer));
+      revealFinalAnswer(formatGeminiMarkdown(d.answer, d.model));
     } else {
-      callDirectGeminiFallback(questionText);
+      revealFinalAnswer(getSpondonFallbackTemplate(isEn));
     }
   })
   .catch(function(){
-    callDirectGeminiFallback(questionText);
+    revealFinalAnswer(getSpondonFallbackTemplate(isEn));
   });
 };
 
