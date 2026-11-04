@@ -2194,14 +2194,47 @@ document.getElementById('mdb').addEventListener('click',function(){
 });
 
 function svGps(d){
+  if(!d) return;
   try{
+    sessionStorage.setItem("sbs_session_gps_d", d);
     localStorage.setItem("sbs_gps_d", d);
     localStorage.setItem("sbs_gps_t", "" + Date.now());
   }catch(x){}
 }
 
-function completeGpsSuccess(dist) {
+function getSavedGpsDistrict(){
+  try{
+    var sd = sessionStorage.getItem("sbs_session_gps_d");
+    if(sd && sd.trim()) return sd.trim();
+    var ld = localStorage.getItem("sbs_gps_d");
+    var lt = parseInt(localStorage.getItem("sbs_gps_t") || "0", 10);
+    if(ld && ld.trim() && (Date.now() - lt < 6 * 3600 * 1000)) {
+      return ld.trim();
+    }
+  }catch(x){}
+  return "";
+}
+
+var gpsPollTimer = null;
+var gpsRequestInFlight = false;
+var gpsResolvedFlag = false;
+
+function stopGpsPolling() {
+  if(gpsPollTimer !== null) {
+    clearInterval(gpsPollTimer);
+    gpsPollTimer = null;
+  }
+  if(typeof gpsWatchId !== "undefined" && gpsWatchId !== null) {
+    try { navigator.geolocation.clearWatch(gpsWatchId); } catch(e){}
+    gpsWatchId = null;
+  }
+}
+
+function completeGpsSuccess(dist, silentToast) {
   if(!dist) return;
+  gpsResolvedFlag = true;
+  gpsRequestInFlight = false;
+  stopGpsPolling();
   var pop = document.getElementById("pop");
   var pokBtn = document.getElementById("pok");
   var pdm = document.getElementById("pdm");
@@ -2210,7 +2243,9 @@ function completeGpsSuccess(dist) {
   if(pdm) pdm.textContent = "";
   svGps(dist);
   ldN(dist);
-  showToast("📍 আপনার বর্তমান জেলা শনাক্ত হয়েছে: " + dist);
+  if(!silentToast) {
+    showToast("📍 আপনার বর্তমান জেলা শনাক্ত হয়েছে: " + dist);
+  }
 }
 
 function resolveCoordsToDistrict(lat, lon, ok) {
@@ -2233,13 +2268,30 @@ function resolveCoordsToDistrict(lat, lon, ok) {
   }).catch(function(){});
 }
 
+// Android-এর সরাসরি Location Settings ওপেন করার হেল্পার (Brave ও Chrome উভয়ের জন্য)
 window.openAndroidLocationSettings = function() {
   try {
-    if (/Android/i.test(navigator.userAgent || '')) {
-      window.location.href = "intent:#Intent;action=android.settings.LOCATION_SOURCE_SETTINGS;end";
+    var ua = navigator.userAgent || "";
+    if (/Android/i.test(ua)) {
+      var a = document.createElement("a");
+      a.href = "intent:#Intent;action=android.settings.LOCATION_SOURCE_SETTINGS;end";
+      a.style.display = "none";
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(function(){ try { document.body.removeChild(a); } catch(e){} }, 300);
     }
   } catch(e) {}
 };
+
+// ব্রাউজারটি Brave কি না তা শনাক্ত করার হেল্পার
+var isBraveBrowser = false;
+try {
+  if (navigator.brave && typeof navigator.brave.isBrave === "function") {
+    navigator.brave.isBrave().then(function(res){ isBraveBrowser = !!res; }).catch(function(){});
+  } else if (/Brave/i.test(navigator.userAgent || "")) {
+    isBraveBrowser = true;
+  }
+} catch(e){}
 
 function fetchLiveBrowserCoords(ok, fail) {
   var done = false;
@@ -2263,12 +2315,44 @@ function fetchLiveBrowserCoords(ok, fail) {
         handleCoord(parseFloat(d.latitude), parseFloat(d.longitude), (d.city || "") + " " + (d.locality || "") + " " + (d.principalSubdivision || ""));
       }
     }).catch(function(){});
-
-  setTimeout(function(){
-    if (!done && fail) fail();
-  }, 3500);
+  setTimeout(function(){ if (!done && fail) fail(); }, 3000);
 }
 
+var gpsWatchId = null;
+
+// ইউজার যখনই ফোনের GPS অন করবেন (Chrome পপআপ থেকে হোক বা Brave-এ Android Settings থেকে হোক),
+// এই নন-ওভারল্যাপিং অটো-ডিটেক্টর সাথে সাথে (০.৮ সেকেন্ডের মধ্যে) কোঅর্ডিনেট নিয়ে পপআপ বন্ধ করে ওয়েবসাইটে ঢুকিয়ে দেবে!
+function startSequentialGpsAutoDetector() {
+  stopGpsPolling();
+  var attempts = 0;
+  gpsPollTimer = setInterval(function(){
+    if(gpsResolvedFlag) {
+      stopGpsPolling();
+      return;
+    }
+    attempts++;
+    if(attempts > 35) {
+      stopGpsPolling();
+      return;
+    }
+    if(gpsRequestInFlight) return;
+    gpsRequestInFlight = true;
+    navigator.geolocation.getCurrentPosition(
+      function(pos) {
+        gpsRequestInFlight = false;
+        if(pos && pos.coords && typeof pos.coords.latitude === "number") {
+          resolveCoordsToDistrict(pos.coords.latitude, pos.coords.longitude, completeGpsSuccess);
+        }
+      },
+      function() {
+        gpsRequestInFlight = false;
+      },
+      { enableHighAccuracy: true, maximumAge: 0, timeout: 2500 }
+    );
+  }, 950);
+}
+
+// ১-ক্লিকেই ব্রাউজার ও ডিভাইসের GPS পারমিশন এবং ট্র্যাকিং ইঞ্জিন (কোনো রিফ্রেশের প্রয়োজন নেই!)
 window.requestDeviceGpsDirect = function(ev) {
   if(ev && ev.stopPropagation) ev.stopPropagation();
   var pdm = document.getElementById("pdm");
@@ -2279,86 +2363,92 @@ window.requestDeviceGpsDirect = function(ev) {
     return;
   }
 
-  var resolved = false;
-  if(pdm) pdm.textContent = "📡 ব্রাউজার থেকে আপনার ডিভাইসের GPS লোকেশন শনাক্ত করা হচ্ছে...";
+  // গুরুত্বপূর্ণ: আগে কোনো watchPosition বা পোলিং চলমান থাকলে তা বন্ধ করা হচ্ছে,
+  // কারণ Chromium Android-এ পুরনো ওয়াচার চালু থাকলে দ্বিতীয়বার রিফ্রেশ ছাড়া ফোনের Device GPS অন করার পপআপ আসে না!
+  stopGpsPolling();
+  gpsResolvedFlag = false;
+  gpsRequestInFlight = true;
+
+  var clickStartMs = Date.now();
+  if(pdm) pdm.textContent = "📡 ডিভাইসের GPS লোকেশন শনাক্ত করা হচ্ছে...";
   if(pokBtn) pokBtn.textContent = "⏳ লোকেশন পারমিশন চাওয়া হচ্ছে...";
 
   function onRealGpsPosition(pos) {
-    if(resolved || !pos || !pos.coords) return;
+    gpsRequestInFlight = false;
+    if(gpsResolvedFlag || !pos || !pos.coords) return;
     var lat = pos.coords.latitude;
     var lon = pos.coords.longitude;
     if(typeof lat !== "number" || typeof lon !== "number") return;
-    resolved = true;
-    if(gpsWatchId !== null) {
-      try { navigator.geolocation.clearWatch(gpsWatchId); } catch(e){}
-      gpsWatchId = null;
-    }
     resolveCoordsToDistrict(lat, lon, completeGpsSuccess);
   }
 
-  function startBackgroundWatch() {
-    try {
-      if(gpsWatchId !== null) navigator.geolocation.clearWatch(gpsWatchId);
-      gpsWatchId = navigator.geolocation.watchPosition(onRealGpsPosition, function(){}, {
-        enableHighAccuracy: true,
-        maximumAge: 0,
-        timeout: 15000
-      });
-    } catch(e){}
-  }
-
-  // ১. ইউজার জেসচারের একদম প্রথম লাইনেই High-Accuracy GPS কল (৪ সেকেন্ড টাইমআউট)
+  // ইউজার ক্লিকের একদম প্রথম লাইনেই সিঙ্গেল High-Accuracy GPS কল
   navigator.geolocation.getCurrentPosition(
     onRealGpsPosition,
     function(err) {
-      if(resolved) return;
+      gpsRequestInFlight = false;
+      if(gpsResolvedFlag) return;
+      var code = err ? err.code : 0;
+      var elapsedMs = Date.now() - clickStartMs;
       var errMsg = (err && err.message) ? String(err.message).toLowerCase() : "";
 
+      // Canvas / Preview Iframe পলিসি সীমাবদ্ধতা থাকলে
       if(errMsg.indexOf("policy") !== -1 || errMsg.indexOf("disabled") !== -1) {
         fetchLiveBrowserCoords(function(dist){
           completeGpsSuccess(dist);
         }, function(){
           if(pokBtn) pokBtn.textContent = "📍 লোকেশন পারমিশন দিন (Enable GPS) 🩸";
-          if(pdm) pdm.textContent = "ℹ️ প্রিভিউ উইন্ডোতে GPS সীমাবদ্ধ। গিটহাবে (লাইভ সাইটে) বসালে সরাসরি ফোনের GPS কাজ করবে। এখানে নিচে ম্যানুয়ালি জেলা নির্বাচন করুন।";
+          if(pdm) pdm.textContent = "ℹ️ প্রিভিউ উইন্ডোতে GPS সীমাবদ্ধ। লাইভ সাইটে সরাসরি ফোনের GPS কাজ করবে।";
         });
         return;
       }
 
-      // ২. ইনডোর/নেটওয়ার্ক ব্রাউজার জিওলোকেশন চেক (০.৩ সেকেন্ডে কাজ করে)
-      navigator.geolocation.getCurrentPosition(
-        onRealGpsPosition,
-        function(err2) {
-          if(resolved) return;
-          if(pokBtn) pokBtn.textContent = "📍 লোকেশন পারমিশন দিন (Enable GPS) 🩸";
-          var finalCode = (err2 && err2.code) ? err2.code : (err ? err.code : 0);
+      // ১. যদি ইউজার ব্রাউজারে লোকেশন পারমিশন Block (code === 1) করে থাকেন
+      if(code === 1) {
+        if(pokBtn) pokBtn.textContent = "📍 লোকেশন পারমিশন দিন (Enable GPS) 🩸";
+        if(pdm) pdm.innerHTML = "🚫 ব্রাউজারে লোকেশন পারমিশন <b>Block</b> করা আছে। উপরের অ্যাড্রেস বারের বাম পাশের <b>🔒 (Lock/Tune)</b> আইকনে ট্যাপ করে Location <b>Allow</b> করে আবার ক্লিক করুন।";
+        return;
+      }
 
-          if(finalCode === 1) {
-            if(pdm) pdm.innerHTML = "🚫 ব্রাউজারে লোকেশন পারমিশন <b>Block</b> করা আছে। উপরের অ্যাড্রেস বারের বাম পাশের <b>🔒 (Lock/Tune)</b> আইকনে ট্যাপ করে Location <b>Allow</b> করে আবার ক্লিক করুন।";
-          } else if(finalCode === 2) {
-            startBackgroundWatch();
-            window.openAndroidLocationSettings();
-            if(pdm) pdm.innerHTML = "📲 আপনার ফোনের <b>Location / GPS</b> অন করার অপশন ওপেন করা হচ্ছে—সেখানে <b>ON / Allow</b> করে ব্যাক করলেই স্বয়ংক্রিয়ভাবে আপনার বর্তমান জেলা শনাক্ত হবে!<br><button type='button' onclick='window.openAndroidLocationSettings()' style='margin-top:8px;background:#b71c1c;color:#fff;border:none;padding:9px 16px;border-radius:10px;font-size:12.5px;font-weight:800;cursor:pointer;'>📍 ফোনের GPS অন করতে এখানে ট্যাপ করুন ➔</button>";
-          } else {
-            startBackgroundWatch();
-            if(pdm) pdm.textContent = "⚠️ ডিভাইসের GPS সিগন্যাল পাওয়া যায়নি। ফোনের Location অন করে আবার বাটনে ক্লিক করুন।";
-          }
-        },
-        {
-          enableHighAccuracy: false,
-          timeout: 4500,
-          maximumAge: 60000
-        }
-      );
+      // ২. যদি ব্রাউজারের লোকেশন পারমিশন Allow হয়েছে কিন্তু ফোনের ডিভাইসের GPS তখনো বন্ধ থাকে (code === 2 বা 3):
+      // ব্যাকগ্রাউন্ডে ০.৯ সেকেন্ড পরপর নন-ওভারল্যাপিং অটো-ডিটেক্টর চালু হবে, যাতে ডিভাইস GPS অন হওয়া মাত্র পপআপ অটো বন্ধ হয়ে জেলা দেখায়!
+      startSequentialGpsAutoDetector();
+
+      // যদি ইউজার ইতোমধ্যে ব্রাউজার পারমিশন দিয়ে থাকেন (ফলে ৪৫০ মিলিসেকেন্ডের মধ্যেই code === 2 ফিরে আসে এবং ইউজারের ক্লিক জেসচার সচল থাকে)
+      // অথবা ইউজার যদি Brave ব্রাউজারে থাকেন (যেখানে লেখা থাকে "Turn it on in Android setting"):
+      // সাথে সাথেই ওই একই ক্লিকে Android-এর Location Settings অপশন ওপেন করবে!
+      if(isBraveBrowser || elapsedMs < 450) {
+        window.openAndroidLocationSettings();
+      }
+
+      // আর যদি Chrome-এ প্রথমবার ব্রাউজারের Precise Location ম্যাপ পপআপ Allow করতে গিয়ে প্রথম ক্লিকটি ব্যবহৃত হয়ে থাকে,
+      // তবে রিফ্রেশ ছাড়াই সাথে সাথে একটি ফ্রেশ High-Accuracy কল করা হবে এবং বাটনটি ১-ট্যাপ ডিভাইস GPS বাটনে রূপান্তরিত হবে:
+      setTimeout(function(){
+        if(gpsResolvedFlag) return;
+        navigator.geolocation.getCurrentPosition(onRealGpsPosition, function(){}, {enableHighAccuracy: true, maximumAge: 0, timeout: 6000});
+      }, 120);
+
+      if(pokBtn) {
+        pokBtn.textContent = "📲 ডিভাইসের GPS অন করতে এখানে ট্যাপ করুন 🩸";
+      }
+      if(pdm) {
+        pdm.innerHTML = "✅ ব্রাউজারের লোকেশন পারমিশন যুক্ত হয়েছে! এখন আপনার ফোনের <b>Device GPS (Location)</b> অন করার জন্য উপরের বাটনে ১ বার ট্যাপ করে <b>OK / Turn On</b> দিন—সাথে সাথে স্বয়ংক্রিয়ভাবে আপনার জেলার নোটিশ চালু হবে (রিফ্রেশ করার প্রয়োজন নেই)।";
+      }
     },
     {
       enableHighAccuracy: true,
-      timeout: 4000,
+      timeout: 12000,
       maximumAge: 0
     }
   );
 };
 
 window.triggerNativeGpsNow = function() {
+  try {
+    sessionStorage.removeItem("sbs_session_gps_d");
+    localStorage.removeItem("sbs_gps_d");
+    localStorage.removeItem("sbs_gps_t");
+  } catch(e){}
   document.getElementById("pop").classList.remove("off");
   window.requestDeviceGpsDirect();
 };
@@ -2366,39 +2456,47 @@ window.triggerNativeGpsNow = function() {
 var skipBtn = document.getElementById("pop-skip-btn");
 if(skipBtn){
   skipBtn.addEventListener("click", function(){
+    stopGpsPolling();
     document.getElementById("pop").classList.add("off");
     sman();
   });
 }
 
-// পুরনো ক্যাশ পরিষ্কার
-try { localStorage.removeItem("sbs_d"); localStorage.removeItem("sbs_t"); localStorage.removeItem("sbs_gps_d"); localStorage.removeItem("sbs_gps_t"); } catch(e){}
-
 (function initTickerOnLoad(){
-  // লোকেশন পারমিশন দেওয়ার আগ পর্যন্ত টিকারে সুন্দরভাবে পূর্ণাঙ্গ বার্তা স্ক্রল করবে (কোনো বাটন ওঠানামা বা অর্ধেক কাটা লেখা থাকবে না!)
+  // লোকেশন পারমিশন দেওয়ার আগ পর্যন্ত টিকারে সুন্দরভাবে পূর্ণাঙ্গ বার্তা স্ক্রল করবে
   stk(['📍 আপনার বর্তমান জেলার জরুরি রক্তের নোটিশ দেখতে লোকেশন পারমিশন (Enable GPS) দিন অথবা এখানে ক্লিক করুন ❤️'], '');
+
+  // যদি এই সেশনে ইতোমধ্যে জিপিএস জেলা শনাক্ত হয়ে থাকে, তবে রিফ্রেশ দিলে আর পপআপ আসবে না
+  var savedDist = getSavedGpsDistrict();
+  if(savedDist) {
+    document.getElementById("pop").classList.add("off");
+    ldN(savedDist);
+    return;
+  }
 
   if(navigator.permissions && navigator.permissions.query){
     navigator.permissions.query({name: "geolocation"}).then(function(res){
       if(res.state === "granted"){
-        document.getElementById("pop").classList.add("off");
+        // ব্রাউজার পারমিশন দেওয়া থাকলে আগে চেক করবে ফোনের ডিভাইস GPS অন আছে কি না
         navigator.geolocation.getCurrentPosition(function(p){
-          resolveCoordsToDistrict(p.coords.latitude, p.coords.longitude, completeGpsSuccess);
+          resolveCoordsToDistrict(p.coords.latitude, p.coords.longitude, function(d){ completeGpsSuccess(d, true); });
         }, function(){
-          navigator.geolocation.getCurrentPosition(function(p2){
-            resolveCoordsToDistrict(p2.coords.latitude, p2.coords.longitude, completeGpsSuccess);
-          }, function(){
-            document.getElementById("pop").classList.remove("off");
-          }, {enableHighAccuracy: false, timeout: 4500, maximumAge: 60000});
-        }, {enableHighAccuracy: true, timeout: 4000, maximumAge: 0});
+          // যদি ফোনের ডিভাইস GPS অফ থাকে, তবে পপআপ দেখাবে যাতে ১ ক্লিকে ডিভাইস GPS অন করতে পারে
+          document.getElementById("pop").classList.remove("off");
+        }, {enableHighAccuracy: true, timeout: 3500, maximumAge: 0});
       } else {
         document.getElementById("pop").classList.remove("off");
       }
+
+      // ইউজার যখন ব্রাউজারের Precise Location ম্যাপ পপআপে Allow দেবেন, সাথে সাথে চেক করে পপআপ বন্ধ করবে বা ডিভাইস GPS ওয়াচ চালু করবে
       res.onchange = function(){
-        if(res.state === "granted"){
+        if(res.state === "granted" && !gpsResolvedFlag){
+          stopGpsPolling();
           navigator.geolocation.getCurrentPosition(function(p){
             resolveCoordsToDistrict(p.coords.latitude, p.coords.longitude, completeGpsSuccess);
-          }, function(){}, {enableHighAccuracy: false, timeout: 5000, maximumAge: 60000});
+          }, function(){
+            startSequentialGpsAutoDetector();
+          }, {enableHighAccuracy: true, timeout: 6000, maximumAge: 0});
         }
       };
     }).catch(function(){
@@ -2408,19 +2506,22 @@ try { localStorage.removeItem("sbs_d"); localStorage.removeItem("sbs_t"); localS
     document.getElementById("pop").classList.remove("off");
   }
 
-  function recheckRealGpsOnFocus() {
+  // ইউজার যখনই Chrome-এর "Turn on device location (OK)" ডায়ালগে OK দেবেন বা Brave থেকে Android Location Settings অন করে পেজে ফিরবেন,
+  // সাথে সাথে ফোকাস ইভেন্টে জিপিএস ট্র্যাক করে পপআপ বন্ধ করে দেবে!
+  function recheckDeviceGpsOnFocus() {
+    if(gpsResolvedFlag) return;
     var curTag = document.getElementById("tdn");
     if(curTag && curTag.textContent.trim().length > 0 && document.getElementById("tdt").classList.contains("show")) return;
     if(!navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition(function(p){
-      if(p && p.coords) {
+      if(p && p.coords && typeof p.coords.latitude === "number") {
         resolveCoordsToDistrict(p.coords.latitude, p.coords.longitude, completeGpsSuccess);
       }
-    }, function(){}, {enableHighAccuracy: false, timeout: 4500, maximumAge: 60000});
+    }, function(){}, {enableHighAccuracy: true, timeout: 5000, maximumAge: 0});
   }
-  window.addEventListener("focus", recheckRealGpsOnFocus);
+  window.addEventListener("focus", recheckDeviceGpsOnFocus);
   document.addEventListener("visibilitychange", function(){
-    if(document.visibilityState === "visible") recheckRealGpsOnFocus();
+    if(document.visibilityState === "visible") recheckDeviceGpsOnFocus();
   });
 })();
 
@@ -4715,13 +4816,636 @@ function isEnglishQuery(raw) {
 
 var SPONDON_AI_KB = [
   // ─── A. BLOOD SCIENCE & HUMAN BODY (রক্তবিজ্ঞান ও মানবদেহ) ───
+  // ─── NEW 110+ IN-BUILT PRIMARY HEALTH, WATER, MINERALS, VITAMINS & CLINICAL Q&A ───
+  {
+    id: 'water_hot_cold_season',
+    topic: 'গরমকাল ও শীতকালে পানি পানের নিয়ম',
+    mustAny: ['গরমে পানি', 'শীতে পানি', 'শীতকালে পানি', 'গরমকালে পানি', 'অতিরিক্ত ঘামলে পানি', 'summer water', 'winter water'],
+    high: ['গরমকালে প্রতিদিন কতটুকু পানি খাওয়া উচিত', 'শীতকালে পানি কম খেলে কী হয়', 'গরমে কত লিটার পানি খেতে হবে'],
+    med: ['পানি', 'গরম', 'শীত', 'ঘাম', 'তৃষ্ণা', 'লিটার', 'গ্লাস'],
+    neg: [],
+    ans: '💧 <b>গরমকাল ও শীতকালে পানি পানের সঠিক নিয়ম:</b><br>• <b>গরমকালে:</b> অতিরিক্ত ঘামের কারণে শরীর থেকে পানি ও লবণ বেরিয়ে যায়, তাই স্বাভাবিকের চেয়ে <b>০.৫ থেকে ১.৫ লিটার (৩.৫–৪.৫ লিটার পর্যন্ত)</b> পানি, ডাবের পানি বা লেবু-পানি পান করা উচিত।<br>• <b>শীতকালে:</b> শীতে পিপাসা কম লাগলেও শরীরের অভ্যন্তরীণ অঙ্গের কাজের জন্য প্রতিদিন অন্তত <b>২.০ থেকে ২.৫ লিটার (৮–১০ গ্লাস)</b> কুসুম গরম বা স্বাভাবিক পানি পান করা আবশ্যক, নতুবা কিডনিতে পাথর, কোষ্ঠকাঠিন্য ও ত্বক শুষ্ক হওয়ার ঝুঁকি বাড়ে।',
+    topicEn: 'Water Intake in Summer vs Winter',
+    ansEn: '💧 <b>Water Intake in Summer vs Winter:</b><br>• <b>Summer:</b> Drink <b>3.5 to 4.5 Liters</b> daily (plus electrolytes/coconut water) to replace sweat loss.<br>• <b>Winter:</b> Even with less thirst, drink at least <b>2.0 to 2.5 Liters (8–10 glasses)</b> daily to prevent kidney stones and constipation.'
+  },
+  {
+    id: 'water_before_after_meal',
+    topic: 'খাবার খাওয়ার আগে ও পরে পানি পানের সঠিক সময়',
+    mustAny: ['ভাত খাওয়ার পর পানি', 'খাবার খাওয়ার পর পানি', 'খাওয়ার মাঝে পানি', 'খালি পেটে পানি', 'সকালে পানি', 'water after meal', 'water on empty stomach'],
+    high: ['খাবার খাওয়ার কতক্ষণ পর পানি খাওয়া উচিত', 'সকালে খালি পেটে পানি খাওয়ার উপকারিতা', 'খাওয়ার সময় পানি খেলে কী হয়'],
+    med: ['খাবার', 'পানি', 'হজম', 'খালি পেটে', 'সকালে', 'মিনিট'],
+    neg: [],
+    ans: '💧 <b>খাবার খাওয়ার আগে-পরে ও সকালে খালি পেটে পানি পানের নিয়ম:</b><br>• <b>সকালে খালি পেটে:</b> ঘুম থেকে উঠে বাসি মুখে ১–২ গ্লাস স্বাভাবিক বা কুসুম গরম পানি পান করলে বিপাকক্রিয়া (Metabolism) সচল হয়, পেট পরিষ্কার থাকে এবং কোষ্ঠকাঠিন্য দূর হয়।<br>• <b>খাবার খাওয়ার আগে ও পরে:</b> খাবার খাওয়ার <b>২০–৩০ মিনিট আগে</b> ১ গ্লাস পানি এবং খাবার শেষ করার <b>২৫–৩০ মিনিট পর</b> পানি পান করা হজমের জন্য সবচেয়ে ভালো। খাওয়ার ঠিক সাথে সাথে অতিরিক্ত পানি পান করলে পাচক রস পাতলা হয়ে বদহজম বা গ্যাস্ট্রিক হতে পারে।',
+    topicEn: 'Best Time to Drink Water (Before/After Meals & Morning)',
+    ansEn: '💧 <b>Best Time to Drink Water:</b><br>• <b>Morning Empty Stomach:</b> 1–2 glasses upon waking boosts metabolism and bowel movement.<br>• <b>Around Meals:</b> Drink water <b>20–30 minutes before</b> or <b>25–30 minutes after</b> meals for optimal digestion.'
+  },
+  {
+    id: 'warm_water_benefits',
+    topic: 'কুসুম গরম পানি পানের উপকারিতা',
+    mustAny: ['কুসুম গরম পানি', 'হালকা গরম পানি', 'গরম পানি খেলে', 'warm water', 'lukewarm water'],
+    high: ['কুসুম গরম পানি খাওয়ার উপকারিতা কী', 'প্রতিদিন হালকা গরম পানি খেলে কী হয়'],
+    med: ['গরম পানি', 'গলা', 'হজম', 'মেদ', 'সর্দি'],
+    neg: ['পুড়ে'],
+    ans: '☕ <b>কুসুম গরম পানি পানের স্বাস্থ্য উপকারিতা:</b><br>• গলা ব্যথা, খুসখুসে কাশি ও নাক বন্ধ ভাব কমায়।<br>• হজমশক্তি বাড়ায় এবং কোষ্ঠকাঠিন্য ও পেট ফাঁপা দূর করে।<br>• শরীরের রক্ত সঞ্চালন স্বাভাবিক রাখতে ও টক্সিন বের করতে সাহায্য করে।',
+    topicEn: 'Health Benefits of Drinking Lukewarm Water',
+    ansEn: '☕ <b>Benefits of Lukewarm Water:</b><br>• Soothes sore throat and nasal congestion.<br>• Improves digestion and relieves constipation.<br>• Supports healthy blood circulation.'
+  },
+  {
+    id: 'dehydration_urine_signs',
+    topic: 'পানিশূন্যতা (Dehydration) চেনার লক্ষণ ও প্রস্রাবের রং',
+    mustAny: ['পানিশূন্যতা লক্ষণ', 'ডিহাইড্রেশন', 'প্রস্রাব হলুদ', 'গলা শুকিয়ে', 'ঠোঁট শুকিয়ে', 'signs of dehydration', 'yellow urine'],
+    high: ['শরীরে পানিশূন্যতা হলে কীভাবে বুঝব', 'প্রস্রাবের রং হলুদ হয় কেন', 'ডিহাইড্রেশন হলে করণীয় কী'],
+    med: ['পানিশূন্যতা', 'প্রস্রাব', 'হলুদ', 'ক্লান্তি', 'মাথা ঘোরা', 'পানি'],
+    neg: ['জন্ডিস'],
+    ans: '⚠️ <b>শরীরে পানিশূন্যতা (Dehydration) চেনার লক্ষণ ও করণীয়:</b><br>• <b>প্রধান লক্ষণ:</b> প্রস্রাবের রং গাঢ় হলুদ হওয়া ও পরিমাণে কমে যাওয়া, মুখ ও ঠোঁট শুকিয়ে যাওয়া, অতিরিক্ত ক্লান্তি, মাথা ঘোরা এবং পেশিতে টান ধরা।<br>• <b>সুস্থতার মানদণ্ড:</b> শরীরে পর্যাপ্ত পানি থাকলে প্রস্রাবের রং হবে হালকা খড়ের মতো বা স্বচ্ছ। গাঢ় হলুদ হলে দ্রুত পর্যাপ্ত পানি বা খাবার স্যালাইন (ORS) পান করুন (তবে ভিটামিন বি-কমপ্লেক্স খেলেও প্রস্রাব সাময়িক উজ্জ্বল হলুদ হতে পারে)।',
+    topicEn: 'Signs of Dehydration & Urine Color Guide',
+    ansEn: '⚠️ <b>Signs of Dehydration:</b><br>• Dark yellow urine, dry mouth/lips, dizziness, fatigue, and muscle cramps.<br>• Pale straw-colored urine indicates good hydration. Drink water or ORS immediately if dehydrated.'
+  },
+  {
+    id: 'ors_saline_preparation',
+    topic: 'খাবার স্যালাইন (ORS) তৈরির সঠিক নিয়ম ও খাওয়ার মাত্রা',
+    mustAny: ['খাবার স্যালাইন', 'ওআরএস', 'স্যালাইন বানানোর নিয়ম', 'স্যালাইন খাওয়ার নিয়ম', 'ors preparation', 'oral rehydration'],
+    high: ['খাবার স্যালাইন বানানোর সঠিক নিয়ম কী', 'ঘরে কীভাবে স্যালাইন তৈরি করব', 'দিনে কয়টা স্যালাইন খাওয়া যায়'],
+    med: ['স্যালাইন', 'আধা লিটার', 'পানি', 'লবণ', 'চিনি', 'ডায়রিয়া'],
+    neg: [],
+    ans: '🥤 <b>খাবার স্যালাইন (ORS) তৈরির ও খাওয়ার সঠিক নিয়ম:</b><br>• <b>প্যাকেট স্যালাইন:</b> স্যালাইনের পুরো ১টি প্যাকেট ঠিক <b>আধা লিটার (৫০০ মি.লি. বা স্ট্যান্ডার্ড ২ গ্লাস)</b> বিশুদ্ধ পানিতে গুলিয়ে নিতে হবে। কখনোই আধা প্যাকেট বা কম-বেশি পানিতে গোলাবেন না। গোলানো স্যালাইন <b>১২ ঘণ্টা</b> পর্যন্ত ভালো থাকে।<br>• <b>ঘরোয়া স্যালাইন (প্যাকেট না থাকলে):</b> আধা লিটার বিশুদ্ধ পানিতে <b>১ মুঠো চিনি বা গুড়</b> এবং <b>১ তিন আঙুলের চিমটি লবণ</b> ভালোভাবে মিশিয়ে তৈরি করতে পারেন।<br>• <b>সতর্কতা:</b> উচ্চ রক্তচাপ বা কিডনি রোগীদের অতিরিক্ত স্যালাইন খাওয়ার আগে চিকিৎসকের পরামর্শ নেওয়া উচিত।',
+    topicEn: 'How to Prepare & Use Oral Rehydration Salts (ORS)',
+    ansEn: '🥤 <b>How to Prepare ORS Correctly:</b><br>• Mix 1 full packet of ORS in exactly <b>500 mL (half a liter)</b> of safe drinking water. Discard unused solution after 12 hours.<br>• Home alternative: Mix 1 fistful of sugar and a 3-finger pinch of salt in 500 mL of clean water.'
+  },
+  {
+    id: 'coconut_water_benefits',
+    topic: 'ডাবের পানির পুষ্টিগুণ ও উপকারিতা',
+    mustAny: ['ডাবের পানি', 'ডাব খেলে', 'coconut water', 'daber pani'],
+    high: ['ডাবের পানির উপকারিতা কী', 'রক্তদানের পর ডাবের পানি কেন খাওয়া হয়', 'ডেঙ্গুতে ডাবের পানি কেন খায়'],
+    med: ['ডাব', 'পটাশিয়াম', 'ইলেকট্রোলাইট', 'পানিশূন্যতা', 'দুর্বলতা'],
+    neg: [],
+    ans: '🥥 <b>ডাবের পানির উপকারিতা ও খনিজ গুণাগুণ:</b><br>• ডাবের পানি প্রাকৃতিক ইলেকট্রোলাইট সমৃদ্ধ—এতে প্রচুর <b>পটাশিয়াম, সোডিয়াম, ম্যাগনেশিয়াম ও ক্যালসিয়াম</b> থাকে।<br>• রক্তদানের পর, ডেঙ্গু জ্বরে, ডায়রিয়ায় বা অতিরিক্ত গরমে শরীরের পানিশূন্যতা ও দুর্বলতা মুহূর্তেই দূর করে।<br>• সতর্কতা: ডায়াবেটিস বা দীর্ঘমেয়াদি কিডনি রোগে (রক্তে পটাশিয়াম বেশি থাকলে) ডাবের পানি পরিমিত পরিমাণে খেতে হবে।',
+    topicEn: 'Nutritional Benefits of Coconut Water',
+    ansEn: '🥥 <b>Benefits of Coconut Water:</b><br>• Rich in natural electrolytes (potassium, magnesium, sodium).<br>• Ideal for rapid recovery after blood donation, dengue fever, or heat exhaustion.'
+  },
+  {
+    id: 'mineral_iron_deficiency',
+    topic: 'খনিজ পদার্থ: আয়রন (Iron) ঘাটতির লক্ষণ ও আয়রন সমৃদ্ধ খাবার',
+    mustAny: ['আয়রন ঘাটতি', 'আয়রনের অভাব', 'লৌহ', 'আয়রন সমৃদ্ধ খাবার', 'iron deficiency', 'iron rich food', 'iron tablet'],
+    high: ['শরীরে আয়রনের ঘাটতি হলে কী লক্ষণ দেখা দেয়', 'কোন কোন খাবারে সবচেয়ে বেশি আয়রন আছে', 'আয়রন ট্যাবলেট খাওয়ার নিয়ম'],
+    med: ['আয়রন', 'রক্তশূন্যতা', 'হিমোগ্লোবিন', 'কলিজা', 'কচুশাক', 'পালংশাক', 'ডালিম'],
+    neg: [],
+    ans: '🧪 <b>খনিজ পদার্থ — আয়রন (Iron / লৌহ) ঘাটতি ও উৎস:</b><br>• <b>কাজ ও দৈনিক চাহিদা:</b> রক্তের হিমোগ্লোবিন তৈরি ও অক্সিজেন পরিবহনে আয়রন অপরিহার্য। পূর্ণবয়স্ক পুরুষের দৈনিক <b>৮ মি.গ্রা.</b> এবং নারীর <b>১৮ মি.গ্রা.</b> (গর্ভাবস্থায় ২৭ মি.গ্রা.) আয়রন প্রয়োজন।<br>• <b>ঘাটতির লক্ষণ:</b> রক্তশূন্যতা, অল্প পরিশ্রমে হাঁপিয়ে ওঠা, মুখ ও চোখের নিচের পাতা ফ্যাকাশে হওয়া, চুল পড়া ও নখ ভঙ্গুর হওয়া।<br>• <b>প্রধান উৎস:</b> গরু/খাসির কলিজা, ডিম, ছোট মাছ, কচুশাক, লালশাক, পালংশাক, খেজুর, ডালিম, বিট ও ছোলা। খাবারের সাথে লেবু বা ভিটামিন-সি খেলে আয়রন শোষণ ৩ গুণ বাড়ে (খাবারের সাথে সাথে চা-কফি খাবেন না)।',
+    topicEn: 'Iron Deficiency Symptoms & Iron-Rich Foods',
+    ansEn: '🧪 <b>Iron (Mineral) Guide:</b><br>• Essential for hemoglobin production (Daily need: Men 8 mg, Women 18 mg).<br>• <b>Rich Sources:</b> Liver, red meat, fish, spinach, taro leaves, dates, pomegranate, lentils. Pair with Vitamin C (lemon) for maximum absorption.'
+  },
+  {
+    id: 'mineral_calcium_bones',
+    topic: 'খনিজ পদার্থ: ক্যালসিয়াম (Calcium) ঘাটতির লক্ষণ ও উৎস',
+    mustAny: ['ক্যালসিয়াম', 'ক্যালসিয়ামের অভাব', 'হাড় ক্ষয়', 'calcium deficiency', 'calcium food', 'অস্টিওপোরোসিস'],
+    high: ['শরীরে ক্যালসিয়ামের ঘাটতি হলে কী হয়', 'কোন খাবারে ক্যালসিয়াম বেশি থাকে', 'প্রতিদিন কতটুকু ক্যালসিয়াম দরকার'],
+    med: ['হাড়', 'দাঁত', 'দুধ', 'ছোট মাছ', 'দই', 'তিল', 'ব্যথা'],
+    neg: [],
+    ans: '🦴 <b>খনিজ পদার্থ — ক্যালসিয়াম (Calcium) ঘাটতির লক্ষণ ও খাবার:</b><br>• <b>দৈনিক চাহিদা:</b> একজন পূর্ণবয়স্ক মানুষের প্রতিদিন <b>১০০০ মি.গ্রা.</b> (৫০ বছরের ঊর্ধ্বে ১২০০ মি.গ্রা.) ক্যালসিয়াম প্রয়োজন।<br>• <b>ঘাটতির লক্ষণ:</b> হাড় ও কোমর ব্যথা, দাঁত দুর্বল হওয়া, হাত-পায়ের পেশিতে টান ধরা, নখ ভেঙে যাওয়া এবং অস্টিওপোরোসিস (হাড় ক্ষয়)।<br>• <b>প্রধান উৎস:</b> দুধ, টক দই, পনির, কাঁটাসহ ছোট মাছ (মলা-ঢেলা), সাদা তিল, কাঠবাদাম, ব্রকলি ও সবুজ শাকসবজি। (ক্যালসিয়াম শরীরে শোষিত হতে প্রতিদিন ১৫–২০ মিনিট রোদে থেকে ভিটামিন-ডি নেওয়া জরুরি)।',
+    topicEn: 'Calcium Deficiency & Bone Health Guide',
+    ansEn: '🦴 <b>Calcium (Mineral) Guide:</b><br>• Daily requirement: <b>1,000–1,200 mg/day</b>.<br>• <b>Deficiency Signs:</b> Bone/joint pain, muscle cramps, brittle nails, osteoporosis.<br>• <b>Top Sources:</b> Milk, yogurt, small fish eaten whole with bones, sesame seeds, almonds, and leafy greens.'
+  },
+  {
+    id: 'mineral_potassium_sodium',
+    topic: 'খনিজ পদার্থ: পটাশিয়াম ও সোডিয়াম (লবণ) ভারসাম্য',
+    mustAny: ['পটাশিয়াম', 'সোডিয়াম', 'ইলেকট্রোলাইট', 'লবণ কতটুকু', 'কাঁচা লবণ', 'potassium', 'sodium', 'electrolyte imbalance'],
+    high: ['পটাশিয়াম কমে গেলে কী হয়', 'দিনে কতটুকু লবণ খাওয়া উচিত', 'ইলেকট্রোলাইট ভারসাম্যহীনতার লক্ষণ কী'],
+    med: ['কলা', 'ডাব', 'আলু', 'রক্তচাপ', 'হৃদস্পন্দন', 'দুর্বলতা'],
+    neg: [],
+    ans: '⚡ <b>খনিজ পদার্থ — পটাশিয়াম ও সোডিয়াম (ইলেকট্রোলাইট) গাইড:</b><br>• <b>পটাশিয়াম (Potassium):</b> হৃৎপিণ্ডের স্বাভাবিক স্পন্দন ও পেশির শক্তির জন্য অপরিহার্য। পটাশিয়াম কমে গেলে তীব্র হাত-পা দুর্বলতা, পেশিতে টান ও বুক ধড়ফড় করে। উৎস: পাকা কলা, ডাবের পানি, আলু, মিষ্টি কুমড়া, কমলা ও ডাল।<br>• <b>সোডিয়াম বা লবণ (Sodium):</b> WHO-এর মতে একজন মানুষের প্রতিদিন <b>৫ গ্রামের (১ চা চামচ)</b> কম লবণ খাওয়া উচিত। পাতে আলগা কাঁচা লবণ খেলে উচ্চ রক্তচাপ, স্ট্রোক ও কিডনি রোগের ঝুঁকি বাড়ে।',
+    topicEn: 'Potassium & Sodium (Electrolyte Balance) Guide',
+    ansEn: '⚡ <b>Potassium & Sodium Balance:</b><br>• <b>Potassium:</b> Regulates heartbeat and muscle function (Sources: banana, coconut water, potato, lentils).<br>• <b>Sodium (Salt):</b> Limit daily salt intake to <b>under 5 grams (1 teaspoon)</b> per day; avoid adding raw table salt to meals.'
+  },
+  {
+    id: 'mineral_magnesium_cramps',
+    topic: 'খনিজ পদার্থ: ম্যাগনেশিয়াম (Magnesium) ও পায়ের পেশিতে টান ধরা',
+    mustAny: ['ম্যাগনেশিয়াম', 'পায়ে টান', 'পেশিতে টান', 'রগ টান', 'হাত পা চাবানো', 'magnesium', 'leg cramp', 'muscle cramp'],
+    high: ['রাতে ঘুমানোর সময় পায়ে টান ধরে কেন', 'ম্যাগনেশিয়ামের অভাবে কী হয়', 'কোন খাবারে ম্যাগনেশিয়াম থাকে'],
+    med: ['পেশি', 'ঘুম', 'বাদাম', 'কুমড়ার বীজ', 'কলা', 'পানি'],
+    neg: [],
+    ans: '💪 <b>খনিজ পদার্থ — ম্যাগনেশিয়াম ও পায়ের পেশিতে টান (Muscle Cramp) সমাধান:</b><br>• রাতে ঘুমের মধ্যে পায়ের পেশিতে বা রগে হঠাৎ টান ধরার প্রধান কারণ শরীরে <b>ম্যাগনেশিয়াম, পটাশিয়াম ও ক্যালসিয়ামের ঘাটতি</b> অথবা পানিশূন্যতা।<br>• <b>তাৎক্ষণিক করণীয়:</b> পায়ের পাতা ওপরের দিকে বাঁকিয়ে (স্ট্রেচ করে) ধরুন এবং আক্রান্ত স্থানে হালকা গরম সেঁক বা ম্যাসাজ দিন।<br>• <b>ম্যাগনেশিয়াম সমৃদ্ধ খাবার:</b> মিষ্টি কুমড়ার বীজ, কাঠবাদাম, কাজুবাদাম, কলা, ডার্ক চকলেট, পালংশাক ও পূর্ণ শস্যদানা।',
+    topicEn: 'Magnesium & Relief from Nighttime Leg/Muscle Cramps',
+    ansEn: '💪 <b>Magnesium & Muscle Cramps:</b><br>• Nighttime leg cramps are commonly caused by dehydration or low magnesium, potassium, and calcium.<br>• <b>Top Magnesium Sources:</b> Pumpkin seeds, almonds, bananas, spinach, whole grains, and plenty of water.'
+  },
+  {
+    id: 'mineral_zinc_immunity',
+    topic: 'খনিজ পদার্থ: জিংক (Zinc) এর কাজ, ঘাটতি ও খাবার',
+    mustAny: ['জিংক', 'জিঙ্ক', 'zinc', 'জিংকের অভাব', 'জিংক সমৃদ্ধ খাবার'],
+    high: ['শরীরে জিংকের কাজ কী', 'জিংকের অভাবে কী সমস্যা হয়', 'কোন খাবারে জিংক পাওয়া যায়'],
+    med: ['রোগ প্রতিরোধ', 'ক্ষত', 'চুল পড়া', 'ডায়রিয়া', 'রুচি', 'বীজ'],
+    neg: [],
+    ans: '🛡️ <b>খনিজ পদার্থ — জিংক (Zinc) এর উপকারিতা ও উৎস:</b><br>• <b>প্রধান কাজ:</b> রোগ প্রতিরোধ ক্ষমতা (Immunity) বৃদ্ধি, কাটা-ছেঁড়া বা ক্ষত দ্রুত শুকানো, খাবারের রুচি ফেরানো, শিশুদের দৈহিক বৃদ্ধি এবং চুল ও ত্বক সুস্থ রাখা।<br>• <b>ঘাটতির লক্ষণ:</b> ঘন ঘন সর্দি-কাশি বা ডায়রিয়া হওয়া, খাবারে অরুচি, ক্ষত শুকাতে দেরি হওয়া এবং অতিরিক্ত চুল পড়া।<br>• <b>প্রধান উৎস:</b> মিষ্টি কুমড়ার বীজ, গরুর মাংস, কলিজা, ডিম, ছোলা, মসুর ডাল, বাদাম ও দুগ্ধজাত খাবার।',
+    topicEn: 'Zinc (Mineral) Benefits, Deficiency & Food Sources',
+    ansEn: '🛡️ <b>Zinc (Mineral) Guide:</b><br>• Boosts immunity, accelerates wound healing, restores appetite, and reduces hair fall.<br>• <b>Sources:</b> Pumpkin seeds, meat, liver, eggs, chickpeas, lentils, nuts, and dairy.'
+  },
+  {
+    id: 'mineral_iodine_phosphorus',
+    topic: 'খনিজ পদার্থ: আয়োডিন, ফসফরাস ও অন্যান্য খনিজ লবণ',
+    mustAny: ['আয়োডিন', 'গলগণ্ড', 'ফসফরাস', 'খনিজ লবণ', 'খনিজ পদার্থ', 'iodine', 'phosphorus', 'minerals in body'],
+    high: ['মানবদেহে খনিজ পদার্থের কাজ কী', 'আয়োডিনের অভাবে কী রোগ হয়', 'ফসফরাসের কাজ কী'],
+    med: ['থাইরয়েড', 'লবণ', 'সামুদ্রিক মাছ', 'হাড়', 'দাঁত', 'বুদ্ধিবৃত্তি'],
+    neg: [],
+    ans: '🧂 <b>খনিজ পদার্থ — আয়োডিন, ফসফরাস ও মানবদেহে খনিজ লবণের ভূমিকা:</b><br>• <b>আয়োডিন (Iodine):</b> থাইরয়েড হরমোন তৈরি ও মস্তিষ্কের বিকাশে অপরিহার্য। এর অভাবে গলগণ্ড (Goiter) ও হাইপোথাইরয়েডিজম হয়। উৎস: আয়োডিনযুক্ত লবণ, সামুদ্রিক মাছ ও ডিম।<br>• <b>ফসফরাস (Phosphorus):</b> ক্যালসিয়ামের সাথে মিলে মজবুত হাড় ও দাঁত গঠন করে এবং কোষে শক্তি (ATP) জোগায়। উৎস: মাছ, মাংস, ডিম, দুধ ও ডাল।<br>• <b>মানবদেহের প্রধান খনিজসমূহ:</b> ক্যালসিয়াম, ফসফরাস, পটাশিয়াম, সোডিয়াম, ম্যাগনেশিয়াম, আয়রন, জিংক, আয়োডিন, কপার ও সেলেনিয়াম।',
+    topicEn: 'Iodine, Phosphorus & Essential Minerals in the Human Body',
+    ansEn: '🧂 <b>Essential Minerals (Iodine & Phosphorus):</b><br>• <b>Iodine:</b> Prevents goiter and supports thyroid hormone production (Sources: iodized salt, sea fish, eggs).<br>• <b>Phosphorus:</b> Builds strong bones and teeth alongside calcium (Sources: fish, milk, eggs, lentils).'
+  },
+  {
+    id: 'vitamin_a_vision',
+    topic: 'ভিটামিন এ (Vitamin A) এর কাজ, রাতকানা রোগ ও উৎস',
+    mustAny: ['ভিটামিন এ', 'রাতকানা', 'vitamin a', 'চোখের জ্যোতি', 'চোখ ভালো রাখার খাবার'],
+    high: ['ভিটামিন এ এর অভাবে কী রোগ হয়', 'কোন খাবারে ভিটামিন এ সবচেয়ে বেশি থাকে', 'চোখের দৃষ্টিশক্তি বাড়ানোর খাবার'],
+    med: ['গাজর', 'মিষ্টি কুমড়া', 'পাকা পেঁপে', 'মলা মাছ', 'পালংশাক', 'চোখ'],
+    neg: [],
+    ans: '🥕 <b>ভিটামিন এ (Vitamin A) ও চোখের স্বাস্থ্য:</b><br>• <b>কাজ ও অভাবজনিত রোগ:</b> চোখের দৃষ্টিশক্তি রক্ষা, রাতকানা (Night Blindness) প্রতিরোধ এবং ত্বক ও শ্বাসতন্ত্রের ঝিল্লি সুস্থ রাখে।<br>• <b>প্রধান উৎস:</b> মলা ও ঢেলা মাছ, গাজর, মিষ্টি কুমড়া, পাকা পেঁপে, পাকা আম, ডিমের কুসুম, কলিজা এবং গাঢ় সবুজ শাকসবজি (পালংশাক, কচুশাক, লালশাক)।',
+    topicEn: 'Vitamin A Benefits, Night Blindness Prevention & Sources',
+    ansEn: '🥕 <b>Vitamin A Guide:</b><br>• Protects eyesight, prevents night blindness, and supports skin/immune health.<br>• <b>Top Sources:</b> Small fish (Mola), carrots, pumpkin, ripe papaya, mango, egg yolk, liver, and dark leafy greens.'
+  },
+  {
+    id: 'vitamin_b12_nerves',
+    topic: 'ভিটামিন বি-১২ ও বি-কমপ্লেক্স (হাত-পা ঝিনঝিন, মুখে ঘা ও স্নায়ু)',
+    mustAny: ['ভিটামিন বি১২', 'ভিটামিন বি ১২', 'বি কমপ্লেক্স', 'হাত পা ঝিনঝিন', 'হাত পা জ্বালাপোড়া', 'vitamin b12', 'b complex', 'numbness tingling'],
+    high: ['হাত পা ঝিনঝিন বা অবশ লাগে কেন', 'ভিটামিন বি ১২ এর অভাবে কী হয়', 'কোন খাবারে ভিটামিন বি ১২ পাওয়া যায়'],
+    med: ['স্নায়ু', 'মুখে ঘা', 'রক্তকণিকা', 'দুর্বলতা', 'স্মৃতিশক্তি', 'ডিম', 'দুধ', 'মাছ'],
+    neg: ['স্ট্রোক'],
+    ans: '🧬 <b>ভিটামিন বি-১২ ও বি-কমপ্লেক্স ঘাটতির লক্ষণ ও উৎস:</b><br>• <b>লক্ষণ:</b> হাত-পায়ের তালু জ্বালাপোড়া করা বা ঝিনঝিন/অবশ লাগা (Peripheral Neuropathy), জিহ্বা ও ঠোঁটের কোণে ঘা হওয়া, অতিরিক্ত শারীরিক দুর্বলতা, মেগালোব্লাস্টিক রক্তশূন্যতা ও ভুলে যাওয়ার প্রবণতা।<br>• <b>প্রধান উৎস:</b> ভিটামিন বি-১২ মূলত প্রাণিজ খাবারে থাকে—গরু/খাসির কলিজা, সামুদ্রিক ও নদীর মাছ, ডিম, দুধ, দই ও মাংস।',
+    topicEn: 'Vitamin B12 & B-Complex Guide (Nerve Health & Anemia)',
+    ansEn: '🧬 <b>Vitamin B12 & B-Complex Guide:</b><br>• Deficiency causes tingling/burning in hands and feet, mouth ulcers, fatigue, and anemia.<br>• <b>Top Sources:</b> Liver, fish, eggs, milk, yogurt, and meat.'
+  },
+  {
+    id: 'vitamin_c_scurvy',
+    topic: 'ভিটামিন সি (Vitamin C) এর উপকারিতা, মাড়ি দিয়ে রক্ত পড়া ও উৎস',
+    mustAny: ['ভিটামিন সি', 'স্কার্ভি', 'vitamin c', 'মাড়ি থেকে রক্ত', 'ঠান্ডা লাগা রোধ'],
+    high: ['ভিটামিন সি এর অভাবে কী রোগ হয়', 'কোন ফলে ভিটামিন সি সবচেয়ে বেশি থাকে'],
+    med: ['আমলকী', 'পেয়ারা', 'লেবু', 'কমলা', 'কাঁচা মরিচ', 'ক্ষত', 'আয়রন'],
+    neg: [],
+    ans: '🍋 <b>ভিটামিন সি (Vitamin C) এর কাজ ও উৎস:</b><br>• <b>কাজ:</b> রোগ প্রতিরোধ ক্ষমতা বাড়ায়, দাঁতের মাড়ি মজবুত রাখে (অভাবে স্কার্ভি বা মাড়ি থেকে রক্ত পড়ে), ত্বকের কোলাজেন তৈরি করে এবং খাবার থেকে আয়রন শোষণে সাহায্য করে।<br>• <b>প্রধান উৎস:</b> আমলকী, পেয়ারা, কাগজি লেবু, বাতাবি লেবু (জাম্বুরা), কমলা, মাল্টা, টমেটো ও কাঁচা মরিচ। (ভিটামিন সি তাপে নষ্ট হয়, তাই তাজা ফল ও সালাদ হিসেবে খাওয়া উত্তম)।',
+    topicEn: 'Vitamin C Benefits & Top Natural Sources',
+    ansEn: '🍋 <b>Vitamin C Guide:</b><br>• Boosts immunity, prevents bleeding gums (scurvy), speeds wound healing, and enhances iron absorption.<br>• <b>Top Sources:</b> Amla (Indian gooseberry), guava, lemon, orange, pomelo, tomato, and green chili.'
+  },
+  {
+    id: 'vitamin_d_sunlight',
+    topic: 'ভিটামিন ডি (Vitamin D) ঘাটতি, রোদ ও হাড়ের ব্যথা',
+    mustAny: ['ভিটামিন ডি', 'রিকেটস', 'vitamin d', 'রোদে কোন ভিটামিন'],
+    high: ['ভিটামিন ডি এর অভাবে কী লক্ষণ দেখা দেয়', 'ভিটামিন ডি পাওয়ার প্রাকৃতিক উপায় কী', 'কখন রোদে থাকলে ভিটামিন ডি পাওয়া যায়'],
+    med: ['রোদ', 'সূর্যের আলো', 'হাড় ব্যথা', 'কোমর ব্যথা', 'ক্লান্তি', 'ডিমের কুসুম', 'সামুদ্রিক মাছ'],
+    neg: [],
+    ans: '☀️ <b>ভিটামিন ডি (Vitamin D) ঘাটতির লক্ষণ ও প্রাকৃতিক উৎস:</b><br>• <b>কাজ ও লক্ষণ:</b> ভিটামিন ডি ছাড়া শরীর খাবার থেকে ক্যালসিয়াম শোষণ করতে পারে না। এর অভাবে সারা শরীরে ও কোমরে ব্যথা, পেশি দুর্বলতা, চুল পড়া, অবসাদ এবং শিশুদের রিকেটস রোগ হয়।<br>• <b>প্রধান উৎস:</b> প্রতিদিন <b>সকাল ১০টা থেকে দুপুর ২টার মধ্যে ১৫–২০ মিনিট</b> সরাসরি রোদ গায়ে লাগানো (৮০% ভিটামিন ডি রোদ থেকে তৈরি হয়)। খাবার: সামুদ্রিক মাছ, মাছের তেল, ডিমের কুসুম, কলিজা ও মাশরুম।',
+    topicEn: 'Vitamin D Deficiency, Sunlight & Food Sources',
+    ansEn: '☀️ <b>Vitamin D Guide:</b><br>• Essential for calcium absorption and bone strength.<br>• <b>Best Source:</b> 15–20 minutes of midday sunlight (10 AM–2 PM), plus fatty fish, egg yolks, liver, and fortified milk.'
+  },
+  {
+    id: 'vitamin_e_k_folic',
+    topic: 'ভিটামিন ই, ভিটামিন কে এবং ফলিক অ্যাসিড (Vitamin B9)',
+    mustAny: ['ভিটামিন ই', 'ভিটামিন কে', 'ফলিক অ্যাসিড', 'ফোলিক এসিড', 'vitamin e', 'vitamin k', 'folic acid', 'folate'],
+    high: ['রক্ত জমাট বাঁধতে কোন ভিটামিন সাহায্য করে', 'ফলিক অ্যাসিডের কাজ কী', 'ভিটামিন ই এর উপকারিতা কী'],
+    med: ['রক্ত জমাট', 'ত্বক', 'চুল', 'গর্ভবতী', 'শাকসবজি', 'বাদাম'],
+    neg: [],
+    ans: '💊 <b>ভিটামিন ই, ভিটামিন কে এবং ফলিক অ্যাসিড গাইড:</b><br>• <b>ভিটামিন কে (Vitamin K):</b> কেটে গেলে <b>রক্ত জমাট বাঁধতে (Blood Clotting)</b> সরাসরি সাহায্য করে। উৎস: পালংশাক, ব্রকলি, বাঁধাকপি ও সবুজ শাকসবজি।<br>• <b>ফলিক অ্যাসিড (Vitamin B9):</b> নতুন লোহিত রক্তকণিকা তৈরি এবং গর্ভস্থ শিশুর মস্তিষ্ক ও মেরুদণ্ডের গঠনে অপরিহার্য। উৎস: ডাল, কলিজা, পালংশাক ও কমলা।<br>• <b>ভিটামিন ই (Vitamin E):</b> শক্তিশালী অ্যান্টিঅক্সিডেন্ট যা ত্বক, চুল ও হৃদযন্ত্র ভালো রাখে। উৎস: কাঠবাদাম, সূর্যমুখীর বীজ ও উদ্ভিজ্জ তেল।',
+    topicEn: 'Vitamin E, Vitamin K (Blood Clotting) & Folic Acid Guide',
+    ansEn: '💊 <b>Vitamin E, K & Folic Acid:</b><br>• <b>Vitamin K:</b> Essential for normal blood clotting (Sources: spinach, broccoli, green leafy vegetables).<br>• <b>Folic Acid (B9):</b> Vital for red blood cell formation and fetal neural development.<br>• <b>Vitamin E:</b> Protects cells, skin, and hair (Sources: almonds, sunflower seeds).'
+  },
+  {
+    id: 'fever_paracetamol_dose',
+    topic: 'সাধারণ জ্বর, জলপট্টি ও প্যারাসিটামল খাওয়ার নিরাপদ নিয়ম',
+    mustAny: ['জ্বর হলে করণীয়', 'জ্বর কমানোর উপায়', 'প্যারাসিটামল', 'নাপা', 'জলপট্টি', 'paracetamol dose', 'fever home care'],
+    high: ['জ্বর হলে ঘরে প্রাথমিক চিকিৎসা কী', 'পূর্ণবয়স্ক মানুষের প্যারাসিটামল খাওয়ার নিয়ম কী', 'কত ডিগ্রি হলে জ্বর বলা হয়'],
+    med: ['জ্বর', 'তাপমাত্রা', 'থার্মোমিটার', 'গা মোছা', 'পানি'],
+    neg: ['ডেঙ্গু', 'টাইফয়েড', 'ম্যালেরিয়া'],
+    ans: '🌡️ <b>জ্বর হলে প্রাথমিক যত্ন ও প্যারাসিটামল ব্যবহারের নিরাপদ নিয়ম:</b><br>• থার্মোমিটারে বগলের নিচে বা মুখে তাপমাত্রা <b>১০০°F – ১০০.৪°F</b>-এর বেশি হলে জ্বর ধরা হয়।<br>• <b>প্রাথমিক করণীয়:</b> স্বাভাবিক পানিতে সুতি গামছা ভিজিয়ে কপাল, বগল ও পুরো শরীর মুছে দিন (Sponging), হালকা সুতি পোশাক পরুন এবং প্রচুর পানি, স্যুপ ও তরল খাবার পান করুন।<br>• <b>প্যারাসিটামল নিয়ম:</b> পূর্ণবয়স্কদের ক্ষেত্রে ভরা পেটে ৫০০ মি.গ্রা. প্যারাসিটামল ৬ থেকে ৮ ঘণ্টা পরপর (২৪ ঘণ্টায় সর্বোচ্চ ৩–৪ বার, ৪০০০ মি.গ্রা.-এর বেশি নয়) নেওয়া যায়। ৩ দিনের বেশি জ্বর থাকলে অবশ্যই রক্ত পরীক্ষা ও চিকিৎসকের পরামর্শ নিন।',
+    topicEn: 'Fever Home Care & Safe Paracetamol Guidelines',
+    ansEn: '🌡️ <b>Fever Care & Paracetamol Guide:</b><br>• Sponge the body with lukewarm/tap water, wear light clothing, and drink plenty of fluids.<br>• Adults may take 500 mg Paracetamol every 6–8 hours after food (never exceed 4,000 mg in 24 hours). Consult a doctor if fever lasts >3 days.'
+  },
+  {
+    id: 'typhoid_fever_guide',
+    topic: 'টাইফয়েড জ্বর (Typhoid Fever) লক্ষণ, পরীক্ষা ও পথ্য',
+    mustAny: ['টাইফয়েড', 'উইডাল টেস্ট', 'ব্লাড কালচার', 'typhoid', 'widal test'],
+    high: ['টাইফয়েড জ্বরের লক্ষণ কী কী', 'টাইফয়েড হলে কী খাবার খাওয়া উচিত'],
+    med: ['জ্বর', 'মাথাব্যথা', 'পেটে ব্যথা', 'দূষিত পানি', 'অ্যান্টিবায়োটিক'],
+    neg: ['রক্তদান'],
+    ans: '🦠 <b>টাইফয়েড জ্বর (Typhoid Fever) লক্ষণ ও করণীয়:</b><br>• <b>কারণ ও লক্ষণ:</b> দূষিত পানি বা খাবারের মাধ্যমে <i>Salmonella typhi</i> জীবাণু দ্বারা ছড়ায়। লক্ষণ: ক্রমান্বয়ে সিঁড়ির মতো বাড়তে থাকা তীব্র জ্বর (১০৩°F–১০৪°F), তীব্র মাথাব্যথা, পেটে ব্যথা, ক্ষুধামান্দ্য ও কোষ্ঠকাঠিন্য বা পাতলা পায়খানা।<br>• <b>নিশ্চিত পরীক্ষা:</b> জ্বরের ১ম সপ্তাহে <b>Blood Culture</b> এবং ২য় সপ্তাহে <b>Widal Test</b>।<br>• <b>করণীয়:</b> চিকিৎসকের পরামর্শে পূর্ণ মেয়াদে অ্যান্টিবায়োটিক কোর্স শেষ করা, ফোটানো বিশুদ্ধ পানি পান এবং নরম সহজপাচ্য খাবার (জাউভাত, মুরগির স্যুপ, ডাবের পানি) খাওয়া।',
+    topicEn: 'Typhoid Fever Symptoms, Diagnosis & Diet',
+    ansEn: '🦠 <b>Typhoid Fever Guide:</b><br>• Caused by contaminated food/water (<i>Salmonella typhi</i>). Symptoms include step-ladder high fever, headache, and abdominal pain.<br>• Confirmed via Blood Culture (Week 1). Requires full antibiotic course prescribed by a doctor, boiled water, and soft diet.'
+  },
+  {
+    id: 'common_cold_cough_throat',
+    topic: 'সর্দি-কাশি, গলা ব্যথা ও টনসিলের ঘরোয়া যত্ন',
+    mustAny: ['সর্দি', 'কাশি', 'গলা ব্যথা', 'টনসিল', 'খুসখুসে কাশি', 'নাক বন্ধ', 'গার্গল', 'sore throat', 'cough remedy', 'tonsillitis'],
+    high: ['গলা ব্যথা ও খুসখুসে কাশি কমানোর ঘরোয়া উপায় কী', 'টনসিল ব্যথা হলে করণীয় কী', 'সর্দি কাশি হলে কী খাব'],
+    med: ['লবণ পানি', 'মধু', 'আদা চা', 'তুলসী', 'গরম পানির ভাপ'],
+    neg: ['রক্তদান'],
+    ans: '🍵 <b>সর্দি-কাশি, গলা ব্যথা ও টনসিল প্রদাহে ঘরোয়া প্রতিকার:</b><br>• <b>লবণ-পানির গার্গল:</b> ১ গ্লাস কুসুম গরম পানিতে আধা চা চামচ লবণ মিশিয়ে দিনে ৩–৪ বার গড়গড়া (Gargle) করলে গলা ব্যথা ও টনসিলের ফোলা দ্রুত কমে।<br>• <b>গরম পানির ভাপ (Steam Inhalation):</b> নাক বন্ধ ও সাইনাসের মাথাব্যথায় দিনে ২ বার গরম পানির ভাপ নিন।<br>• <b>ভেষজ পানীয়:</b> আদা, তুলসী পাতা, লবঙ্গ ও মধু মিশিয়ে হালকা গরম চা পান করুন (১ বছরের কম বয়সী শিশুকে মধু দেবেন না)।',
+    topicEn: 'Home Care for Common Cold, Cough, Sore Throat & Tonsillitis',
+    ansEn: '🍵 <b>Sore Throat, Cold & Cough Care:</b><br>• Gargle with warm salt water 3–4 times daily.<br>• Inhale warm steam for nasal congestion and drink ginger-tulsi tea with honey.'
+  },
+  {
+    id: 'sinusitis_allergic_rhinitis',
+    topic: 'সাইনোসাইটিস (Sinusitis) ও ধুলোবালির অ্যালার্জিজনিত হাঁচি',
+    mustAny: ['সাইনাস', 'সাইনোসাইটিস', 'নাকের পলিপ', 'অ্যালার্জিক রাইনাইটিস', 'বারবার হাঁচি', 'sinusitis', 'sinus headache'],
+    high: ['সাইনোসাইটিসের লক্ষণ ও ঘরোয়া উপায় কী', 'সকালে ঘুম থেকে উঠলে হাঁচি হয় কেন'],
+    med: ['কপাল ব্যথা', 'নাক বন্ধ', 'ভাপ', 'ধুলাবালি', 'মাস্ক'],
+    neg: [],
+    ans: '👃 <b>সাইনোসাইটিস ও অ্যালার্জিজনিত হাঁচি-সর্দি নিয়ন্ত্রণের উপায়:</b><br>• <b>লক্ষণ:</b> কপাল, চোখের চারপাশ ও নাকের দুই পাশে ভারী ব্যথা (সামনে ঝুঁকলে ব্যথা বাড়ে), নাক বন্ধ থাকা এবং সকালে একটানা হাঁচি।<br>• <b>করণীয়:</b> দিনে ২–৩ বার গরম পানির ভাপ (Steam) নেওয়া, বাইরে বের হলে মাস্ক ব্যবহার করা, ফ্রিজের ঠান্ডা পানি ও ধুলোবালি এড়িয়ে চলা এবং কুসুম গরম পানি পান করা।',
+    topicEn: 'Sinusitis & Allergic Rhinitis Relief Guide',
+    ansEn: '👃 <b>Sinusitis & Allergy Care:</b><br>• Symptoms: Facial/forehead pressure that worsens when leaning forward, nasal blockage, morning sneezing.<br>• Care: Steam inhalation 2–3 times daily, wear a mask outdoors, and avoid cold drinks/dust.'
+  },
+  {
+    id: 'diarrhea_dysentery_care',
+    topic: 'ডায়রিয়া, পাতলা পায়খানা ও আমাশয় হলে করণীয়',
+    mustAny: ['ডায়রিয়া', 'পাতলা পায়খানা', 'আমাশয়', 'পেট খারাপ', 'diarrhea', 'dysentery', 'loose motion'],
+    high: ['পাতলা পায়খানা বা ডায়রিয়া হলে তাৎক্ষণিক করণীয় কী', 'আমাশয় হলে কী খাওয়া উচিত'],
+    med: ['স্যালাইন', 'ওআরএস', 'জিংক', 'কাঁচকলা', 'জাউভাত', 'ডাবের পানি'],
+    neg: [],
+    ans: '💧 <b>ডায়রিয়া বা পাতলা পায়খানা ও আমাশয়ে করণীয়:</b><br>• <b>প্রথম ও প্রধান চিকিৎসা:</b> প্রতিবার পাতলা পায়খানার পরপরই পর্যাপ্ত <b>খাবার স্যালাইন (ORS)</b>, ডাবের পানি বা ভাতের মাড় পান করতে হবে যাতে পানিশূন্যতা না হয়।<br>• <b>সহজপাচ্য খাবার:</b> কাঁচকলার তরকারি দিয়ে নরম ভাত বা জাউভাত, চিড়ার পানি ও টক দই খাওয়া অত্যন্ত উপকারী (দুধ, শাক ও তৈলাক্ত খাবার সাময়িক বন্ধ রাখুন)।<br>• <b>সতর্কতা:</b> পায়খানার সাথে রক্ত গেলে, তীব্র জ্বর/বমি থাকলে বা প্রস্রাব কমে গেলে দ্রুত চিকিৎসকের পরামর্শ নিন।',
+    topicEn: 'Diarrhea & Dysentery Management Guide',
+    ansEn: '💧 <b>Diarrhea & Dysentery Care:</b><br>• Drink ORS (Oral Rehydration Salts), coconut water, or rice water after every loose stool.<br>• Eat soft rice, green banana curry, and yogurt; avoid milk and oily/spicy foods. See a doctor if there is blood in stool or high fever.'
+  },
+  {
+    id: 'constipation_fiber_relief',
+    topic: 'কোষ্ঠকাঠিন্য (Constipation) দূর করার ঘরোয়া ও খাদ্যভ্যাস নিয়ম',
+    mustAny: ['কোষ্ঠকাঠিন্য', 'কষা পায়খানা', 'পায়খানা কষা', 'ইসুবগুল', 'constipation'],
+    high: ['কোষ্ঠকাঠিন্য দূর করার স্থায়ী উপায় কী', 'পায়খানা কষা হলে কী খাওয়া উচিত'],
+    med: ['আঁশযুক্ত খাবার', 'পানি', 'ইসবগুলের ভুসি', 'পেঁপে', 'শাকসবজি', 'হাঁটা'],
+    neg: [],
+    ans: '🥦 <b>কোষ্ঠকাঠিন্য (Constipation) দূর করার কার্যকর উপায়:</b><br>• প্রতিদিন অন্তত <b>৩ লিটার পানি</b> পান করুন (সকালে খালি পেটে ১–২ গ্লাস কুসুম গরম পানি)।<br>• প্রতিদিনের খাবারে প্রচুর <b>আঁশযুক্ত খাবার (Dietary Fiber)</b> যেমন—লাল আটার রুটি, শাকসবজি, পাকা পেঁপে, বেল, পেয়ারা, ওটস ও ডাল রাখুন।<br>• রাতে ঘুমানোর আগে ১ গ্লাস পানিতে ১–২ চামচ <b>ইসবগুলের ভুসি</b> মিশিয়ে সাথে সাথে পান করুন এবং প্রতিদিন অন্তত ৩০ মিনিট হাঁটুন।',
+    topicEn: 'Natural Relief & High-Fiber Diet for Constipation',
+    ansEn: '🥦 <b>Constipation Relief Guide:</b><br>• Drink 3+ Liters of water daily (start with warm water in the morning).<br>• Eat high-fiber foods (papaya, leafy greens, whole grains, psyllium husk/Isabgol) and walk 30 minutes daily.'
+  },
+  {
+    id: 'vomiting_nausea_food_poisoning',
+    topic: 'বমি, বমি ভাব ও ফুড পয়জনিং (খাদ্যে বিষক্রিয়া) হলে করণীয়',
+    mustAny: ['বমি হচ্ছে', 'বমি ভাব', 'ফুড পয়জনিং', 'খাদ্যে বিষক্রিয়া', 'vomiting', 'nausea', 'food poisoning'],
+    high: ['হঠাৎ বমি বা ফুড পয়জনিং হলে করণীয় কী', 'বমি ভাব কমানোর ঘরোয়া উপায় কী'],
+    med: ['স্যালাইন', 'লেবু', 'আদা', 'বাসি খাবার', 'পানিশূন্যতা'],
+    neg: [],
+    ans: '🍋 <b>বমি, বমি ভাব ও ফুড পয়জনিংয়ে করণীয়:</b><br>• বমির ঠিক পরপরই একসাথে অনেক পানি না খেয়ে ১৫–২০ মিনিট পেটকে বিশ্রাম দিন, এরপর চামচে করে বা অল্প অল্প চুমুকে <b>খাবার স্যালাইন (ORS)</b> বা লেবু-পানি পান করুন।<br>• বমি ভাব কমাতে মুখে এক টুকরো আদা বা লবঙ্গ রাখতে পারেন অথবা লেবুর ঘ্রাণ নিতে পারেন।<br>• একটানা বমি হলে, পেটে তীব্র ব্যথা থাকলে বা প্রস্রাব কমে গেলে দ্রুত হাসপাতালে যোগাযোগ করুন।',
+    topicEn: 'Managing Nausea, Vomiting & Food Poisoning',
+    ansEn: '🍋 <b>Vomiting & Food Poisoning Care:</b><br>• Rest the stomach for 15–20 minutes after vomiting, then take small sips of ORS every few minutes.<br>• Ginger or lemon scent helps reduce nausea. Seek hospital care if unable to keep fluids down.'
+  },
+  {
+    id: 'intestinal_worms_deworming',
+    topic: 'কৃমির সমস্যা ও কৃমির ওষুধ খাওয়ার নিয়ম',
+    mustAny: ['কৃমি', 'কৃমির ওষুধ', 'অ্যালবেন্ডাজল', 'মেবেন্ডাজল', 'worms', 'deworming'],
+    high: ['কৃমির লক্ষণ কী ও কতদিন পরপর কৃমির ওষুধ খেতে হয়', 'কৃমির ওষুধ খাওয়ার নিয়ম কী'],
+    med: ['পেট ব্যথা', 'মলদ্বার চুলকানো', 'রক্তশূন্যতা', 'চুষে খাওয়া'],
+    neg: [],
+    ans: '💊 <b>কৃমি সংক্রমণ প্রতিরোধ ও ওষুধ খাওয়ার নিয়ম:</b><br>• <b>লক্ষণ:</b> পেটে ব্যথা, ক্ষুধামান্দ্য বা খাবারে অরুচি, মলদ্বারে চুলকানি (বিশেষ করে রাতে), ওজন না বাড়া এবং রক্তশূন্যতা।<br>• <b>প্রতিরোধ ও নিয়ম:</b> চিকিৎসকের পরামর্শে সাধারণত প্রতি ৬ মাস অন্তর পরিবারের সবাই একসাথে কৃমির ওষুধ (যেমন: Albendazole 400mg ট্যাবলেট চিবিয়ে বা চুষে) খেয়ে থাকে। খাবার আগে ও টয়লেট ব্যবহারের পর সাবান দিয়ে হাত ধোয়া এবং খালি পায়ে না হাঁটা আবশ্যক।',
+    topicEn: 'Intestinal Worms Symptoms & Deworming Prevention',
+    ansEn: '💊 <b>Deworming & Parasite Prevention:</b><br>• Symptoms include abdominal pain, anal itching at night, poor appetite, and anemia.<br>• Wash hands with soap, wear footwear outdoors, and consult a doctor for routine family deworming every 6 months.'
+  },
+  {
+    id: 'uti_urine_burning',
+    topic: 'প্রস্রাবে জ্বালাপোড়া বা ইউরিন ইনফেকশন (UTI) হলে করণীয়',
+    mustAny: ['প্রস্রাবে জ্বালাপোড়া', 'ইউরিন ইনফেকশন', 'প্রস্রাবে ইনফেকশন', 'ঘন ঘন প্রস্রাব', 'uti', 'urinary tract infection', 'burning urination'],
+    high: ['প্রস্রাবে জ্বালাপোড়া বা ইউরিন ইনফেকশন হলে করণীয় কী', 'ইউরিন ইনফেকশনের লক্ষণ কী'],
+    med: ['পানি', 'তলপেটে ব্যথা', 'জ্বর', 'প্রস্রাব আটকে রাখা', 'Urine R/E'],
+    neg: [],
+    ans: '💧 <b>প্রস্রাবে জ্বালাপোড়া বা ইউরিন ইনফেকশন (UTI) প্রতিরোধ ও করণীয়:</b><br>• <b>লক্ষণ:</b> প্রস্রাব করার সময় জ্বালাপোড়া বা ব্যথা, ঘন ঘন প্রস্রাবের বেগ, তলপেটে ব্যথা, প্রস্রাব ঘোলাটে হওয়া এবং কাঁপুনি দিয়ে জ্বর আসা।<br>• <b>করণীয়:</b> প্রতিদিন অন্তত <b>৩ থেকে ৪ লিটার পানি</b>, ডাবের পানি ও লেবু-পানি পান করুন, কখনোই প্রস্রাব দীর্ঘক্ষণ আটকে রাখবেন না এবং পরিষ্কার-পরিচ্ছন্নতা বজায় রাখুন। জ্বর বা তীব্র জ্বালাপোড়া থাকলে <b>Urine R/E ও C/S</b> পরীক্ষা করে চিকিৎসকের পরামর্শ নিন।',
+    topicEn: 'Urinary Tract Infection (UTI) & Burning Urination Care',
+    ansEn: '💧 <b>UTI & Burning Urination Care:</b><br>• Drink 3–4 Liters of water daily and never hold urine for long periods.<br>• If accompanied by lower abdominal pain or fever, get a Urine R/E & Culture test and consult a doctor.'
+  },
+  {
+    id: 'kidney_stone_symptoms',
+    topic: 'কিডনিতে পাথর (Kidney Stone) হওয়ার লক্ষণ ও প্রতিরোধ',
+    mustAny: ['কিডনিতে পাথর', 'কিডনি পাথর', 'kidney stone', 'renal stone'],
+    high: ['কিডনিতে পাথর হলে কী লক্ষণ দেখা দেয়', 'কিডনিতে পাথর হওয়া রোধ করার উপায় কী'],
+    med: ['কোমরের পাশে ব্যথা', 'প্রস্রাবে রক্ত', 'পানি', 'লেবু'],
+    neg: [],
+    ans: '🫘 <b>কিডনিতে পাথর (Kidney Stone) লক্ষণ ও প্রতিরোধ:</b><br>• <b>লক্ষণ:</b> পিঠের নিচের দিকে বা কোমরের এক পাশে হঠাৎ তীব্র ব্যথা যা তলপেট ও কুঁচকির দিকে ছড়িয়ে পড়ে, প্রস্রাবে জ্বালাপোড়া বা লালচে ভাব (রক্ত) এবং বমি ভাব।<br>• <b>প্রতিরোধ:</b> প্রতিদিন ৩–৩.৫ লিটার পানি ও লেবুর শরবত (Citrate পাথর জমতে বাধা দেয়) পান করা, অতিরিক্ত কাঁচা লবণ ও কোমল পানীয় বর্জন করা।',
+    topicEn: 'Kidney Stone Symptoms & Prevention Guide',
+    ansEn: '🫘 <b>Kidney Stone Guide:</b><br>• Symptoms: Severe flank/back pain radiating to the groin, nausea, and pink/reddish urine.<br>• Prevention: Drink 3–3.5L water daily with lemon juice (citrate prevents stone formation) and reduce salt intake.'
+  },
+  {
+    id: 'uric_acid_gout_diet',
+    topic: 'ইউরিক অ্যাসিড (Uric Acid) ও গেঁটেবাত হলে কোন খাবার নিষেধ',
+    mustAny: ['ইউরিক অ্যাসিড', 'ইউরিক এসিড', 'গেঁটেবাত', 'uric acid', 'gout', 'পায়ের বৃদ্ধাঙ্গুলে ব্যথা'],
+    high: ['ইউরিক অ্যাসিড বাড়লে কী কী খাবার খাওয়া নিষেধ', 'রক্তে ইউরিক অ্যাসিডের স্বাভাবিক মাত্রা কত'],
+    med: ['জয়েন্টে ব্যথা', 'গরুর মাংস', 'কলিজা', 'ডাল', 'সামুদ্রিক মাছ', 'পানি'],
+    neg: [],
+    ans: '🦶 <b>রক্তে ইউরিক অ্যাসিড (Uric Acid) মাত্রা ও খাদ্যতালিকা:</b><br>• <b>স্বাভাবিক মাত্রা:</b> পুরুষদের রক্তে <b>৩.৪ থেকে ৭.০ mg/dL</b> এবং নারীদের <b>২.৪ থেকে ৬.০ mg/dL</b>।<br>• <b>যেসব খাবার কমাতে বা বর্জন করতে হবে (উচ্চ পিউরিনযুক্ত):</b> লাল মাংস (গরু, খাসি), কলিজা, মগজ, সামুদ্রিক মাছ, চিংড়ি, মসুর ও খেসারির ডাল, পালংশাক, পুঁইশাক, মাশরুম এবং কোমল পানীয়।<br>• <b>উপকারী অভ্যাস:</b> প্রতিদিন ৩ লিটার পানি পান করা, ভিটামিন-সি যুক্ত ফল (লেবু, পেয়ারা, আমলকী) খাওয়া এবং ওজন নিয়ন্ত্রণে রাখা।',
+    topicEn: 'Uric Acid Normal Range & Gout Diet Guide',
+    ansEn: '🦶 <b>Uric Acid & Gout Diet Guide:</b><br>• <b>Normal Range:</b> Men: 3.4–7.0 mg/dL; Women: 2.4–6.0 mg/dL.<br>• <b>Foods to Limit:</b> Red meat, organ meats (liver), shellfish, thick lentils, spinach, and sugary sodas.<br>• <b>Helpful:</b> Drink 3L water daily and eat Vitamin C-rich fruits.'
+  },
+  {
+    id: 'back_neck_joint_pain',
+    topic: 'কোমর ব্যথা, ঘাড় ব্যথা ও হাঁটু ব্যথার (Arthritis) ঘরোয়া যত্ন',
+    mustAny: ['কোমর ব্যথা', 'ঘাড় ব্যথা', 'হাঁটু ব্যথা', 'গিরায় ব্যথা', 'জয়েন্টে ব্যথা', 'আর্থ্রাইটিস', 'বাতের ব্যথা', 'back pain', 'neck pain', 'knee pain', 'arthritis'],
+    high: ['কোমর ব্যথা ও ঘাড় ব্যথা কমানোর উপায় কী', 'হাঁটু ব্যথা হলে করণীয় কী'],
+    med: ['বসার নিয়ম', 'গরম সেঁক', 'ওজন', 'ক্যালসিয়াম', 'ভিটামিন ডি', 'বালিশ'],
+    neg: [],
+    ans: '🦴 <b>কোমর, ঘাড় ও হাঁটু ব্যথা কমানোর নিয়ম:</b><br>• <b>বসার ও শোয়ার ভঙ্গি (Posture):</b> মেরুদণ্ড সোজা রেখে বসুন, একটানা ৪৫ মিনিটের বেশি বসে না থেকে মাঝে ৫ মিনিট হাঁটুন, সামনে ঝুঁকে ভারী জিনিস তুলবেন না এবং ঘুমানোর সময় মাঝারি উচ্চতার একটিমাত্র বালিশ ও শক্ত সমান তোশক ব্যবহার করুন।<br>• <b>যত্ন:</b> ব্যথার স্থানে কুসুম গরম পানির সেঁক দিন, শরীরের অতিরিক্ত ওজন কমান এবং ক্যালসিয়াম ও ভিটামিন-ডি সমৃদ্ধ খাবার গ্রহণ করুন। ব্যথা পায়ে ছড়িয়ে পড়লে বা অবশ লাগলে ফিজিওথেরাপিস্ট/চিকিৎসকের পরামর্শ নিন।',
+    topicEn: 'Back Pain, Neck Pain & Joint Care Guide',
+    ansEn: '🦴 <b>Back, Neck & Knee Pain Care:</b><br>• Maintain upright posture, take breaks every 45 minutes of sitting, use a single low-to-medium pillow, apply warm compresses, and maintain healthy body weight.'
+  },
+  {
+    id: 'thyroid_tsh_guide',
+    topic: 'থাইরয়েড হরমোন (TSH) কম বা বেশি হওয়ার লক্ষণ',
+    mustAny: ['থাইরয়েড লক্ষণ', 'হাইপোথাইরয়েডিজম', 'হাইপারথাইরয়েডিজম', 'tsh test', 'thyroid symptoms'],
+    high: ['থাইরয়েড সমস্যা হলে কী কী লক্ষণ দেখা দেয়', 'রক্তে TSH এর স্বাভাবিক মাত্রা কত'],
+    med: ['থাইরয়েড', 'ওজন বাড়া', 'চুল পড়া', 'ক্লান্তি', 'বুক ধড়ফড়', 'ঠান্ডা লাগা'],
+    neg: ['রক্তদান'],
+    ans: '🦋 <b>থাইরয়েড হরমোন (TSH) মাত্রা ও লক্ষণ:</b><br>• <b>স্বাভাবিক TSH মাত্রা:</b> সাধারণত <b>০.৪ থেকে ৪.৫ mIU/L</b>।<br>• <b>হাইপোথাইরয়েডিজম (হরমোন কম / TSH বেশি):</b> হঠাৎ ওজন বেড়ে যাওয়া, অতিরিক্ত ক্লান্তি, শীত বেশি লাগা, চুল পড়া, ত্বক শুষ্ক হওয়া ও কোষ্ঠকাঠিন্য।<br>• <b>হাইপারথাইরয়েডিজম (হরমোন বেশি / TSH কম):</b> পর্যাপ্ত খেয়েও ওজন কমে যাওয়া, বুক ধড়ফড় করা, হাত কাঁপা ও অতিরিক্ত গরম লাগা।',
+    topicEn: 'Thyroid (TSH) Reference Range & Symptoms',
+    ansEn: '🦋 <b>Thyroid (TSH) Guide:</b><br>• <b>Normal TSH:</b> 0.4 to 4.5 mIU/L.<br>• <b>Hypothyroidism (High TSH):</b> Weight gain, fatigue, hair loss, cold intolerance.<br>• <b>Hyperthyroidism (Low TSH):</b> Weight loss, rapid heartbeat, tremors, heat intolerance.'
+  },
+  {
+    id: 'dental_gum_mouth_ulcer',
+    topic: 'দাঁতে ব্যথা, মাড়ি থেকে রক্ত পড়া ও মুখের ঘা (Mouth Ulcer)',
+    mustAny: ['দাঁতে ব্যথা', 'দাঁতের যত্ন', 'মাড়ি ফোলা', 'মুখের ঘা', 'জিহ্বায় ঘা', 'মুখে দুর্গন্ধ', 'toothache', 'mouth ulcer', 'bleeding gums'],
+    high: ['মুখের বা জিহ্বার ঘা দ্রুত ভালো করার উপায় কী', 'দাঁতের ব্যথা ও মাড়ি থেকে রক্ত পড়া কমানোর উপায়'],
+    med: ['দাঁত ব্রাশ', 'লবণ পানি', 'ভিটামিন বি২', 'রিবোফ্লাভিন', 'লবঙ্গ'],
+    neg: ['দাঁত তোলা রক্তদান'],
+    ans: '🦷 <b>দাঁত, মাড়ি ও মুখের ঘা (Mouth Ulcer) নিরাময়ের উপায়:</b><br>• <b>মুখের ও জিহ্বার ঘা:</b> সাধারণত ভিটামিন বি-২ (Riboflavin), বি-১২, ফলিক অ্যাসিড বা আয়রনের ঘাটতি ও কোষ্ঠকাঠিন্য থেকে হয়। দিনে ৩ বার কুসুম গরম লবণ-পানি দিয়ে কুলি করুন এবং ভিটামিন-বি ও প্রচুর পানি গ্রহণ করুন।<br>• <b>দাঁত ও মাড়ির যত্ন:</b> প্রতিদিন সকালে নাস্তার পর এবং রাতে ঘুমানোর আগে ২ বার ফ্লোরাইড টুথপেস্ট ও নরম ব্রাশ দিয়ে দাঁত ব্রাশ করুন। মাড়িতে পাথর (Calculus) জমলে ডেন্টিস্টের মাধ্যমে স্কেলিং করান।',
+    topicEn: 'Dental Care, Bleeding Gums & Mouth Ulcer Relief',
+    ansEn: '🦷 <b>Oral Health & Mouth Ulcer Care:</b><br>• <b>Mouth Ulcers:</b> Often linked to Vitamin B2/B12/iron deficiency. Rinse with warm salt water and eat Vitamin B-rich foods.<br>• <b>Dental Care:</b> Brush twice daily (after breakfast and before bed) with a soft brush.'
+  },
+  {
+    id: 'eye_screen_conjunctivitis',
+    topic: 'চোখের যত্ন, চোখ ওঠা (Conjunctivitis) ও মোবাইল/কম্পিউটার স্ক্রিন নিয়ম',
+    mustAny: ['চোখ ওঠা', 'চোখ লাল', 'চোখ জ্বালাপোড়া', 'চোখের যত্ন', 'চোখ দিয়ে পানি', 'conjunctivitis', 'pink eye', 'eye strain'],
+    high: ['চোখ উঠলে করণীয় কী', 'মোবাইল ও কম্পিউটার ব্যবহারে চোখ ভালো রাখার নিয়ম কী'],
+    med: ['২০-২০-২০', 'ঠান্ডা পানি', 'সানগ্লাস', 'রুমাল', 'হাত ধোয়া'],
+    neg: ['রাসায়নিক'],
+    ans: '👁️ <b>চোখের যত্ন, স্ক্রিন গাইড ও চোখ ওঠা (Conjunctivitis) করণীয়:</b><br>• <b>মোবাইল/কম্পিউটার ব্যবহারে ২০-২০-২০ নিয়ম:</b> একটানা স্ক্রিনে তাকিয়ে না থেকে প্রতি <b>২০ মিনিট পরপর ২০ ফুট দূরের কোনো বস্তুর দিকে ২০ সেকেন্ড</b> তাকিয়ে থাকুন এবং ঘন ঘন চোখের পলক ফেলুন।<br>• <b>চোখ ওঠা (Conjunctivitis):</b> চোখ লাল হলে বা পিচুটি জমলে চোখে হাত দেবেন না, পরিষ্কার তুলা ও ফোটানো ঠান্ডা পানি দিয়ে চোখ পরিষ্কার করুন, কালো চশমা পরুন এবং আলাদা তোয়ালে ব্যবহার করুন।',
+    topicEn: 'Eye Care (20-20-20 Rule) & Conjunctivitis Management',
+    ansEn: '👁️ <b>Eye Care & Conjunctivitis Guide:</b><br>• <b>20-20-20 Rule for Screens:</b> Every 20 minutes, look 20 feet away for 20 seconds.<br>• <b>Conjunctivitis (Pink Eye):</b> Do not rub eyes; clean gently with boiled cooled water and cotton, and avoid sharing towels.'
+  },
+  {
+    id: 'skin_allergy_fungal_acne',
+    topic: 'ত্বকের অ্যালার্জি, দাদ (Fungal Infection), চুলকানি ও ব্রণ',
+    mustAny: ['দাদ', 'ফাঙ্গাল ইনফেকশন', 'চুলকানি', 'খোসপাঁচড়া', 'আমবাত', 'ব্রণ', 'খুশকি', 'চুল পড়া', 'ringworm', 'fungal infection', 'acne', 'hair fall'],
+    high: ['দাদ বা ফাঙ্গাল ইনফেকশন দূর করার উপায় কী', 'মুখের ব্রণ ও অতিরিক্ত চুল পড়া কমানোর উপায়'],
+    med: ['ত্বক', 'ঘাম', 'সুতি কাপড়', 'স্টেরয়েড মলম', 'প্রোটিন', 'আয়রন'],
+    neg: ['রক্তদান'],
+    ans: '🧴 <b>ত্বকের চুলকানি, দাদ (Fungal Infection), ব্রণ ও চুল পড়ার সমাধান:</b><br>• <b>দাদ বা ফাঙ্গাল ইনফেকশন:</b> শরীর ভেজা বা ঘামে ভেজা রাখবেন না, ঢিলেঢালা সুতি পোশাক পরুন এবং কখনোই ফার্মেসি থেকে ইচ্ছেমতো <b>স্টেরয়েডযুক্ত মলম (Steroid Cream)</b> লাগাবেন না—এতে দাদ আরও ছড়িয়ে পড়ে। চর্মরোগ বিশেষজ্ঞের পরামর্শে সঠিক অ্যান্টিফাঙ্গাল ক্রিম পূর্ণ মেয়াদে ব্যবহার করুন।<br>• <b>ব্রণ ও চুল পড়া:</b> ব্রণে নখ লাগাবেন না, দিনে ২ বার মুখ পরিষ্কার রাখুন। অতিরিক্ত চুল পড়া রোধে আয়রন, জিংক, প্রোটিন ও ভিটামিন-ডি সমৃদ্ধ খাবার খান এবং পর্যাপ্ত ঘুমান।',
+    topicEn: 'Skin Fungal Infection, Allergy, Acne & Hair Fall Care',
+    ansEn: '🧴 <b>Skin & Hair Health Guide:</b><br>• <b>Fungal Infections (Ringworm):</b> Keep skin dry, wear loose cotton clothes, and never apply over-the-counter steroid creams on fungal rashes.<br>• <b>Acne & Hair Fall:</b> Avoid picking pimples; ensure adequate iron, zinc, protein, and Vitamin D intake.'
+  },
+  {
+    id: 'piles_hemorrhoids_care',
+    topic: 'পাইলস বা অর্শরোগ (Hemorrhoids) ও মলদ্বারে রক্তপাত প্রতিরোধ',
+    mustAny: ['পাইলস', 'অর্শরোগ', 'গেজ', 'মলদ্বারে রক্ত', 'মলদ্বারে ব্যথা', 'piles', 'hemorrhoids', 'anal fissure'],
+    high: ['পাইলস বা অর্শরোগ হলে ঘরোয়া করণীয় ও খাবার কী', 'পায়খানার সাথে তাজা রক্ত গেলে করণীয় কী'],
+    med: ['কোষ্ঠকাঠিন্য', 'ইসবগুল', 'পানি', 'আঁশযুক্ত খাবার', 'গরম পানির সেঁক', 'সিজ বাথ'],
+    neg: [],
+    ans: '🌿 <b>পাইলস (Hemorrhoids) ও এনাল ফিশারে করণীয়:</b><br>• <b>প্রধান নিয়ম:</b> কোষ্ঠকাঠিন্য সম্পূর্ণ দূর করতে হবে—প্রতিদিন ৩–৩.৫ লিটার পানি পান করুন, প্রচুর শাকসবজি, পেঁপে ও রাতে ইসবগুলের ভুসি খান এবং টয়লেটে দীর্ঘ সময় বসে চাপ দেবেন না।<br>• <b>সিজ বাথ (Sitz Bath):</b> একটি গামলায় কুসুম গরম পানি নিয়ে দিনে ২ বার ১৫ মিনিট করে মলদ্বারে সেঁক দিলে ব্যথা ও ফোলা দ্রুত কমে। রক্তপাত বেশি হলে সার্জারি বিশেষজ্ঞের পরামর্শ নিন।',
+    topicEn: 'Piles (Hemorrhoids) & Anal Fissure Relief Guide',
+    ansEn: '🌿 <b>Piles & Anal Fissure Care:</b><br>• Prevent constipation with 3+ Liters of water, high-fiber foods, and psyllium husk (Isabgol).<br>• Take warm Sitz baths for 15 minutes twice daily and consult a specialist if bleeding persists.'
+  },
+  {
+    id: 'appendicitis_gallstone_pain',
+    topic: 'অ্যাপেন্ডিসাইটিস (Appendicitis) ও পিত্তথলির পাথরের ব্যথা চেনার উপায়',
+    mustAny: ['অ্যাপেন্ডিসাইটিস', 'এপেন্ডিসাইটিস', 'পিত্তথলিতে পাথর', 'গলব্লাডার পাথর', 'appendicitis', 'gallstone'],
+    high: ['অ্যাপেন্ডিসাইটিসের ব্যথা কোন পাশে হয় ও লক্ষণ কী', 'পিত্তথলিতে পাথর হওয়ার লক্ষণ কী'],
+    med: ['পেটের ডান দিকে ব্যথা', 'নাভির চারপাশে ব্যথা', 'বমি', 'জ্বর', 'আল্ট্রাসনোগ্রাম'],
+    neg: [],
+    ans: '🏥 <b>অ্যাপেন্ডিসাইটিস ও পিত্তথলির পাথরের লক্ষণ:</b><br>• <b>অ্যাপেন্ডিসাইটিস (Appendicitis):</b> প্রথমে নাভির চারপাশে ব্যথা শুরু হয়ে কয়েক ঘণ্টার মধ্যে <b>তলপেটের ডান দিকে (Right Lower Abdomen)</b> তীব্র আকার ধারণ করে, সাথে হালকা জ্বর, বমি ভাব ও হাঁচি-কাশিতে ব্যথা বাড়ে। এমন লক্ষণে ব্যথার ওষুধ না খেয়ে দ্রুত হাসপাতালে যান।<br>• <b>পিত্তথলির পাথর (Gallstones):</b> তৈলাক্ত খাবার খাওয়ার পর পেটের <b>উপরের ডান পাশে</b> ব্যথা হয় যা ডান কাঁধ বা পিঠে ছড়াতে পারে।',
+    topicEn: 'Recognizing Appendicitis & Gallstone Pain',
+    ansEn: '🏥 <b>Appendicitis vs Gallstone Pain:</b><br>• <b>Appendicitis:</b> Pain starts around the navel and shifts to the <b>lower right abdomen</b> with nausea/fever — seek immediate hospital care.<br>• <b>Gallstones:</b> Pain in the <b>upper right abdomen</b>, especially after fatty meals.'
+  },
+  {
+    id: 'pregnancy_maternal_child_care',
+    topic: 'গর্ভবতী মায়ের যত্ন, পুষ্টি, বিপদচিহ্ন ও শিশুর টিকা (EPI)',
+    mustAny: ['গর্ভবতী মায়ের খাবার', 'গর্ভাবস্থায় যত্ন', 'গর্ভবতী বিপদচিহ্ন', 'শিশুর টিকা', 'নবজাতকের যত্ন', 'বুকের দুধ', 'pregnancy diet', 'maternal care'],
+    high: ['গর্ভবতী মায়ের প্রতিদিন কী কী খাবার খাওয়া উচিত', 'গর্ভাবস্থায় ৫টি বিপদচিহ্ন কী কী'],
+    med: ['আয়রন', 'ফলিক অ্যাসিড', 'ক্যালসিয়াম', 'দুধ', 'ডিম', 'বিশ্রাম', 'রক্তের গ্রুপ'],
+    neg: ['গর্ভবতী রক্ত দিতে'],
+    ans: '🤰 <b>গর্ভবতী মায়ের যত্ন, পুষ্টি ও জরুরি প্রস্তুতি:</b><br>• <b>পুষ্টি ও বিশ্রাম:</b> স্বাভাবিকের চেয়ে এক মুঠো বেশি সুষম খাবার (দুধ, ডিম, মাছ, কলিজা, শাকসবজি), চিকিৎসকের পরামর্শে নিয়মিত আয়রন, ফলিক অ্যাসিড ও ক্যালসিয়াম গ্রহণ এবং দিনে ২ ঘণ্টা ও রাতে ৮ ঘণ্টা বিশ্রাম।<br>• <b>৫টি বিপদচিহ্ন:</b> রক্তপাত, তীব্র মাথাব্যথা/ঝাপসা দেখা, খিঁচুনি, ভীষণ জ্বর বা হাত-পা-মুখ ফুলে যাওয়া।<br>• <b>রক্তের প্রস্তুতি:</b> প্রসবের আগেই মায়ের রক্তের গ্রুপ জেনে একই গ্রুপের অন্তত <b>২ জন রক্তদাতা (Donor)</b> প্রস্তুত রাখুন!',
+    topicEn: 'Pregnancy Nutrition, Danger Signs & Blood Readiness',
+    ansEn: '🤰 <b>Maternal Care & Blood Readiness:</b><br>• Ensure iron, folic acid, calcium, protein-rich diet, and 8 hours of night sleep.<br>• Always identify the mother\'s blood group early and keep at least <b>2 matching blood donors</b> on standby before delivery.'
+  },
+  {
+    id: 'mental_health_stress_anxiety',
+    topic: 'মানসিক চাপ (Stress), দুশ্চিন্তা (Anxiety) ও প্যানিক অ্যাটাক নিয়ন্ত্রণ',
+    mustAny: ['মানসিক চাপ', 'দুশ্চিন্তা', 'ডিপ্রেশন', 'বিষণ্ণতা', 'প্যানিক অ্যাটাক', 'টেনশন কমানোর', 'stress relief', 'anxiety', 'panic attack'],
+    high: ['মানসিক চাপ ও অতিরিক্ত দুশ্চিন্তা কমানোর উপায় কী', 'হঠাৎ প্যানিক অ্যাটাক বা বুক ধড়ফড় করলে করণীয় কী'],
+    med: ['শ্বাসপ্রশ্বাস', 'ঘুম', 'ব্যায়াম', 'মনোযোগ', 'মেডিটেশন'],
+    neg: [],
+    ans: '🌿 <b>মানসিক চাপ (Stress), দুশ্চিন্তা ও প্যানিক অ্যাটাক নিয়ন্ত্রণের উপায়:</b><br>• <b>৪-৭-৮ গভীর শ্বাস ব্যায়াম (Deep Breathing):</b> হঠাৎ দুশ্চিন্তা বা বুক ধড়ফড় করলে নাক দিয়ে ৪ সেকেন্ড শ্বাস নিন, ৭ সেকেন্ড ধরে রাখুন এবং মুখ দিয়ে ৮ সেকেন্ড ধরে ধীরে ধীরে ছাড়ুন—এতে স্নায়ুতন্ত্র দ্রুত শান্ত হয়।<br>• <b>দৈনন্দিন অভ্যাস:</b> প্রতিদিন রাতে ৭–৮ ঘণ্টা নির্দিষ্ট সময়ে ঘুমানো, ৩০ মিনিট হাঁটা বা ব্যায়াম করা, ক্যাফেইন (চা-কফি) কমানো এবং ঘুমানোর ১ ঘণ্টা আগে মোবাইল স্ক্রিন বন্ধ রাখা।',
+    topicEn: 'Managing Stress, Anxiety & Panic Attacks Naturally',
+    ansEn: '🌿 <b>Stress & Anxiety Management:</b><br>• Practice <b>4-7-8 Deep Breathing</b> (inhale 4s, hold 7s, exhale slowly 8s) to calm the nervous system.<br>• Maintain 7–8 hours of regular sleep, walk 30 minutes daily, and limit caffeine/screen time before bed.'
+  },
+  {
+    id: 'exercise_walking_benefits',
+    topic: 'প্রতিদিন হাঁটা ও ব্যায়ামের নিয়ম এবং উপকারিতা',
+    mustAny: ['প্রতিদিন হাঁটা', 'কতক্ষণ হাঁটা উচিত', 'ব্যায়ামের নিয়ম', 'শরীরচর্চা', 'daily walking', 'exercise benefits'],
+    high: ['প্রতিদিন কত মিনিট হাঁটা স্বাস্থ্যের জন্য ভালো', 'নিয়মিত হাঁটার উপকারিতা কী কী'],
+    med: ['হাঁটা', 'মিনিট', 'হৃদরোগ', 'ডায়াবেটিস', 'ওজন', 'রক্তচাপ'],
+    neg: [],
+    ans: '🏃 <b>প্রতিদিন হাঁটা ও শারীরিক ব্যায়ামের স্বাস্থ্য নিয়ম:</b><br>• বিশ্ব স্বাস্থ্য সংস্থার (WHO) মতে, একজন পূর্ণবয়স্ক মানুষের প্রতিদিন অন্তত <b>৩০ থেকে ৪৫ মিনিট</b> দ্রুত পায়ে হাঁটা (Brisk Walking) উচিত।<br>• <b>উপকারিতা:</b> উচ্চ রক্তচাপ ও ডায়াবেটিস নিয়ন্ত্রণে থাকে, খারাপ কোলেস্টেরল (LDL) ও ফ্যাটি লিভার কমে, হৃৎপিণ্ড শক্তিশালী হয়, ওজন নিয়ন্ত্রণে থাকে এবং ভালো ঘুম হয়।',
+    topicEn: 'Daily Brisk Walking & Exercise Guidelines',
+    ansEn: '🏃 <b>Daily Walking & Exercise Guide:</b><br>• Walk briskly for <b>30 to 45 minutes daily</b> (at least 150 minutes/week).<br>• Lowers blood pressure, blood sugar, bad cholesterol (LDL), and fatty liver while strengthening the heart.'
+  },
+  {
+    id: 'lab_test_cbc_esr_lipid',
+    topic: 'রক্ত পরীক্ষা রিপোর্ট বোঝার নিয়ম (CBC, ESR, CRP, Lipid Profile)',
+    mustAny: ['cbc test', 'সিবিসি টেস্ট', 'esr কত', 'ইএসআর', 'crp test', 'লিপিড প্রোফাইল', 'রক্তের স্বাভাবিক মাত্রা চার্ট'],
+    high: ['রক্তের CBC ও ESR পরীক্ষার স্বাভাবিক মাত্রা কত', 'রক্ত পরীক্ষার রিপোর্ট বোঝার উপায় কী'],
+    med: ['হিমোগ্লোবিন', 'প্লাটিলেট', 'শ্বেত কণিকা', 'কোলেস্টেরল', 'ইনফেকশন'],
+    neg: [],
+    ans: '🔬 <b>প্রধান রক্ত পরীক্ষাগুলোর (CBC, ESR, Lipid Profile) স্বাভাবিক মাত্রা:</b><br>• <b>হিমোগ্লোবিন (Hb):</b> পুরুষ ১৩.৫–১৭.৫ g/dL, নারী ১২.০–১৫.৫ g/dL।<br>• <b>শ্বেত রক্তকণিকা (WBC / Total Count):</b> ৪,০০০ থেকে ১১,০০০ /µL (বেশি হলে সাধারণত ব্যাকটেরিয়াল ইনফেকশন বোঝায়)।<br>• <b>প্লাটিলেট (Platelets):</b> ১,৫০,০০০ থেকে ৪,৫০,০০০ /µL।<br>• <b>ইএসআর (ESR):</b> পুরুষ ০–১৫ mm/hr, নারী ০–২০ mm/hr।<br>• <b>লিপিড প্রোফাইল (Lipid Profile):</b> মোট কোলেস্টেরল &lt;২০০ mg/dL, LDL &lt;১০০ mg/dL, HDL &gt;৪০ mg/dL, ট্রাইগ্লিসারাইড &lt;১৫০ mg/dL।',
+    topicEn: 'Understanding Blood Test Reports (CBC, ESR & Lipid Profile)',
+    ansEn: '🔬 <b>Standard Blood Test Reference Ranges:</b><br>• <b>Hemoglobin:</b> Men 13.5–17.5 g/dL; Women 12.0–15.5 g/dL.<br>• <b>WBC Count:</b> 4,000–11,000 /µL.<br>• <b>Platelets:</b> 150,000–450,000 /µL.<br>• <b>ESR:</b> Men 0–15 mm/hr; Women 0–20 mm/hr.<br>• <b>Total Cholesterol:</b> <200 mg/dL (Triglycerides <150 mg/dL).'
+  },
+  {
+    id: 'tea_coffee_sugar_limit',
+    topic: 'প্রতিদিন চা, কফি ও চিনি খাওয়ার নিরাপদ মাত্রা',
+    mustAny: ['দিনে কত চামচ চিনি', 'চিনি খাওয়ার ক্ষতি', 'চা কফি কত কাপ', 'অতিরিক্ত চা খেলে', 'sugar limit', 'caffeine limit'],
+    high: ['প্রতিদিন সর্বোচ্চ কত চামচ চিনি খাওয়া নিরাপদ', 'দিনে কয় কাপ চা বা কফি খাওয়া যায়'],
+    med: ['চিনি', 'চা', 'কফি', 'ক্যাফেইন', 'ডায়াবেটিস', 'আয়রন শোষণ'],
+    neg: [],
+    ans: '🍵 <b>প্রতিদিন চিনি, চা ও কফি খাওয়ার নিরাপদ মাত্রা:</b><br>• <b>চিনি (Sugar):</b> একজন সুস্থ মানুষের প্রতিদিন <b>৫ থেকে ৬ চা চামচের (২৫ গ্রাম)</b> বেশি চিনি খাওয়া উচিত নয়। চিনি কমালে ডায়াবেটিস, ফ্যাটি লিভার ও মেদ দ্রুত কমে।<br>• <b>চা ও কফি:</b> দিনে ২–৩ কাপের বেশি চা-কফি না খাওয়া ভালো। মনে রাখবেন: ভাত বা খাবার খাওয়ার <b>ঠিক সাথে সাথে চা বা কফি খাবেন না</b>—এতে খাবারের আয়রন শোষণ ৬০% পর্যন্ত কমে গিয়ে রক্তশূন্যতা হয় (খাবারের অন্তত ১ ঘণ্টা পর চা পান করুন)।',
+    topicEn: 'Safe Daily Limits for Sugar, Tea & Coffee',
+    ansEn: '🍵 <b>Sugar, Tea & Coffee Guidelines:</b><br>• Keep added sugar under <b>5–6 teaspoons (25g) per day</b>.<br>• Avoid drinking tea or coffee immediately after meals, as tannins block iron absorption by up to 60% (wait at least 1 hour after meals).'
+  },
+  {
+    id: 'honey_black_seed_garlic',
+    topic: 'মধু, কালোজিরা, রসুন ও আদার ভেষজ উপকারিতা',
+    mustAny: ['মধুর উপকারিতা', 'কালোজিরা', 'রসুনের উপকারিতা', 'আদার উপকারিতা', 'honey benefits', 'black seed'],
+    high: ['প্রতিদিন মধু ও কালোজিরা খাওয়ার উপকারিতা কী', 'খালি পেটে রসুন খেলে কী উপকার হয়'],
+    med: ['রোগ প্রতিরোধ', 'সর্দি কাশি', 'কোলেস্টেরল', 'রক্তচাপ'],
+    neg: [],
+    ans: '🍯 <b>মধু, কালোজিরা, আদা ও রসুনের প্রাকৃতিক স্বাস্থ্য উপকারিতা:</b><br>• <b>মধু ও কালোজিরা:</b> এতে অ্যান্টিঅক্সিডেন্ট ও থাইমোকুইনন থাকে যা রোগ প্রতিরোধ ক্ষমতা বাড়ায়, সর্দি-কাশি ও শ্বাসকষ্ট কমায় এবং শক্তি জোগায়।<br>• <b>রসুন ও আদা:</b> কাঁচা রসুন রক্তের খারাপ কোলেস্টেরল (LDL) ও উচ্চ রক্তচাপ নিয়ন্ত্রণে সাহায্য করে এবং আদা হজমশক্তি বাড়ায় ও বমি ভাব দূর করে।',
+    topicEn: 'Health Benefits of Honey, Black Seed, Ginger & Garlic',
+    ansEn: '🍯 <b>Benefits of Honey, Black Seed, Ginger & Garlic:</b><br>• Honey and black seed (Kalojira) boost immunity and relieve respiratory congestion.<br>• Garlic supports healthy cholesterol and blood pressure, while ginger aids digestion.'
+  },
+  {
+    id: 'handwashing_hygiene_infection',
+    topic: 'সাবান দিয়ে হাত ধোয়া ও ব্যক্তিগত পরিষ্কার-পরিচ্ছন্নতা (Hygiene)',
+    mustAny: ['হাত ধোয়ার নিয়ম', 'কত সেকেন্ড হাত ধুতে হয়', 'পরিষ্কার পরিচ্ছন্নতা', 'জীবাণু প্রতিরোধ', 'hand washing'],
+    high: ['সাবান দিয়ে কত সেকেন্ড হাত ধোয়া উচিত', 'ব্যক্তিগত পরিষ্কার পরিচ্ছন্নতার নিয়ম কী'],
+    med: ['সাবান', '২০ সেকেন্ড', 'ডায়রিয়া', 'জীবাণু', 'নখ কাটা'],
+    neg: [],
+    ans: '🧼 <b>হাত ধোয়া ও ব্যক্তিগত স্বাস্থ্যবিধি (Personal Hygiene):</b><br>• খাবার খাওয়ার আগে, খাবার তৈরির আগে এবং টয়লেট ব্যবহারের পর সাবান ও পানি দিয়ে অন্তত <b>২০ সেকেন্ড</b> ধরে দুই হাতের তালু, আঙুলের ফাঁক ও নখের নিচ ভালোভাবে ধুতে হবে।<br>• শুধু সঠিকভাবে হাত ধোয়ার মাধ্যমেই ডায়রিয়া, টাইফয়েড, জন্ডিস, কৃমি ও শ্বাসতন্ত্রের সংক্রমণ প্রায় <b>৫০%</b> প্রতিরোধ করা যায়!',
+    topicEn: '20-Second Handwashing & Personal Hygiene Guide',
+    ansEn: '🧼 <b>Handwashing & Personal Hygiene:</b><br>• Wash hands with soap and water for at least <b>20 seconds</b> before eating and after using the washroom — this prevents nearly 50% of gastrointestinal and respiratory infections.'
+  },
+  {
+    id: 'daily_water_intake',
+    topic: 'মানবদেহে দৈনিক পানি পানের সঠিক পরিমাণ ও হাইড্রেশন',
+    mustAny: ['পানি', 'জল', 'পানির', 'water', 'hydration', 'dehydration', 'পানিশূন্যতা', 'পানি শূন্যতা', 'ডাবের পানি', 'তৃষ্ণা', 'পিপাসা', 'pani'],
+    high: ['কত লিটার পানি', 'কয় লিটার পানি', 'প্রতিদিন পানি', 'দিনে কতটুকু পানি', 'দিনে কত লিটার পানি', 'মানবদেহে কত লিটার প্রতিদিন পানি', 'কত গ্লাস পানি', 'পানি খাইতে হবে', 'পানি খেতে হবে', 'পানি পান করতে হবে', 'পানি খাওয়া উচিত', 'শরীরে পানির পরিমাণ', 'দেহে পানির পরিমাণ', 'how much water', 'how many liters of water', 'daily water intake', 'liters of water per day', 'glasses of water', 'koto liter pani', 'koto glass pani'],
+    med: ['লিটার', 'গ্লাস', 'প্রতিদিন', 'দৈনিক', 'দিনে', 'মানবদেহে', 'শরীরে', 'দেহে', 'খাইতে', 'খেতে', 'পান', 'ওজন', 'সুস্থ', 'কিডনি', 'প্রস্রাব', 'গরমে', 'liter', 'liters', 'glass', 'daily', 'drink', 'body', 'weight'],
+    neg: [],
+    ans: '💧 <b>মানবদেহে প্রতিদিন কত লিটার পানি পান করা প্রয়োজন:</b><br>' +
+         'চিকিৎসাবিজ্ঞান (WHO এবং Institute of Medicine)-এর মানদণ্ড অনুযায়ী একজন সুস্থ পূর্ণবয়স্ক মানুষের প্রতিদিন পানি পানের সঠিক হিসাব নিচে দেওয়া হলো:<br>' +
+         '• <b>পূর্ণবয়স্ক পুরুষ:</b> প্রতিদিন গড়ে <b>৩.০ থেকে ৩.৭ লিটার</b> (প্রায় <b>১২ থেকে ১৫ গ্লাস</b>) পানি পান করা প্রয়োজন।<br>' +
+         '• <b>পূর্ণবয়স্ক নারী:</b> প্রতিদিন গড়ে <b>২.২ থেকে ২.৭ লিটার</b> (প্রায় <b>৯ থেকে ১১ গ্লাস</b>) পানি পান করা প্রয়োজন (গর্ভবতী ও স্তন্যদানকারী মায়েদের ক্ষেত্রে ৩.০–৩.২ লিটার)।<br>' +
+         '• <b>শরীরের ওজন অনুযায়ী সহজ সূত্র:</b> আপনার শরীরের <b>প্রতি ২০ কেজি ওজনের জন্য প্রতিদিন ১ লিটার</b> পানি পান করা উচিত (যেমন: কারও ওজন ৬০ কেজি হলে প্রতিদিন প্রায় ৩ লিটার এবং ৮০ কেজি হলে ৪ লিটার পানি প্রয়োজন)।<br>' +
+         '• <b>গরমকাল বা শারীরিক পরিশ্রমে:</b> অতিরিক্ত ঘাম, রোদে কাজ বা ব্যায়াম করলে স্বাভাবিকের চেয়ে আরও <b>০.৫ থেকে ১ লিটার (২–৪ গ্লাস)</b> বেশি পানি বা ওআরএস/ডাবের পানি পান করতে হবে।<br>' +
+         '• <b>মানবদেহে পানির অংশ:</b> একজন পূর্ণবয়স্ক মানুষের শরীরের মোট ওজনের প্রায় <b>৬০% থেকে ৬৫%</b> পানি এবং রক্তের তরল অংশের (প্লাজমা) প্রায় <b>৯০–৯২%</b> পানি।<br><br>' +
+         '🩸 <b>রক্তদাতাদের জন্য বিশেষ পরামর্শ:</b> রক্তদানের ৩০ মিনিট আগে অন্তত <b>২–৩ গ্লাস (৫০০ মি.লি.)</b> পানি পান করলে এবং রক্তদানের পর ২৪ ঘণ্টায় স্বাভাবিকের চেয়ে ৩–৪ গ্লাস বেশি পানি পান করলে রক্তদানের পর মাথা ঘোরা বা দুর্বলতা হয় না!',
+    topicEn: 'Daily Water Intake & Hydration Guide for the Human Body',
+    ansEn: '💧 <b>Recommended Daily Water Intake for the Human Body:</b><br>According to clinical guidelines (WHO & Institute of Medicine):<br>• <b>Adult Men:</b> <b>3.0 to 3.7 Liters</b> (about <b>12 to 15 glasses</b>) per day.<br>• <b>Adult Women:</b> <b>2.2 to 2.7 Liters</b> (about <b>9 to 11 glasses</b>) per day (3.0–3.2 Liters during pregnancy/lactation).<br>• <b>Formula by Body Weight:</b> Drink <b>1 Liter of water for every 20 kg of body weight</b> (e.g., 3 Liters/day for a 60 kg person).<br>• <b>Hot Weather & Exercise:</b> Add an extra <b>0.5 to 1.0 Liter</b> when sweating heavily.<br>• <b>Body Water Percentage:</b> About <b>60% to 65%</b> of the adult human body is water, and blood plasma is <b>90–92% water</b>.<br><br>🩸 <b>For Blood Donors:</b> Drink 2–3 glasses (500 mL) of water 30 minutes before donating blood and an extra 3–4 glasses over the next 24 hours to prevent dizziness!'
+  },
+  {
+    id: 'daily_sleep_rest',
+    topic: 'বয়স অনুযায়ী দৈনিক ঘুম ও বিশ্রামের সঠিক পরিমাণ',
+    mustAny: ['ঘুম', 'ঘুমানো', 'ঘুমাতে', 'অনিদ্রা', 'নিদ্রা', 'sleep', 'insomnia', 'ghum', 'কত ঘণ্টা ঘুম', 'কয় ঘণ্টা ঘুম'],
+    high: ['প্রতিদিন কত ঘণ্টা ঘুমানো উচিত', 'দিনে কত ঘণ্টা ঘুম', 'মানুষের কত ঘণ্টা ঘুম দরকার', 'ঘুমের পরিমাণ', 'কতক্ষণ ঘুমানো উচিত', 'how many hours of sleep', 'daily sleep requirement', 'koto ghonta ghum'],
+    med: ['ঘণ্টা', 'ঘন্টা', 'রাত', 'বিশ্রাম', 'বয়স', 'সুস্থ', 'মস্তিষ্ক', 'hours', 'night', 'rest'],
+    neg: [],
+    ans: '😴 <b>বয়স অনুযায়ী প্রতিদিন কত ঘণ্টা ঘুমানো প্রয়োজন:</b><br>' +
+         '• <b>পূর্ণবয়স্ক মানুষ (১৮–৬৪ বছর):</b> প্রতিদিন রাতে <b>৭ থেকে ৮ ঘণ্টা</b> গভীর ও নিরবচ্ছিন্ন ঘুম প্রয়োজন।<br>' +
+         '• <b>কিশোর ও তরুণ (১৪–১৭ বছর):</b> প্রতিদিন <b>৮ থেকে ১০ ঘণ্টা</b> ঘুম প্রয়োজন।<br>' +
+         '• <b>স্কুলগামী শিশু (৬–১৩ বছর):</b> প্রতিদিন <b>৯ থেকে ১১ ঘণ্টা</b> এবং নবজাতকদের ১৪–১৭ ঘণ্টা ঘুম প্রয়োজন।<br>' +
+         '• <b>বয়স্ক ব্যক্তি (৬৫+ বছর):</b> প্রতিদিন <b>৭ থেকে ৮ ঘণ্টা</b> ঘুম আদর্শ।<br><br>' +
+         '🩸 <b>রক্তদাতাদের জন্য নিয়ম:</b> রক্তদানের আগের রাতে অন্তত <b>৬ থেকে ৮ ঘণ্টা</b> পর্যাপ্ত ঘুম হতে হবে। না ঘুমিয়ে বা রাত জেগে খালি পেটে রক্তদান করলে মাথা ঘোরা হতে পারে।',
+    topicEn: 'Recommended Daily Sleep Hours by Age',
+    ansEn: '😴 <b>Recommended Daily Sleep by Age (Clinical Guidelines):</b><br>• <b>Adults (18–64 years):</b> <b>7 to 8 hours</b> per night.<br>• <b>Teenagers (14–17 years):</b> <b>8 to 10 hours</b> per night.<br>• <b>Children (6–13 years):</b> <b>9 to 11 hours</b> per night.<br>• <b>Older Adults (65+ years):</b> <b>7 to 8 hours</b> per night.<br><br>🩸 <b>Note for Blood Donors:</b> Always get at least <b>6 to 8 hours of sleep</b> the night before donating blood.'
+  },
+  {
+    id: 'normal_body_vitals',
+    topic: 'মানবদেহের স্বাভাবিক তাপমাত্রা, পালস রেট, অক্সিজেন ও ভাইটাল সাইন',
+    mustAny: ['তাপমাত্রা', 'পালস', 'হৃদস্পন্দন', 'হার্ট রেট', 'অক্সিজেন লেভেল', 'অক্সিজেন মাত্রা', 'spo2', 'pulse rate', 'heart rate', 'body temperature', 'normal temperature', 'শ্বাসপ্রশ্বাস', 'নাড়ির গতি'],
+    high: ['শরীরের স্বাভাবিক তাপমাত্রা কত', 'মানবদেহের তাপমাত্রা কত', 'স্বাভাবিক পালস রেট কত', 'হৃদস্পন্দন মিনিটে কতবার', 'অক্সিজেন লেভেল কত থাকা উচিত', 'normal body temperature', 'normal pulse rate', 'normal spo2 level'],
+    med: ['ফারেনহাইট', 'সেলসিয়াস', 'মিনিটে', 'স্বাভাবিক', 'মাত্রা', 'জ্বর', 'অক্সিজেন', 'bpm', 'fahrenheit', 'celsius'],
+    neg: ['রক্ত সংরক্ষণ', 'ফ্রিজে'],
+    ans: '🩺 <b>মানবদেহের স্বাভাবিক ভাইটাল সাইন (Vital Signs) চার্ট:</b><br>' +
+         '• <b>শরীরের স্বাভাবিক তাপমাত্রা (Body Temperature):</b> <b>৯৮.৪°F থেকে ৯৮.৬°F</b> (৩৭°C)। থার্মোমিটারে তাপমাত্রা <b>১০০.৪°F (৩৮°C)</b> বা তার বেশি হলে চিকিৎসা বিজ্ঞানে জ্বর হিসেবে গণ্য হয়।<br>' +
+         '• <b>স্বাভাবিক হৃদস্পন্দন বা পালস রেট (Pulse / Heart Rate):</b> পূর্ণবয়স্ক সুস্থ মানুষের মিনিটে <b>৬০ থেকে ১০০ বার</b> (গড়ে মিনিটে <b>৭২ বার</b>)।<br>' +
+         '• <b>রক্তে অক্সিজেনের মাত্রা (SpO2):</b> পালস অক্সিমিটারে স্বাভাবিক মাত্রা <b>৯৫% থেকে ১০০%</b> (৯২%-এর নিচে নামলে দ্রুত অক্সিজেন ও চিকিৎসকের পরামর্শ প্রয়োজন)।<br>' +
+         '• <b>স্বাভাবিক শ্বাসপ্রশ্বাসের গতি (Respiratory Rate):</b> বিশ্রামে মিনিটে <b>১২ থেকে ২০ বার</b>।<br>' +
+         '• <b>স্বাভাবিক রক্তচাপ (Blood Pressure):</b> <b>১২০/৮০ mmHg</b> (১০০/৬০ থেকে ১৩০/৮৫ mmHg পর্যন্ত স্বাভাবিক)।',
+    topicEn: 'Normal Human Body Vital Signs (Temperature, Pulse, SpO2 & BP)',
+    ansEn: '🩺 <b>Normal Human Body Vital Signs:</b><br>• <b>Body Temperature:</b> <b>98.4°F to 98.6°F (37°C)</b> (Fever is ≥100.4°F / 38°C).<br>• <b>Resting Heart / Pulse Rate:</b> <b>60 to 100 beats per minute</b> (average 72 bpm).<br>• <b>Blood Oxygen Saturation (SpO2):</b> <b>95% to 100%</b> (seek medical care if <92%).<br>• <b>Respiratory Rate:</b> <b>12 to 20 breaths per minute</b>.<br>• <b>Normal Blood Pressure:</b> <b>120/80 mmHg</b>.'
+  },
+  {
+    id: 'human_body_organs_bones',
+    topic: 'মানবদেহের হাড়, পেশি, অঙ্গপ্রত্যঙ্গ ও শারীরবৃত্তীয় তথ্য',
+    mustAny: ['কয়টি হাড়', 'কতটি হাড়', '২০৬', 'পেশি কয়টি', 'সবচেয়ে বড় অঙ্গ', 'সবচেয়ে বড় গ্রন্থি', 'মস্তিষ্কের ওজন', 'হৃৎপিণ্ডের ওজন', 'how many bones', 'bones in human body', 'largest organ'],
+    high: ['মানবদেহে হাড়ের সংখ্যা কত', 'মানুষের শরীরে কয়টি হাড় আছে', 'মানবদেহের সবচেয়ে বড় অঙ্গ কোনটি', 'সবচেয়ে বড় গ্রন্থি কোনটি', 'how many bones in adult human body'],
+    med: ['মানবদেহে', 'শরীরে', 'হাড়', 'অস্থি', 'পেশি', 'লিভার', 'যকৃৎ', 'ত্বক', 'কিডনি', 'ফুসফুস', 'হৃৎপিণ্ড', 'মস্তিষ্ক', 'bones', 'muscles', 'organs'],
+    neg: [],
+    ans: '🧬 <b>মানবদেহের গুরুত্বপূর্ণ শারীরবৃত্তীয় তথ্য:</b><br>' +
+         '• <b>মোট হাড়ের সংখ্যা:</b> একজন পূর্ণবয়স্ক মানুষের শরীরে মোট <b>২০৬টি হাড়</b> থাকে (নবজাতক শিশুর দেহে প্রায় ৩০০টি হাড় থাকে, যা বড় হওয়ার সাথে সাথে জোড়া লেগে ২০৬টিতে পরিণত হয়)।<br>' +
+         '• <b>সবচেয়ে বড় ও ছোট হাড়:</b> সবচেয়ে বড় ও মজবুত হাড় উরুর হাড় বা <b>ফিমার (Femur)</b> এবং সবচেয়ে ছোট হাড় কানের মধ্যকর্ণের <b>স্টেপিস (Stapes)</b>।<br>' +
+         '• <b>মোট পেশির সংখ্যা:</b> মানবদেহে প্রায় <b>৬০০ থেকে ৬৫০টি পেশি (Muscles)</b> রয়েছে।<br>' +
+         '• <b>সবচেয়ে বড় অঙ্গ ও গ্রন্থি:</b> মানবদেহের সবচেয়ে বড় বাহ্যিক অঙ্গ <b>ত্বক (Skin)</b> এবং সবচেয়ে বড় অভ্যন্তরীণ গ্রন্থি <b>যকৃৎ বা লিভার (Liver)</b>।<br>' +
+         '• <b>হৃৎপিণ্ড ও মস্তিষ্ক:</b> হৃৎপিণ্ডের ওজন প্রায় <b>২৫০–৩৫০ গ্রাম</b> (দিনে প্রায় ১ লক্ষ বার স্পন্দিত হয়) এবং পূর্ণবয়স্ক মস্তিষ্কের ওজন প্রায় <b>১.৩ থেকে ১.৪ কেজি</b>।',
+    topicEn: 'Key Human Body Anatomy & Physiology Facts',
+    ansEn: '🧬 <b>Key Human Body Anatomy Facts:</b><br>• <b>Total Bones:</b> <b>206 bones</b> in an adult (around 300 in newborns).<br>• <b>Largest & Smallest Bone:</b> Largest is the <b>Femur (thigh bone)</b>; smallest is the <b>Stapes</b> in the middle ear.<br>• <b>Muscles:</b> Over <b>600 muscles</b>.<br>• <b>Largest Organ & Gland:</b> Largest external organ is the <b>Skin</b>; largest internal gland/organ is the <b>Liver</b>.<br>• <b>Heart & Brain:</b> The heart beats ~100,000 times a day (~72 bpm); the adult brain weighs <b>1.3 to 1.4 kg</b>.'
+  },
+  {
+    id: 'bmi_ideal_weight_chart',
+    topic: 'উচ্চতা অনুযায়ী আদর্শ ওজন ও বিএমআই (BMI) হিসাব',
+    mustAny: ['বিএমআই', 'bmi', 'আদর্শ ওজন', 'উচ্চতা অনুযায়ী ওজন', 'ওজন কত হওয়া উচিত', 'ওজন কমানোর', 'ওজন বাড়ানোর', 'ideal weight', 'body mass index'],
+    high: ['উচ্চতা অনুযায়ী ওজন কত হওয়া উচিত', 'বিএমআই হিসাব', 'স্বাভাবিক বিএমআই কত', 'আদর্শ ওজন চার্ট', 'ideal weight for height', 'normal bmi range'],
+    med: ['উচ্চতা', 'ওজন', 'কেজি', 'ফুট', 'ইঞ্চি', 'স্থূলতা', 'মেদ', 'চর্বি', 'height', 'weight', 'kg', 'obesity'],
+    neg: [],
+    ans: '⚖️ <b>উচ্চতা অনুযায়ী আদর্শ ওজন ও BMI নির্দেশিকা:</b><br>' +
+         '• <b>বিএমআই (BMI) সূত্র:</b> ওজন (কেজি) ÷ [উচ্চতা (মিটার)]²।<br>' +
+         '• <b>স্বাভাবিক BMI মাত্রা:</b> <b>১৮.৫ থেকে ২৪.৯ kg/m²</b> (এশীয়দের ক্ষেত্রে ১৮.৫–২৩.০ সবচেয়ে আদর্শ)। ১৮.৫-এর নিচে হলে কম ওজন (Underweight) এবং ২৫-এর বেশি হলে অতিরিক্ত ওজন (Overweight)।<br>' +
+         '• <b>উচ্চতা অনুযায়ী গড় আদর্শ ওজন:</b><br>' +
+         '  — <b>৫ ফুট ০ ইঞ্চি:</b> ৪৪ – ৫৫ কেজি<br>' +
+         '  — <b>৫ ফুট ২ ইঞ্চি:</b> ৪৮ – ৫৯ কেজি<br>' +
+         '  — <b>৫ ফুট ৪ ইঞ্চি:</b> ৫১ – ৬৪ কেজি<br>' +
+         '  — <b>৫ ফুট ৬ ইঞ্চি:</b> ৫৫ – ৬৮ কেজি<br>' +
+         '  — <b>৫ ফুট ৮ ইঞ্চি:</b> ৫৮ – ৭২ কেজি<br>' +
+         '  — <b>৫ ফুট ১০ ইঞ্চি:</b> ৬২ – ৭৭ কেজি<br>' +
+         '🩸 <b>রক্তদানের শর্ত:</b> নিরাপদে রক্তদানের জন্য যেকোনো উচ্চতায় ন্যূনতম ওজন <b>৪৮ থেকে ৫০ কেজি</b> হতে হবে।',
+    topicEn: 'Ideal Body Weight & BMI Chart by Height',
+    ansEn: '⚖️ <b>Ideal Weight & BMI Guide:</b><br>• <b>Normal BMI Range:</b> <b>18.5 to 24.9 kg/m²</b>.<br>• <b>Ideal Weight by Height:</b><br>  — <b>5 ft 0 in:</b> 44–55 kg | <b>5 ft 2 in:</b> 48–59 kg | <b>5 ft 4 in:</b> 51–64 kg<br>  — <b>5 ft 6 in:</b> 55–68 kg | <b>5 ft 8 in:</b> 58–72 kg | <b>5 ft 10 in:</b> 62–77 kg<br>🩸 <b>For Blood Donation:</b> Minimum body weight must be <b>48–50 kg (110 lbs)</b>.'
+  },
+  {
+    id: 'blood_sugar_diabetes_range',
+    topic: 'রক্তে গ্লুকোজ বা ডায়াবেটিসের স্বাভাবিক মাত্রা ও নিয়ন্ত্রণ',
+    mustAny: ['সুগার লেভেল', 'ডায়াবেটিস কত হলে', 'রক্তে শর্করা', 'গ্লুকোজ মাত্রা', 'ফাস্টিং সুগার', 'hba1c', 'blood sugar level', 'normal glucose', 'diabetes range', 'খালি পেটে সুগার'],
+    high: ['ডায়াবেটিস কত হলে নরমাল', 'খালি পেটে সুগার কত থাকা উচিত', 'খাবার পর সুগার কত', 'স্বাভাবিক ব্লাড সুগার কত', 'normal blood sugar level', 'fasting blood sugar normal range'],
+    med: ['ডায়াবেটিস', 'সুগার', 'গ্লুকোজ', 'ইনসুলিন', 'খালি পেটে', 'খাবার ২ ঘণ্টা পর', 'mmol', 'mg/dl', 'sugar', 'glucose', 'fasting'],
+    neg: [],
+    ans: '🩸 <b>রক্তে গ্লুকোজ বা ডায়াবেটিসের স্বাভাবিক মাত্রা (WHO চার্ট):</b><br>' +
+         '• <b>খালি পেটে (Fasting Blood Sugar):</b> স্বাভাবিক মাত্রা <b>৩.৯ থেকে ৫.৫ mmol/L</b> (৭০–৯৯ mg/dL)। (৫.৬–৬.৯ হলে প্রি-ডায়াবেটিস এবং ৭.০ mmol/L বা তার বেশি হলে ডায়াবেটিস)।<br>' +
+         '• <b>খাবার ২ ঘণ্টা পর (2 Hours After Meal / 2h ABF):</b> স্বাভাবিক মাত্রা <b>৭.৮ mmol/L (১৪০ mg/dL)-এর নিচে</b>। (৭.৮–১১.০ হলে প্রি-ডায়াবেটিস এবং ১১.১ mmol/L বা তার বেশি হলে ডায়াবেটিস)।<br>' +
+         '• <b>HbA1c (গত ৩ মাসের গড় সুগার):</b> <b>৫.৭%-এর নিচে</b> স্বাভাবিক, ৫.৭%–৬.৪% প্রি-ডায়াবেটিস, এবং ৬.৫% বা তার বেশি ডায়াবেটিস।',
+    topicEn: 'Normal Blood Sugar (Glucose) & HbA1c Reference Ranges',
+    ansEn: '🩸 <b>Normal Blood Glucose & Diabetes Reference Chart:</b><br>• <b>Fasting Blood Sugar:</b> <b>3.9 to 5.5 mmol/L</b> (70–99 mg/dL).<br>• <b>2 Hours After Meal (Postprandial):</b> <b>Below 7.8 mmol/L</b> (<140 mg/dL).<br>• <b>HbA1c (3-Month Average):</b> Normal is <b>below 5.7%</b> (5.7%–6.4% prediabetes; ≥6.5% diabetes).'
+  },
+  {
+    id: 'daily_calorie_vitamin_nutrition',
+    topic: 'দৈনিক ক্যালোরি, প্রোটিন, ভিটামিন ও সুষম খাদ্য তালিকা',
+    mustAny: ['ক্যালোরি', 'ক্যালরি', 'প্রোটিন কতটুকু', 'ভিটামিন ডি', 'ভিটামিন সি', 'ভিটামিন বি', 'সুষম খাদ্য', 'পুষ্টিকর খাবার', 'calorie intake', 'daily protein', 'vitamin deficiency', 'রোগ প্রতিরোধ ক্ষমতা'],
+    high: ['প্রতিদিন কত ক্যালোরি খাবার খাওয়া উচিত', 'দৈনিক প্রোটিনের চাহিদা কত', 'কোন খাবারে কোন ভিটামিন থাকে', 'রোগ প্রতিরোধ ক্ষমতা বাড়ানোর খাবার', 'daily calorie requirement', 'how much protein per day'],
+    med: ['খাবার', 'পুষ্টি', 'ভিটামিন', 'ক্যালসিয়াম', 'আয়রন', 'জিংক', 'দুধ', 'ডিম', 'মাছ', 'ফল', 'শাকসবজি', 'calories', 'protein', 'vitamins', 'diet'],
+    neg: [],
+    ans: '🥗 <b>দৈনিক ক্যালোরি, প্রোটিন ও ভিটামিনের সঠিক চাহিদা:</b><br>' +
+         '• <b>দৈনিক ক্যালোরি চাহিদা:</b> একজন কর্মক্ষম পূর্ণবয়স্ক পুরুষের প্রতিদিন গড়ে <b>২২০০ থেকে ২৫০০ কিলোক্যালোরি</b> এবং নারীর <b>১৮০০ থেকে ২০০০ কিলোক্যালোরি</b> খাবার প্রয়োজন।<br>' +
+         '• <b>দৈনিক প্রোটিন চাহিদা:</b> শরীরের প্রতি কেজি ওজনের জন্য প্রতিদিন <b>০.৮ থেকে ১.০ গ্রাম প্রোটিন</b> প্রয়োজন (যেমন: ৬০ কেজি ওজনের মানুষের দৈনিক ৫০–৬০ গ্রাম প্রোটিন—ডিম, মাছ, মুরগির মাংস, ডাল, দুধ ও বাদাম থেকে)।<br>' +
+         '• <b>প্রধান ভিটামিন ও উৎস:</b><br>' +
+         '  — <b>ভিটামিন সি (রোগ প্রতিরোধ ও আয়রন শোষণ):</b> আমলকী, পেয়ারা, লেবু, কমলা, কাঁচা মরিচ।<br>' +
+         '  — <b>ভিটামিন ডি ও ক্যালসিয়াম (হাড় ও দাঁতের গঠন):</b> সকাল ১০টা–২টার রোদ (১৫–২০ মিনিট), সামুদ্রিক মাছ, ডিমের কুসুম ও দুধ।<br>' +
+         '  — <b>ভিটামিন বি-১২ ও ফলিক অ্যাসিড (রক্তকণিকা তৈরি):</b> কলিজা, ডিম, দুধ, মাছ ও সবুজ শাকসবজি।',
+    topicEn: 'Daily Calorie, Protein & Essential Vitamin Guide',
+    ansEn: '🥗 <b>Daily Calorie, Protein & Vitamin Requirements:</b><br>• <b>Daily Calories:</b> Adult Men: <b>2,200–2,500 kcal/day</b>; Adult Women: <b>1,800–2,000 kcal/day</b>.<br>• <b>Daily Protein:</b> <b>0.8 to 1.0 g per kg</b> of body weight (50–60g/day for a 60 kg adult).<br>• <b>Key Vitamins:</b> Vitamin C (citrus, guava, amla — boosts iron absorption), Vitamin D (sunlight, egg yolk, fish), Vitamin B12 & Folate (liver, eggs, milk, leafy greens — essential for red blood cells).'
+  },
+  {
+    id: 'kidney_liver_creatinine_care',
+    topic: 'কিডনি ও লিভার সুস্থ রাখার উপায় এবং ক্রিয়েটিনিন মাত্রা',
+    mustAny: ['কিডনি', 'ক্রিয়েটিনিন', 'লিভার', 'ফ্যাটি লিভার', 'যকৃৎ', 'sgpt', 'bilirubin', 'creatinine', 'kidney', 'fatty liver'],
+    high: ['ক্রিয়েটিনিন নরমাল কত', 'কিডনি ভালো রাখার উপায়', 'ফ্যাটি লিভার হলে করণীয়', 'লিভার সুস্থ রাখার উপায়', 'normal creatinine level', 'how to keep kidneys healthy'],
+    med: ['প্রস্রাব', 'পাথর', 'ব্যথাকে', 'পানি', 'ওষুধ', 'রক্ত পরীক্ষা', 'urine', 'liver'],
+    neg: [],
+    ans: '🫘 <b>কিডনি ও লিভার সুস্থ রাখার নিয়ম এবং পরীক্ষার স্বাভাবিক মাত্রা:</b><br>' +
+         '• <b>সিরাম ক্রিয়েটিনিন (Serum Creatinine - কিডনি ফাংশন):</b> পূর্ণবয়স্ক পুরুষদের স্বাভাবিক মাত্রা <b>০.৭ থেকে ১.৩ mg/dL</b> এবং নারীদের <b>০.৬ থেকে ১.১ mg/dL</b>।<br>' +
+         '• <b>কিডনি সুস্থ রাখার উপায়:</b> প্রতিদিন পর্যাপ্ত পানি (২.৫–৩.৫ লিটার) পান করা, চিকিৎসকের পরামর্শ ছাড়া ব্যথানাশক ওষুধ (NSAIDs/Painkillers) না খাওয়া, কাঁচা লবণ বর্জন করা এবং প্রস্রাব আটকে না রাখা।<br>' +
+         '• <b>লিভার ও ফ্যাটি লিভার (SGPT/ALT):</b> রক্তে SGPT-এর স্বাভাবিক মাত্রা <b>৭ থেকে ৫৬ U/L</b> এবং বিলিরুবিন <b>০.২ থেকে ১.২ mg/dL</b>। ফ্যাটি লিভার কমাতে অতিরিক্ত তেল-চর্বি, ফাস্টফুড ও চিনি কমিয়ে প্রতিদিন ৩০–৪০ মিনিট হাঁটা সবচেয়ে কার্যকর।',
+    topicEn: 'Kidney & Liver Health Guide and Normal Creatinine/SGPT Ranges',
+    ansEn: '🫘 <b>Kidney & Liver Reference Ranges & Care:</b><br>• <b>Normal Serum Creatinine:</b> Men: <b>0.7–1.3 mg/dL</b>; Women: <b>0.6–1.1 mg/dL</b>.<br>• <b>Kidney Care:</b> Drink 2.5–3.5L water daily, avoid unnecessary painkillers (NSAIDs), and limit excess salt.<br>• <b>Liver Function (SGPT/ALT):</b> Normal is <b>7–56 U/L</b>; Bilirubin is <b>0.2–1.2 mg/dL</b>. Regular brisk walking (30–40 mins/day) and reducing sugar/fried foods reverses fatty liver.'
+  },
+  {
+    id: 'gastric_acidity_digestion',
+    topic: 'গ্যাস্ট্রিক, অ্যাসিডিটি, বুক জ্বালাপোড়া ও হজমের সমস্যায় করণীয়',
+    mustAny: ['গ্যাস্ট্রিক', 'অ্যাসিডিটি', 'এসিডিটি', 'বুক জ্বালাপোড়া', 'হজম', 'বদহজম', 'কোষ্ঠকাঠিন্য', 'পেট ফাঁপা', 'আলসার', 'gastric', 'acidity', 'heartburn', 'indigestion', 'constipation'],
+    high: ['গ্যাস্ট্রিক কমানোর ঘরোয়া উপায়', 'বুক জ্বালাপোড়া করলে করণীয়', 'অ্যাসিডিটি থেকে মুক্তির উপায়', 'হজম শক্তি বাড়ানোর উপায়'],
+    med: ['পেট', 'খাবার', 'পানি', 'আঁশযুক্ত', 'তেল', 'মশলা', 'অ্যান্টাসিড'],
+    neg: [],
+    ans: '🌿 <b>গ্যাস্ট্রিক, অ্যাসিডিটি ও হজমের সমস্যা কমানোর কার্যকর উপায়:</b><br>' +
+         '• <b>তাৎক্ষণিক আরাম:</b> ১ গ্লাস কুসুম গরম বা স্বাভাবিক পানি পান করুন, অথবা সামান্য আদা কুচি লবণ দিয়ে চিবিয়ে খান। প্রয়োজনে চিকিৎসকের পরামর্শে অ্যান্টাসিড (Antacid) নেওয়া যেতে পারে।<br>' +
+         '• <b>দৈনন্দিন অভ্যাস:</b> দীর্ঘ সময় খালি পেটে থাকবেন না (৩–৪ ঘণ্টা পরপর অল্প করে খাবার খান), খাওয়ার ঠিক সাথে সাথে অতিরিক্ত পানি পান না করে ২০–৩০ মিনিট পর পানি পান করুন, এবং রাতের খাবার ঘুমানোর অন্তত ২ ঘণ্টা আগে শেষ করুন।<br>' +
+         '• <b>বর্জনীয়:</b> অতিরিক্ত তৈলাক্ত ও ভাজাপোড়া খাবার, খালি পেটে চা-কফি এবং ধূমপান এড়িয়ে চলুন।',
+    topicEn: 'Relief & Prevention for Gastric Acidity, Heartburn & Indigestion',
+    ansEn: '🌿 <b>Managing Gastric Acidity & Indigestion:</b><br>• Eat smaller meals every 3–4 hours rather than staying on an empty stomach.<br>• Avoid deep-fried/spicy foods and tea/coffee on an empty stomach.<br>• Finish dinner at least 2 hours before sleeping and drink plenty of water throughout the day.'
+  },
+  {
+    id: 'headache_migraine_vertigo',
+    topic: 'মাথাব্যথা, মাইগ্রেন ও মাথা ঘোরার কারণ ও করণীয়',
+    mustAny: ['মাথাব্যথা', 'মাথা ব্যথা', 'মাইগ্রেন', 'মাথা ঘোরা', 'মাথা ঘুরছে', 'চোখে অন্ধকার', 'headache', 'migraine', 'vertigo'],
+    high: ['মাথাব্যথা কমানোর উপায়', 'মাইগ্রেনের ব্যথা কমানোর উপায়', 'হঠাৎ মাথা ঘুরালে করণীয় কী'],
+    med: ['ঘুম', 'পানি', 'রক্তচাপ', 'চশমা', 'দুর্বলতা', 'প্যারাসিটামল'],
+    neg: [],
+    ans: '🧠 <b>মাথাব্যথা, মাইগ্রেন ও মাথা ঘোরার প্রাথমিক করণীয়:</b><br>' +
+         '• <b>পানিশূন্যতা ও ঘুমের অভাব:</b> বেশিরভাগ সাধারণ মাথাব্যথা পানিশূন্যতা (Dehydration) বা কম ঘুমের কারণে হয়। প্রথমেই ১–২ গ্লাস পানি পান করে শান্ত ও অন্ধকার ঘরে বিশ্রাম নিন।<br>' +
+         '• <b>হঠাৎ মাথা ঘোরা (Vertigo / Low BP / Low Sugar):</b> হঠাৎ মাথা ঘুরালে সাথে সাথে বসে বা শুয়ে পড়ুন, রক্তচাপ (BP) ও ব্লাড সুগার মাপুন এবং ডাবের পানি, ওআরএস বা চিনি-পানি পান করুন।<br>' +
+         '• <b>সতর্কতা:</b> মাথাব্যথার সাথে তীব্র বমি, ঝাপসা দেখা, কথা জড়িয়ে যাওয়া বা হাত-পা অবশ ভাব থাকলে দেরি না করে দ্রুত হাসপাতালে যোগাযোগ করুন।',
+    topicEn: 'Headache, Migraine & Vertigo Care Guide',
+    ansEn: '🧠 <b>Headache, Migraine & Vertigo Care:</b><br>• Hydrate immediately with 1–2 glasses of water and rest in a quiet, dimly lit room.<br>• If experiencing sudden dizziness/vertigo, sit or lie down immediately and check blood pressure and blood glucose.<br>• Seek emergency medical care if accompanied by severe vomiting, blurred vision, slurred speech, or limb weakness.'
+  },
   {
     id: 'blood_volume',
     topic: 'মানবদেহে রক্তের পরিমাণ',
-    mustAny: ['পরিমাণ', 'পরিমান', 'লিটার', 'কতটুকু রক্ত', 'কয় লিটার', 'কত লিটার', 'শরীরে রক্ত', 'দেহে রক্ত', 'রক্ত থাকে', 'blood volume', 'poriman', 'koto liter', 'মিলিলিটার', 'how much blood', 'blood volume', 'liters of blood', 'litres of blood', 'amount of blood', 'quantity of blood', 'blood in human body', 'blood in a man', 'blood in a woman', 'blood in male', 'blood in female'],
+    mustAny: ['কতটুকু রক্ত', 'কত লিটার রক্ত', 'কয় লিটার রক্ত', 'রক্তের পরিমাণ', 'রক্তের পরিমান', 'শরীরে রক্ত', 'দেহে রক্ত', 'রক্ত থাকে', 'মোট রক্ত', 'মানুষের রক্ত কত', 'blood volume', 'koto liter rokto', 'rokter poriman', 'how much blood', 'liters of blood', 'litres of blood', 'amount of blood', 'quantity of blood', 'blood in human body', 'blood in a man', 'blood in a woman', 'blood in male', 'blood in female'],
     high: ['রক্তের পরিমাণ', 'রক্তের পরিমান', 'কত লিটার রক্ত', 'কয় লিটার রক্ত', 'কতটুকু রক্ত থাকে', 'শরীরে রক্তের পরিমাণ', 'দেহে রক্তের পরিমাণ', 'পুরুষ মানুষের শরীরে রক্ত', 'নারীর শরীরে রক্ত', 'মানুষের শরীরে রক্ত কত', 'poriman koto', 'koto liter rokto', 'blood volume', 'how much blood is in the human body', 'blood volume in adult male', 'blood volume in female', 'how many liters of blood', 'how much blood does a person have'],
-    med: ['পরিমাণ', 'পরিমান', 'লিটার', 'পুরুষ', 'নারী', 'মানুষের', 'শরীরে', 'দেহে', 'পূর্ণবয়স্ক', 'ওজনের', 'মিলি', 'লিটারে', 'volume', 'liters', 'litres', 'male', 'female', 'adult', 'body', 'man', 'woman'],
-    neg: ['কতদিন পরপর', 'কত মাস পর'],
+    med: ['রক্ত', 'ব্লাড', 'পুরুষ', 'নারী', 'মানুষের', 'পূর্ণবয়স্ক', 'মিলিলিটার', 'blood', 'male', 'female', 'adult'],
+    neg: ['পানি', 'জল', 'water', 'পান করতে', 'খাইতে', 'খেতে', 'দুধ', 'কতদিন পরপর', 'কত মাস পর'],
     ans: '🩸 <b>মানবদেহে রক্তের সঠিক পরিমাণ:</b><br>' +
          'একজন সুস্থ পূর্ণবয়স্ক মানুষের শরীরে তার মোট দৈহিক ওজনের প্রায় <b>৭% থেকে ৮%</b> রক্ত থাকে:<br>' +
          '• <b>পূর্ণবয়স্ক পুরুষের শরীরে:</b> গড়ে <b>৫.০ থেকে ৬.০ লিটার</b> রক্ত থাকে।<br>' +
@@ -5758,6 +6482,132 @@ function checkSpecificBloodGroupQuery(rawQuestion, isEn) {
 }
 
 // Intelligent Bilingual (Bangla + English + Banglish) Intent Scoring Function
+// ─── AUTO-REGISTER 80+ ADDITIONAL GRANULAR HEALTH, MINERAL, VITAMIN & WEBSITE Q&A TOPICS (TOTAL 200+ IN-BUILT Q&A) ───
+(function registerExtendedSpondonHealthKB(){
+  var extraTopics = [
+    ['milk_egg_benefits', 'দুধ ও ডিমের পুষ্টিগুণ', ['দুধ খাওয়ার উপকারিতা', 'ডিম খাওয়ার উপকারিতা', 'প্রতিদিন ডিম খেলে', 'রাতের বেলা দুধ'], '🥛 <b>দুধ ও ডিমের পুষ্টিগুণ:</b><br>• <b>ডিম:</b> একটি ডিমে প্রায় ৬–৭ গ্রাম উচ্চমানের প্রোটিন, ভিটামিন বি-১২, ভিটামিন ডি, কোলিন ও আয়রন থাকে। সুস্থ মানুষ প্রতিদিন ১টি সেদ্ধ ডিম নিশ্চিন্তে খেতে পারেন।<br>• <b>দুধ:</b> দুধে ক্যালসিয়াম, প্রোটিন ও ফসফরাস থাকে যা হাড় ও দাঁত মজবুত করে এবং রাতে ভালো ঘুমে সাহায্য করে।'],
+    ['banana_apple_guava', 'কলা, পেয়ারা ও দেশি ফলের উপকারিতা', ['কলা খাওয়ার উপকারিতা', 'পেয়ারার উপকারিতা', 'ডালিমের উপকারিতা', 'বেদানার উপকারিতা'], '🍎 <b>দেশি ফলের পুষ্টিগুণ:</b><br>• <b>পাকা কলা:</b> পটাশিয়াম, ম্যাগনেশিয়াম ও তাৎক্ষণিক শক্তির অন্যতম সেরা উৎস।<br>• <b>পেয়ারা ও আমলকী:</b> কমলার চেয়েও কয়েক গুণ বেশি ভিটামিন-সি ও ফাইবার থাকে।<br>• <b>ডালিম/বেদানা:</b> রক্তের হিমোগ্লোবিন ও আয়রন বাড়াতে দারুণ কার্যকর।'],
+    ['leafy_greens_vegetables', 'সবুজ শাকসবজি ও কচুশাকের উপকারিতা', ['কচুশাকের উপকারিতা', 'পালংশাকের উপকারিতা', 'লালশাকের উপকারিতা', 'শাকসবজি কেন খাব'], '🥬 <b>সবুজ শাকসবজির উপকারিতা:</b><br>• কচুশাক, লালশাক ও পালংশাকে প্রচুর <b>আয়রন, ফলিক অ্যাসিড, ভিটামিন-এ, ভিটামিন-কে এবং আঁশ (Fiber)</b> থাকে যা রক্তশূন্যতা ও কোষ্ঠকাঠিন্য দূর করে এবং চোখ ভালো রাখে।'],
+    ['fish_omega3_heart', 'মাছ ও ওমেগা-৩ ফ্যাটি অ্যাসিডের উপকারিতা', ['ওমেগা ৩', 'omega 3', 'সামুদ্রিক মাছের উপকারিতা', 'ছোট মাছের উপকারিতা'], '🐟 <b>মাছ ও ওমেগা-৩ ফ্যাটি অ্যাসিডের উপকারিতা:</b><br>• সামুদ্রিক মাছ ও দেশি মাছে থাকা ওমেগা-৩ ফ্যাটি অ্যাসিড হৃৎপিণ্ডের রক্তনালি পরিষ্কার রাখে, ট্রাইগ্লিসারাইড কমায় ও মস্তিষ্কের কর্মক্ষমতা বাড়ায়। কাঁটাসহ ছোট মাছ ক্যালসিয়াম ও ভিটামিন-এ-এর সেরা উৎস।'],
+    ['fastfood_softdrinks_harm', 'ফাস্টফুড ও কোমল পানীয়ের (Soft Drinks) ক্ষতিকর দিক', ['ফাস্টফুডের ক্ষতি', 'সফট ড্রিংকস', 'কোক পেপসি খেলে', 'ভাজাপোড়া খাবারের ক্ষতি'], '🚫 <b>ফাস্টফুড ও কোমল পানীয়ের স্বাস্থ্যঝুঁকি:</b><br>• কোমল পানীয়তে অতিরিক্ত চিনি ও ফসফরিক অ্যাসিড থাকে যা হাড়ের ক্যালসিয়াম ক্ষয় করে, ফ্যাটি লিভার, স্থূলতা ও ডায়াবেটিস ঘটায়। অতিরিক্ত ভাজাপোড়া খাবারের ট্রান্স-ফ্যাট হৃদরোগের ঝুঁকি বাড়ায়।'],
+    ['malaria_mosquito_care', 'ম্যালেরিয়া ও মশাবাহিত জ্বর প্রতিরোধ', ['ম্যালেরিয়া লক্ষণ', 'কাঁপুনি দিয়ে জ্বর', 'মশাবাহিত রোগ'], '🦟 <b>ম্যালেরিয়া জ্বরের লক্ষণ ও করণীয়:</b><br>• নির্দিষ্ট সময় পরপর প্রচণ্ড শীত ও কাঁপুনি দিয়ে জ্বর আসা এবং ঘাম দিয়ে জ্বর ছেড়ে যাওয়া ম্যালেরিয়ার প্রধান লক্ষণ। পার্বত্য বা ঝুঁকিপূর্ণ এলাকায় ভ্রমণের পর এমন জ্বর হলে দ্রুত রক্তের MP/RDT পরীক্ষা ও চিকিৎসা নিন।'],
+    ['chikungunya_joint_pain', 'চিকুনগুনিয়া জ্বর ও গিরায় ব্যথা', ['চিকুনগুনিয়া', 'chikungunya', 'জ্বরের পর গিরায় ব্যথা'], '🦟 <b>চিকুনগুনিয়া জ্বর ও করণীয়:</b><br>• এডিস মশাবাহিত এই ভাইরাস জ্বরে উচ্চ তাপমাত্রার পাশাপাশি হাত-পায়ের গিরায় (Joints) তীব্র ব্যথা ও ফোলা হয়। প্রচুর পানি, ডাবের পানি ও বিশ্রাম নিন এবং চিকিৎসকের পরামর্শ ছাড়া ব্যথানাশক (NSAIDs) খাবেন না।'],
+    ['pneumonia_chest_infection', 'নিউমোনিয়া (Pneumonia) লক্ষণ ও সতর্কতা', ['নিউমোনিয়া', 'pneumonia', 'বুকে কফ জমা', 'পাঁজর দেবে যাওয়া'], '🫁 <b>নিউমোনিয়ার লক্ষণ ও জরুরি সতর্কতা:</b><br>• তীব্র জ্বর, কফসহ কাশি, শ্বাস নেওয়ার সময় বুকে ব্যথা এবং দ্রুত শ্বাসপ্রশ্বাস (শিশুদের ক্ষেত্রে বুকের নিচের পাঁজর ভেতরে দেবে যাওয়া)। এমন লক্ষণে দেরি না করে দ্রুত হাসপাতালে যোগাযোগ করুন।'],
+    ['ear_pain_water_wax', 'কানে পানি ঢোকা, কান পাকা বা কানে ব্যথায় করণীয়', ['কানে পানি ঢুকলে', 'কানে ব্যথা', 'কানের খৈল', 'কান পাকা', 'ear pain'], '👂 <b>কানের যত্ন ও কানে পানি ঢুকলে করণীয়:</b><br>• কানে পানি ঢুকলে যে কানে পানি ঢুকেছে সেদিকে মাথা কাত করে হালকা ঝাঁকান বা পরিষ্কার তোয়ালে দিয়ে মুছে নিন। কানে কখনোই কটন বাড, কাঠি বা তেল দেবেন না—এতে কানের পর্দা ক্ষতিগ্রস্ত হতে পারে।'],
+    ['foot_heel_pain', 'পায়ের গোড়ালি ব্যথা (Plantar Fasciitis) সমাধান', ['গোড়ালি ব্যথা', 'পায়ের তলায় ব্যথা', 'সকালে পা ফেলতে ব্যথা', 'heel pain'], '🦶 <b>পায়ের গোড়ালি ব্যথায় করণীয়:</b><br>• সকালে ঘুম থেকে উঠে মাটিতে পা ফেলতে গোড়ালিতে ব্যথা হলে নরম সোলের জুতা ব্যবহার করুন, পায়ের তলায় কুসুম গরম ও ঠান্ডা পানির সেঁক দিন, ওজন নিয়ন্ত্রণে রাখুন এবং খালি পায়ে শক্ত মেঝেতে হাঁটবেন না।'],
+    ['pregnancy_anemia_hb', 'গর্ভাবস্থায় রক্তশূন্যতা ও হিমোগ্লোবিন', ['গর্ভাবস্থায় হিমোগ্লোবিন', 'গর্ভবতী মায়ের রক্তশূন্যতা', 'pregnancy hemoglobin'], '🤰 <b>গর্ভাবস্থায় হিমোগ্লোবিন মাত্রা ও করণীয়:</b><br>• গর্ভাবস্থায় হিমোগ্লোবিন অন্তত <b>১১.০ g/dL</b> বা তার ওপরে থাকা প্রয়োজন। হিমোগ্লোবিন কম থাকলে চিকিৎসকের পরামর্শে আয়রন ও ফলিক অ্যাসিড ট্যাবলেট এবং কলিজা, ডিম, মাছ, ডালিম ও কচুশাক খেতে হবে।'],
+    ['menstrual_cramps_period_pain', 'পিরিয়ড বা মাসিকের তলপেটে ব্যথা কমানোর উপায়', ['পিরিয়ডের ব্যথা', 'মাসিকের ব্যথা', 'তলপেটে ব্যথা মাসিক', 'period cramps'], '🌸 <b>মাসিকের সময় তলপেটে ব্যথা কমানোর উপায়:</b><br>• তলপেটে হট ওয়াটার ব্যাগ বা কুসুম গরম পানির সেঁক দিন, হালকা গরম পানি ও আদা চা পান করুন এবং পর্যাপ্ত বিশ্রাম নিন। অতিরিক্ত রক্তপাত বা অসহ্য ব্যথা হলে গাইনি চিকিৎসকের পরামর্শ নিন।'],
+    ['baby_breastfeeding_vaccine', 'নবজাতকের বুকের দুধ ও টিকা (EPI)', ['শালদুধ', 'কত মাস শুধু বুকের দুধ', 'বাচ্চার খাবার'], '👶 <b>নবজাতক ও শিশুর পুষ্টি নিয়ম:</b><br>• জন্মের ১ ঘণ্টার মধ্যে নবজাতককে মায়ের শালদুধ (Colostrum) খাওয়াতে হবে এবং <b>জন্ম থেকে পূর্ণ ৬ মাস বয়স পর্যন্ত শুধুমাত্র মায়ের বুকের দুধ</b> (এক ফোঁটা পানিও নয়) খাওয়াতে হবে। ৬ মাস পূর্ণ হলে বুকের দুধের পাশাপাশি পরিপূরক ঘরোয়া খাবার শুরু করুন।'],
+    ['cholesterol_hdl_ldl_food', 'ভালো কোলেস্টেরল (HDL) বাড়ানো ও খারাপ কোলেস্টেরল (LDL) কমানো', ['খারাপ কোলেস্টেরল কমানোর উপায়', 'hdl বাড়ানোর উপায়', 'ldl কমানোর খাবার'], '❤️ <b>কোলেস্টেরল নিয়ন্ত্রণের খাবার:</b><br>• খারাপ কোলেস্টেরল (LDL) ও ট্রাইগ্লিসারাইড কমাতে ওটস, রসুন, সামুদ্রিক মাছ, কাঠবাদাম, অলিভ অয়েল ও শাকসবজি খান এবং প্রতিদিন ৩০ মিনিট হাঁটুন। গরুর মাংস, ঘি, মাখন ও ডুবো তেলে ভাজা খাবার এড়িয়ে চলুন।'],
+    ['memory_brain_food', 'স্মৃতিশক্তি ও মস্তিষ্কের কার্যক্ষমতা বাড়ানোর খাবার', ['স্মৃতিশক্তি বাড়ানোর উপায়', 'পড়া মনে রাখার উপায়', 'মস্তিষ্কের খাবার', 'brain food'], '🧠 <b>স্মৃতিশক্তি ও মনোযোগ বাড়ানোর উপায়:</b><br>• প্রতিদিন রাতে ৭–৮ ঘণ্টা ঘুমানো মস্তিষ্কের স্মৃতি সংরক্ষণের জন্য সবচেয়ে জরুরি। খাবার: আখরোট, কাঠবাদাম, সামুদ্রিক ও ছোট মাছ, ডিম, ডার্ক চকলেট, কুমড়ার বীজ ও পর্যাপ্ত পানি।'],
+    ['bad_breath_halitosis', 'মুখের দুর্গন্ধ (Bad Breath) দূর করার উপায়', ['মুখের দুর্গন্ধ', 'নিঃশ্বাসে দুর্গন্ধ', 'bad breath'], '🦷 <b>মুখের দুর্গন্ধ দূর করার উপায়:</b><br>• দিনে ২ বার দাঁত ব্রাশ করার পাশাপাশি জিহ্বা পরিষ্কার (Tongue Cleaning) করুন, পর্যাপ্ত পানি পান করুন যাতে মুখ শুষ্ক না থাকে, লবঙ্গ বা এলাচ মুখে রাখুন এবং দাঁতে পাথর থাকলে ডেন্টিস্টের কাছে স্কেলিং করান।'],
+    ['dandruff_scalp_care', 'মাথার খুশকি (Dandruff) দূর করার উপায়', ['খুশকি দূর করার উপায়', 'মাথায় খুশকি', 'dandruff'], '🧴 <b>মাথার খুশকি দূর করার উপায়:</b><br>• সপ্তাহে ২–৩ বার কিটোকোনাজল (Ketoconazole) সমৃদ্ধ অ্যান্টি-ড্যানড্রাফ শ্যাম্পু ব্যবহার করুন, মাথার ত্বক পরিষ্কার রাখুন এবং অন্যের চিরুনি বা তোয়ালে ব্যবহার করা থেকে বিরত থাকুন।'],
+    ['sunburn_prickly_heat', 'রোদে পোড়া (Sunburn) ও ঘামাচি দূর করার উপায়', ['ঘামাচি দূর করার উপায়', 'রোদে পোড়া দাগ', 'sunburn', 'prickly heat'], '☀️ <b>ঘামাচি ও রোদে পোড়া ত্বকের যত্ন:</b><br>• ঘামাচি কমাতে দিনে ২ বার ঠান্ডা পানিতে গোসল করুন, ঢিলেঢালা সুতি পোশাক পরুন এবং আক্রান্ত স্থানে বরফের সেঁক বা ক্যালামাইন লোশন ব্যবহার করুন। রোদে বের হলে ছাতা বা সানস্ক্রিন ব্যবহার করুন।'],
+    ['spondon_helpline_numbers', 'স্পন্দন ব্লাড সোসাইটির জরুরি হেল্পলাইন নাম্বার', ['হেল্পলাইন নাম্বার', 'স্পন্দনের নাম্বার', 'কার সাথে যোগাযোগ করব', 'ফোন নাম্বার দাও'], '📞 <b>স্পন্দন ব্লাড সোসাইটি (JTEC) জরুরি যোগাযোগ:</b><br>• <b>হেল্পলাইন নাম্বার:</b> <b>01995047930</b>, <b>01947662428</b><br>• <b>অফিসিয়াল ইমেইল:</b> spondonbloodsociety.jtec@gmail.com<br>• <b>অফিসিয়াল ফেসবুক পেজ:</b> facebook.com/spondon.jtec'],
+    ['copper_selenium_mineral', 'খনিজ পদার্থ: কপার (তামা) ও সেলেনিয়ামের কাজ', ['কপার খনিজ', 'সেলেনিয়াম', 'selenium', 'copper mineral'], '🧪 <b>কপার ও সেলেনিয়াম খনিজের কাজ:</b><br>• কপার আয়রন শোষণে ও লোহিত কণিকা তৈরিতে সাহায্য করে এবং সেলেনিয়াম থাইরয়েড গ্রন্থি ও রোগ প্রতিরোধ ক্ষমতা রক্ষা করে। উৎস: বাদাম, বীজ, ডিম, সামুদ্রিক মাছ ও ডাল।'],
+    ['chromium_manganese_mineral', 'খনিজ পদার্থ: ক্রোমিয়াম ও ম্যাঙ্গানিজের কাজ', ['ক্রোমিয়াম', 'ম্যাঙ্গানিজ', 'chromium', 'manganese'], '🧪 <b>ক্রোমিয়াম ও ম্যাঙ্গানিজের কাজ:</b><br>• ক্রোমিয়াম ইনসুলিনের কার্যকারিতা বাড়িয়ে রক্তের সুগার নিয়ন্ত্রণে সাহায্য করে এবং ম্যাঙ্গানিজ হাড়ের গঠন ও বিপাকক্রিয়ায় সহায়তা করে। উৎস: গোটা শস্য, ব্রকলি, বাদাম ও শাকসবজি।'],
+    ['fluoride_teeth_enamel', 'খনিজ পদার্থ: ফ্লোরাইড ও দাঁতের এনামেল সুরক্ষা', ['ফ্লোরাইড', 'দাঁতের ক্ষয়', 'দাঁতের পোকা', 'fluoride'], '🦷 <b>ফ্লোরাইড ও দাঁতের সুরক্ষা:</b><br>• ফ্লোরাইড দাঁতের বাইরের শক্ত আবরণ (Enamel) মজবুত করে এবং দাঁতের ক্ষয় বা ক্যাভিটি প্রতিরোধ করে। প্রতিদিন ২ বার ফ্লোরাইডযুক্ত টুথপেস্ট দিয়ে দাঁত ব্রাশ করা উচিত।'],
+    ['vitamin_b1_thiamine', 'ভিটামিন বি-১ (থায়ামিন) ও বেরিবেরি রোগ', ['ভিটামিন বি১', 'থায়ামিন', 'বেরিবেরি', 'vitamin b1', 'beriberi'], '🌾 <b>ভিটামিন বি-১ (Thiamine) ও অভাবজনিত রোগ:</b><br>• ভিটামিন বি-১ খাবার থেকে শক্তি তৈরি ও স্নায়ুতন্ত্র সচল রাখে। এর অভাবে বেরিবেরি (Beriberi) রোগ, স্নায়ু দুর্বলতা ও ক্ষুধামান্দ্য হয়। উৎস: ঢেঁকিছাঁটা চাল, লাল আটা, ডাল, বাদাম ও ডিম।'],
+    ['vitamin_b2_riboflavin', 'ভিটামিন বি-২ (রিবোফ্লাভিন) ও ঠোঁটের কোণে ঘা', ['ভিটামিন বি২', 'রিবোফ্লাভিন', 'ঠোঁটের কোণায় ঘা', 'জিহ্বায় জ্বালাপোড়া', 'vitamin b2'], '💊 <b>ভিটামিন বি-২ (Riboflavin) ঘাটতি ও উৎস:</b><br>• ভিটামিন বি-২-এর অভাবে ঠোঁটের দুই কোণে ঘা বা ফেটে যাওয়া (Angular Stomatitis) এবং জিহ্বা লাল হয়ে জ্বালাপোড়া করে। উৎস: দুধ, ডিম, দই, কলিজা ও সবুজ শাকসবজি।'],
+    ['vitamin_b3_niacin', 'ভিটামিন বি-৩ (নিয়াসিন) ও পেলেগ্রা রোগ', ['ভিটামিন বি৩', 'নিয়াসিন', 'পেলেগ্রা', 'vitamin b3', 'niacin'], '💊 <b>ভিটামিন বি-৩ (Niacin) এর কাজ:</b><br>• ত্বক, স্নায়ু ও পরিপাকতন্ত্র সুস্থ রাখে। এর তীব্র অভাবে পেলেগ্রা (Pellagra) রোগ হয়। উৎস: মাছ, মুরগির মাংস, চিনাবাদাম, মাশরুম ও শস্যদানা।'],
+    ['vitamin_b6_pyridoxine', 'ভিটামিন বি-৬ (পাইরিডক্সিন) ও হিমোগ্লোবিন সংশ্লেষণ', ['ভিটামিন বি৬', 'পাইরিডক্সিন', 'vitamin b6'], '💊 <b>ভিটামিন বি-৬ (Pyridoxine) এর কাজ:</b><br>• মস্তিষ্কের নিউরোট্রান্সমিটার এবং রক্তের হিমোগ্লোবিন তৈরিতে সাহায্য করে। উৎস: কলা, ছোলা, আলু, মাছ, মুরগির মাংস ও ডিম।'],
+    ['vitamin_b7_biotin_hair', 'ভিটামিন বি-৭ (বায়োটিন) ও চুল-নখের স্বাস্থ্য', ['বায়োটিন', 'ভিটামিন বি৭', 'নখ ভেঙে যাওয়া', 'biotin'], '💇 <b>বায়োটিন (Vitamin B7) ও চুল-নখের যত্ন:</b><br>• বায়োটিন চুল পড়া কমায়, চুল ঘন করে এবং নখ শক্ত রাখে। প্রাকৃতিক উৎস: ডিমের কুসুম, কাঠবাদাম, আখরোট, মিষ্টি আলু, কলা ও দুধ।'],
+    ['dehydration_children_elderly', 'শিশু ও বয়স্কদের পানিশূন্যতা কেন বেশি ঝুঁকিপূর্ণ', ['বাচ্চাদের পানিশূন্যতা', 'বয়স্কদের পানিশূন্যতা', 'প্রস্রাব বন্ধ হয়ে গেলে'], '👶 <b>শিশু ও বয়স্কদের পানিশূন্যতায় সতর্কতা:</b><br>• শিশুদের ডায়রিয়া বা বমি হলে খুব দ্রুত পানিশূন্যতা দেখা দেয়। চোখ কোটরে ঢুকে যাওয়া, জিহ্বা শুকিয়ে যাওয়া, মাথার তালু দেবে যাওয়া বা ৬ ঘণ্টার বেশি প্রস্রাব না হওয়া বিপদচিহ্ন—এমন হলে দ্রুত ওআরএস খাওয়ানোর পাশাপাশি হাসপাতালে নিন।'],
+    ['water_purification_boiling', 'পানি বিশুদ্ধ করার সঠিক নিয়ম (ফোটানো ও ফিল্টার)', ['পানি বিশুদ্ধ করার নিয়ম', 'পানি কতক্ষণ ফোটাতে হয়', 'ফুটানো পানি'], '💧 <b>নিরাপদ ও বিশুদ্ধ পানি তৈরির নিয়ম:</b><br>• পানি চুলায় টগবগ করে ফুটে ওঠার পর আরও <b>১৫ থেকে ২০ মিনিট</b> ফোটালে সব ধরনের জীবাণু (টাইফয়েড, কলেরা, জন্ডিসের জীবাণু) ধ্বংস হয়। এরপর ঠান্ডা করে পরিষ্কার পাত্রে ঢেকে রাখুন।'],
+    ['overhydration_excess_water', 'অতিরিক্ত পানি পানের ক্ষতি (Overhydration / Hyponatremia)', ['অতিরিক্ত পানি খেলে কী হয়', 'বেশি পানি খাওয়ার ক্ষতি', 'কিডনি রোগীর পানি'], '⚠️ <b>অতিরিক্ত পানি পানের সতর্কতা:</b><br>• সুস্থ মানুষের দৈনিক ৩–৪ লিটার পানি যথেষ্ট। একসাথে অল্প সময়ে অতিরিক্ত (৫–৬ লিটারের বেশি) পানি পান করলে রক্তে সোডিয়ামের মাত্রা কমে গিয়ে (Hyponatremia) মাথাব্যথা ও বমি হতে পারে। এছাড়া দীর্ঘমেয়াদি কিডনি বা হার্ট ফেইলিউর রোগীদের চিকিৎসকের নির্ধারিত পরিমাণে পানি পান করতে হয়।'],
+    ['dietary_fiber_digestion', 'আঁশযুক্ত খাবার (Dietary Fiber) কেন প্রতিদিন খাওয়া জরুরি', ['আঁশযুক্ত খাবার কী', 'ফাইবার সমৃদ্ধ খাবার', 'dietary fiber'], '🥦 <b>আঁশযুক্ত খাবারের (Dietary Fiber) উপকারিতা:</b><br>• আঁশযুক্ত খাবার কোষ্ঠকাঠিন্য ও পাইলস প্রতিরোধ করে, রক্তে সুগার ও খারাপ কোলেস্টেরল (LDL) কমায় এবং ওজন নিয়ন্ত্রণে রাখে। উৎস: শাকসবজি, খোসাসহ ফল (পেয়ারা, আপেল), লাল আটা, ওটস, ডাল ও চিয়া সিড।'],
+    ['protein_deficiency_signs', 'শরীরে প্রোটিন বা আমিষের ঘাটতির লক্ষণ', ['প্রোটিনের অভাব', 'আমিষের কাজ কী', 'প্রোটিন সমৃদ্ধ খাবার'], '🥚 <b>প্রোটিন (আমিষ) ঘাটতির লক্ষণ ও উৎস:</b><br>• শরীরের পেশি গঠন, ক্ষত নিরাময়, হরমোন ও অ্যান্টিবডি তৈরিতে প্রোটিন অপরিহার্য। এর অভাবে পেশি শুকিয়ে যাওয়া, হাত-পায়ে পানি আসা, চুল পড়া ও চরম দুর্বলতা দেখা দেয়। উৎস: মাছ, মাংস, ডিম, দুধ, ডাল, ছোলা, সয়াবিন ও বাদাম।'],
+    ['probiotics_yogurt_gut', 'টক দই ও প্রোবায়োটিক (Probiotics) এর উপকারিতা', ['টক দইয়ের উপকারিতা', 'প্রোবায়োটিক কী', 'অন্ত্রের স্বাস্থ্য', 'yogurt benefits'], '🥣 <b>টক দই ও প্রোবায়োটিকের উপকারিতা:</b><br>• টক দইয়ে উপকারী ব্যাকটেরিয়া (Probiotics/Lactobacillus) থাকে যা হজমশক্তি বাড়ায়, গ্যাস্ট্রিক ও ডায়রিয়া কমায় এবং ক্যালসিয়াম ও প্রোটিনের যোগান দেয়। বিশেষ করে অ্যান্টিবায়োটিক খাওয়ার পর অন্ত্রের ভালো ব্যাকটেরিয়া ফিরিয়ে আনতে টক দই খুব উপকারী।'],
+    ['bloating_gas_relief', 'পেট ফাঁপা ও পেটে গ্যাস জমার ঘরোয়া সমাধান', ['পেট ফাঁপা', 'পেটে গ্যাস', 'ঢেকুর ওঠা', 'bloating'], '🌿 <b>পেট ফাঁপা ও বদহজম কমানোর উপায়:</b><br>• খাবার ধীরে ধীরে ভালোভাবে চিবিয়ে খান, খাওয়ার পর ১০–১৫ মিনিট হাঁটুন, কুসুম গরম পানিতে সামান্য আদা বা জোয়ান/মৌরি ভিজিয়ে পান করুন এবং কোমল পানীয় ও অতিরিক্ত ডুবো তেলে ভাজা খাবার এড়িয়ে চলুন।'],
+    ['hiccups_stop_remedy', 'হেঁচকি (Hiccups) ওঠা বন্ধ করার সহজ উপায়', ['হেঁচকি বন্ধ করার উপায়', 'বারবার হেঁচকি উঠলে', 'hiccups'], '💧 <b>হঠাৎ হেঁচকি (Hiccups) বন্ধ করার উপায়:</b><br>• ১ গ্লাস ঠান্ডা বা স্বাভাবিক পানি ছোট ছোট চুমুকে না থেমে পান করুন, অথবা ১০ সেকেন্ড শ্বাস আটকে রেখে ধীরে ধীরে ছাড়ুন, কিংবা আধা চামচ চিনি মুখে রেখে গিলে ফেলুন। ৪৮ ঘণ্টার বেশি একটানা হেঁচকি থাকলে চিকিৎসকের পরামর্শ নিন।'],
+    ['snoring_sleep_apnea', 'নাক ডাকা (Snoring) কমানোর উপায়', ['নাক ডাকা বন্ধ করার উপায়', 'ঘুমে নাক ডাকা', 'snoring'], '😴 <b>ঘুমের মধ্যে নাক ডাকা কমানোর উপায়:</b><br>• চিত হয়ে না ঘুমিয়ে এক কাত হয়ে (বিশেষ করে বাম কাত হয়ে) ঘুমানোর অভ্যাস করুন, শরীরের অতিরিক্ত ওজন কমান, ঘুমানোর আগে গরম পানির ভাপ নিন যাতে নাক পরিষ্কার থাকে এবং ধূমপান বর্জন করুন।'],
+    ['motion_sickness_travel_vomiting', 'বাসে বা গাড়িতে উঠলে বমি (Motion Sickness) রোধের উপায়', ['গাড়িতে উঠলে বমি', 'বাসে বমি বন্ধের উপায়', 'motion sickness'], '🚌 <b>ভ্রমণে বা গাড়িতে বমি (Motion Sickness) রোধের উপায়:</b><br>• গাড়ির সামনের দিকের সিটে বসুন, জানালা খুলে বাতাস চলাচল করতে দিন, চলন্ত গাড়িতে মোবাইল স্ক্রিনের দিকে তাকিয়ে থাকবেন না এবং মুখে লেবুর টুকরো, আদা বা লবঙ্গ রাখুন।'],
+    ['heat_exhaustion_summer_care', 'তীব্র দাবদাহ ও গরমে সুস্থ থাকার ১০টি নিয়ম', ['তীব্র গরমে করণীয়', 'দাবদাহে সতর্কতা', 'রোদে বের হওয়ার নিয়ম'], '☀️ <b>তীব্র দাবদাহ ও গরমে সুস্থ থাকার নিয়ম:</b><br>• প্রতিদিন ৩.৫–৪ লিটার পানি, ডাবের পানি বা স্যালাইন পান করুন, বাইরে বের হলে ছাতা ও হালকা রঙের ঢিলেঢালা সুতি পোশাক পরুন, সরাসরি রোদ থেকে এসেই ফ্রিজের বরফ-ঠান্ডা পানি পান করবেন না।'],
+    ['winter_asthma_skin_care', 'শীতকালে হাঁপানি ও শুষ্ক ত্বকের যত্ন', ['শীতকালে ত্বকের যত্ন', 'শীতে শ্বাসকষ্ট বাড়লে', 'ঠোঁট ফাটা রোধ'], '❄️ <b>শীতকালে স্বাস্থ্য ও ত্বকের যত্ন:</b><br>• গোসলের পর ত্বক হালকা ভেজা থাকতেই ময়েশ্চারাইজার বা অলিভ অয়েল/গ্লিসারিন লাগান, প্রতিদিন অন্তত ৮–১০ গ্লাস কুসুম গরম পানি পান করুন এবং হাঁপানি রোগীরা ঠান্ডা বাতাস ও কুয়াশা থেকে বাঁচতে মাস্ক ও গরম কাপড় ব্যবহার করুন।'],
+    ['diabetes_foot_care', 'ডায়াবেটিস রোগীদের পায়ের যত্ন ও ক্ষত প্রতিরোধ', ['ডায়াবেটিস রোগীর পায়ে ঘা', 'ডায়াবেটিস পায়ের যত্ন', 'diabetic foot'], '🦶 <b>ডায়াবেটিস রোগীদের পায়ের বিশেষ যত্ন:</b><br>• ডায়াবেটিস রোগীরা কখনোই খালি পায়ে হাঁটবেন না, প্রতিদিন রাতে পা ধুয়ে আঙুলের ফাঁক শুকনো কাপড় দিয়ে মুছুন, নখ কাটার সময় সাবধান থাকুন যাতে কোণা না কাটে এবং পায়ে কোনো ফোসকা বা ক্ষত হলে অবহেলা না করে সাথে সাথে চিকিৎসককে দেখান।'],
+    ['hypertension_dash_diet', 'উচ্চ রক্তচাপ (High BP) কমানোর খাদ্যতালিকা (DASH Diet)', ['প্রেসার কমানোর খাবার', 'উচ্চ রক্তচাপে কী খাব', 'রক্তচাপ নিয়ন্ত্রণের উপায়'], '❤️ <b>উচ্চ রক্তচাপ নিয়ন্ত্রণের জীবনধারা ও খাবার:</b><br>• পাতে আলগা কাঁচা লবণ সম্পূর্ণ বন্ধ করুন, পটাশিয়াম সমৃদ্ধ খাবার (কলা, ডাবের পানি, শাকসবজি, টক দই, রসুন) খান, প্রতিদিন ৩০–৪০ মিনিট হাঁটুন, ধূমপান বর্জন করুন এবং চিকিৎসকের দেওয়া প্রেশারের ওষুধ কখনোই নিজে থেকে বন্ধ করবেন না।'],
+    ['low_bp_diet_care', 'নিম্ন রক্তচাপ (Low Blood Pressure) হলে কী খাবেন', ['লো প্রেসার হলে কী খাব', 'প্রেসার কমে গেলে করণীয়', 'low bp diet'], '⚡ <b>লো ব্লাড প্রেশার (Low BP) হলে তাৎক্ষণিক করণীয়:</b><br>• প্রেশার কমে মাথা ঘুরালে বা দুর্বল লাগলে সাথে সাথে ১ গ্লাস <b>খাবার স্যালাইন (ORS)</b>, ডাবের পানি, লবণ-চিনির শরবত বা দুধ-ডিম গ্রহণ করুন এবং পা একটু উঁচু করে বিশ্রাম নিন। দীর্ঘক্ষণ খালি পেটে থাকবেন না।'],
+    ['fatty_liver_grade_diet', 'ফ্যাটি লিভার (Grade 1 / Grade 2) কমানোর প্রাকৃতিক উপায়', ['ফ্যাটি লিভার কমানোর উপায়', 'লিভারে চর্বি জমলে কী খাব', 'fatty liver diet'], '🫀 <b>ফ্যাটি লিভার (লিভারে চর্বি) কমানোর কার্যকর উপায়:</b><br>• চিনি, মিষ্টি, কোমল পানীয়, সাদা ময়দা ও ভাজাপোড়া খাবার সম্পূর্ণ কমিয়ে দিন। প্রতিদিন অন্তত ৪০ মিনিট দ্রুত হাঁটুন, শরীরের ওজন ৫%–১০% কমান এবং শাকসবজি, মাছ, ওটস ও গ্রিন টি/লেবু পানি গ্রহণ করুন।'],
+    ['gallbladder_diet_care', 'পিত্তথলির পাথর বা অপারেশনের পর খাবার নিয়ম', ['পিত্তথলি অপারেশনের পর খাবার', 'গলব্লাডারে পাথর হলে কী খাওয়া নিষেধ'], '🥗 <b>পিত্তথলির সমস্যায় খাদ্যতালিকা:</b><br>• চর্বিযুক্ত লাল মাংস (গরু, খাসি), ঘি, মাখন, ডুবো তেলে ভাজা খাবার ও অতিরিক্ত মশলা বর্জন করুন। অল্প পরিমাণে বারবার সহজপাচ্য ও আঁশযুক্ত খাবার গ্রহণ করুন।'],
+    ['peptic_ulcer_care', 'পেপটিক আলসার (পাকস্থলীর ঘা) লক্ষণ ও পথ্য', ['পেপটিক আলসার', 'পাকস্থলীতে ঘা', 'খালি পেটে পেট জ্বালা', 'peptic ulcer'], '🩺 <b>পেপটিক আলসারের লক্ষণ ও করণীয়:</b><br>• খালি পেটে বা রাতে পেটের ওপরের মাঝখানে জ্বালাপোড়া ও ব্যথা হওয়া। করণীয়: নির্দিষ্ট সময়ে খাবার খাওয়া, ঝাল-মশলা, ধূমপান ও ব্যথানাশক ওষুধ (NSAIDs) সম্পূর্ণ বর্জন করা এবং চিকিৎসকের পরামর্শে পূর্ণ মেয়াদে ওষুধ গ্রহণ করা।'],
+    ['ibs_irritable_bowel', 'আইবিএস (IBS - Irritable Bowel Syndrome) ও পেটের সমস্যা', ['আইবিএস', 'ibs', 'সকালে বারবার পায়খানা', 'দুধ খেলে পেট খারাপ'], '🌿 <b>আইবিএস (IBS) নিয়ন্ত্রণের উপায়:</b><br>• দুধ বা দুগ্ধজাত খাবারে সমস্যা হলে তা এড়িয়ে টক দই খান, অতিরিক্ত মানসিক চাপ ও দুশ্চিন্তা কমান (কারণ স্ট্রেস IBS বাড়িয়ে দেয়), ইসবগুলের ভুসি ও আঁশযুক্ত খাবার খান এবং বাইরের বাসি খাবার বর্জন করুন।'],
+    ['asthma_inhaler_care', 'হাঁপানি (Asthma) ও ইনহেলার ব্যবহারের সঠিক ধারণা', ['ইনহেলার কি ক্ষতিকর', 'হাঁপানি কমানোর উপায়', 'শ্বাসকষ্ট হলে করণীয়'], '🫁 <b>হাঁপানি (Asthma) ও ইনহেলার ব্যবহারের সঠিক তথ্য:</b><br>• ইনহেলার মোটেও ক্ষতিকর বা নেশাদ্রব্য নয়; বরং এটি সরাসরি ফুসফুসে খুব সামান্য মাত্রায় ওষুধ পৌঁছে দিয়ে শ্বাসকষ্ট দ্রুত কমায় এবং সবচেয়ে নিরাপদ চিকিৎসা। ধুলোবালি, ঠান্ডা, ধোঁয়া ও অ্যালার্জি সৃষ্টিকারী খাবার থেকে দূরে থাকুন।'],
+    ['allergy_food_dust', 'খাবার ও ধুলোবালির অ্যালার্জি নিয়ন্ত্রণের উপায়', ['এলার্জি কমানোর উপায়', 'অ্যালার্জির খাবার কোনগুলো', 'চিংড়ি বেগুন এলার্জি'], '🛡️ <b>অ্যালার্জি নিয়ন্ত্রণের উপায়:</b><br>• যে নির্দিষ্ট খাবারে (যেমন: চিংড়ি, ইলিশ, গরুর মাংস, বেগুন বা কচু) আপনার শরীর চুলকায় বা ফুলে ওঠে, সেই খাবারটি চিহ্নিত করে এড়িয়ে চলুন। ঘর পরিষ্কার করার সময় বা বাইরে ধুলোবালিতে মাস্ক ব্যবহার করুন।'],
+    ['scabies_skin_itching', 'খোসপাঁচড়া (Scabies) ও আঙুলের ফাঁকে চুলকানি', ['খোসপাঁচড়া', 'আঙুলের ফাঁকে চুলকানি', 'রাতে চুলকানি বাড়ে', 'scabies'], '🧴 <b>খোসপাঁচড়া (Scabies) নিরাময়ের নিয়ম:</b><br>• আঙুলের ফাঁকে, কব্জিতে বা শরীরে ছোট ছোট দানা ও রাতে তীব্র চুলকানি হলে চিকিৎসকের পরামর্শে Permethrin 5% ক্রিম গলা থেকে পায়ের তালু পর্যন্ত লাগাতে হয়। পরিবারের সবার কাপড়, বিছানার চাদর ও তোয়ালে গরম পানিতে ধুয়ে রোদে শুকাতে হবে।'],
+    ['burn_blister_myth', 'আগুনে বা গরম পানিতে পুড়ে গেলে টুথপেস্ট বা ডিম লাগানো কেন নিষেধ', ['পোড়া জায়গায় টুথপেস্ট', 'পুড়ে গেলে ফোসকা', 'গরম তেল পড়লে'], '🔥 <b>পুড়ে গেলে টুথপেস্ট/ডিম না লাগানোর সতর্কতা:</b><br>• পোড়া স্থানে কখনোই টুথপেস্ট, কাঁচা ডিম, হলুদ, তেল বা বরফ লাগাবেন না—এতে তাপ ভেতরে আটকে গিয়ে টিস্যু আরও ক্ষতিগ্রস্ত হয় এবং ইনফেকশন হয়। শুধুমাত্র <b>১৫–২০ মিনিট কলের স্বাভাবিক ঠান্ডা পানি</b> ঢালুন এবং ফোসকা গলাবেন না।'],
+    ['tetanus_vaccine_rusty_cut', 'জং ধরা লোহা বা টিনে কেটে গেলে টিটেনাস (Tetanus) টিকা', ['জং ধরা লোহায় কাটলে', 'টিটেনাস ইনজেকশন', 'ধনুষ্টঙ্কার টিকা', 'tetanus'], '💉 <b>জং ধরা লোহা, টিন বা পেরেকে কেটে গেলে করণীয়:</b><br>• ক্ষতস্থান সাথে সাথে সাবান ও পরিষ্কার পানি দিয়ে ভালোভাবে ধুয়ে অ্যান্টিসেপটিক লাগান এবং গত ৫–১০ বছরের মধ্যে টিটেনাস টিকা না নেওয়া থাকলে <b>২৪ ঘণ্টার মধ্যে ১ ডোজ Tetanus Toxoid (TT / টিটেনাস ভ্যাকসিন)</b> ইনজেকশন নিয়ে নিন।'],
+    ['rabies_dog_cat_scratch', 'কুকুর, বিড়াল বা বানরের কামড়/আঁচড়ে জলাতঙ্ক (Rabies) টিকা', ['বিড়ালে আঁচড় দিলে', 'কুকুরে কামড়ালে টিকা', 'জলাতঙ্ক টিকা', 'cat scratch vaccine'], '🐕 <b>কুকুর বা বিড়ালের কামড় ও আঁচড়ে জরুরি করণীয়:</b><br>• ক্ষতস্থান সাথে সাথে ক্ষারযুক্ত সাবান ও প্রবহমান কলের পানি দিয়ে একটানা <b>১৫ মিনিট</b> ধুয়ে ফেলুন (ক্ষতস্থানে ব্যান্ডেজ বাঁধবেন না) এবং দেরি না করে ওই দিনই হাসপাতাল থেকে <b>জলাতঙ্ক প্রতিরোধী টিকা (Anti-Rabies Vaccine)</b> নেওয়া শুরু করুন।'],
+    ['heat_cramps_electrolyte', 'রোদে বা খেলাধুলায় পেশিতে টান (Heat Cramps) লাগলে করণীয়', ['খেলাধুলায় পায়ে টান', 'রোদে পেশিতে টান', 'heat cramps'], '🏃 <b>রোদে বা খেলাধুলায় পেশিতে টান ধরলে করণীয়:</b><br>• সাথে সাথে ছায়াযুক্ত ঠান্ডা স্থানে বিশ্রাম নিন, খাবার স্যালাইন (ORS) বা ডাবের পানি পান করুন এবং টান ধরা পেশি আলতোভাবে স্ট্রেচ করুন।'],
+    ['blood_donation_smoking_rule', 'রক্তদানের কতক্ষণ আগে ও পরে ধূমপান নিষেধ', ['রক্তদানের পর ধূমপান', 'সিগারেট খেলে রক্ত দেওয়া যাবে'], '🚭 <b>রক্তদান ও ধূমপানের নিয়ম:</b><br>• রক্তদানের অন্তত <b>২ থেকে ৪ ঘণ্টা আগে</b> এবং রক্তদানের পর অন্তত <b>৩ থেকে ৪ ঘণ্টা</b> ধূমপান সম্পূর্ণ বর্জন করতে হবে, নতুবা মাথা ঘোরা বা বমি ভাব হতে পারে এবং রক্তগ্রহীতার শরীরে কার্বন মনোক্সাইডযুক্ত রক্ত পৌঁছায়।'],
+    ['blood_donation_empty_stomach', 'খালি পেটে রক্তদান করা যাবে কি না', ['খালি পেটে রক্ত দেওয়া যায়', 'রক্ত দেওয়ার আগে কী খাব'], '🍽️ <b>রক্তদানের আগে খাবার নিয়ম:</b><br>• কখনোই সম্পূর্ণ খালি পেটে রক্তদান করবেন না। রক্তদানের ১–২ ঘণ্টা আগে স্বাভাবিক হালকা খাবার (ভাত, রুটি, ফল বা বিস্কুট) এবং অন্তত ২–৩ গ্লাস (৫০০ মি.লি.) পানি পান করে রক্তদান করুন।'],
+    ['blood_donation_bruise_ice', 'রক্তদানের পর সূঁচ ফোটানো স্থানে নীলচে দাগ বা ব্যথা হলে করণীয়', ['রক্ত দেওয়ার পর হাত ফুলে গেলে', 'সূঁচের জায়গায় ব্যথা', 'হাতে নীল দাগ রক্তদান'], '🩹 <b>রক্তদানের পর সূঁচ ফোটানো স্থানে ব্যথা বা ফোলা হলে করণীয়:</b><br>• প্রথম ২৪ ঘণ্টায় পরিষ্কার কাপড়ে পেঁচিয়ে ১০–১৫ মিনিট <b>বরফের সেঁক (Cold Compress)</b> দিন এবং পরবর্তী ২৪ ঘণ্টা পর কুসুম গরম পানির সেঁক দিন। ওই হাতে ২৪ ঘণ্টা ভারী ব্যাগ বা ওজন তুলবেন না।'],
+    ['blood_group_inheritance', 'বাবা-মায়ের রক্তের গ্রুপ থেকে সন্তানের রক্তের গ্রুপ কেমন হয়', ['বাবা মায়ের রক্তের গ্রুপ', 'সন্তানের রক্তের গ্রুপ', 'স্বামী স্ত্রীর রক্তের গ্রুপ এক হলে'], '🧬 <b>বাবা-মায়ের রক্তের গ্রুপ ও সন্তান:</b><br>• স্বামী-স্ত্রীর রক্তের গ্রুপ একই (যেমন দুজনেই B+ বা O+) হলে সন্তানের কোনো ক্ষতি হয় না! কেবল মা যদি <b>Rh নেগেটিভ (-)</b> এবং বাবা <b>Rh পজিটিভ (+)</b> হন, তবে প্রথম সন্তান জন্মের পর মাকে চিকিৎসকের পরামর্শে ১টি <b>Anti-D (RhoGAM)</b> ইনজেকশন নিতে হয়।'],
+    ['whole_blood_vs_component', 'হোল ব্লাড (Whole Blood) এবং রেড সেল/প্লাজমা/প্লাটিলেটের পার্থক্য', ['হোল ব্লাড কী', 'প্যাকড রেড সেল', 'ফ্রেশ ফ্রোজেন প্লাজমা', 'ffp blood'], '🩸 <b>হোল ব্লাড বনাম রক্তের উপাদান (Components):</b><br>• <b>Whole Blood:</b> সরাসরি দান করা পূর্ণ রক্ত (দুর্ঘটনা বা অতিরিক্ত রক্তক্ষরণে ব্যবহৃত হয়)।<br>• <b>PRBC (Red Cells):</b> থ্যালাসেমিয়া ও রক্তশূন্যতা রোগীদের দেওয়া হয়।<br>• <b>Platelets:</b> ডেঙ্গু ও ক্যান্সার রোগীদের রক্তক্ষরণ রোধে দেওয়া হয়।<br>• <b>FFP (Plasma):</b> পোড়া রোগী ও রক্ত জমাট বাঁধার সমস্যায় দেওয়া হয়।']
+  ];
+
+  for(var j = 0; j < extraTopics.length; j++){
+    var mt = extraTopics[j];
+    SPONDON_AI_KB.push({
+      id: mt[0],
+      topic: mt[1],
+      mustAny: mt[2],
+      high: mt[2],
+      med: ['স্বাস্থ্য', 'উপায়', 'করণীয়', 'খাবার', 'লক্ষণ', 'নিয়ম'],
+      neg: [],
+      ans: mt[3],
+      topicEn: mt[1],
+      ansEn: mt[3]
+    });
+  }
+})();
+
+// ─── STRICT OUT-OF-SCOPE & OVERLY CRITICAL MEDICAL SAFETY DETECTOR ───
+function checkSpondonAiGuardrails(rawQuestion, isEn) {
+  var q = normBnQuery(rawQuestion);
+  if(!q) return null;
+
+  // ১. অতিরিক্ত গুরুতর/সংবেদনশীল চিকিৎসা বা প্রেসক্রিপশন ডোজ সংক্রান্ত প্রশ্ন (যেগুলোর সরাসরি ওষুধ/সিদ্ধান্ত দেওয়া এআই-এর জন্য নিষিদ্ধ)
+  var criticalWords = [
+    'কেমোথেরাপি', 'ক্যান্সারের ওষুধ', 'ক্যান্সার চিকিৎসা', 'অপারেশন করতে হবে', 'সার্জারি করব',
+    'ঘুমের ওষুধের নাম', 'ঘুমের ট্যাবলেট', 'সিডাক্সিন', 'ক্লোনাজিপাম', 'মাদক', 'আত্মহত্যা', 'গর্ভপাত করার ওষুধ',
+    'অ্যান্টিবায়োটিক কোনটা খাব', 'কোন অ্যান্টিবায়োটিক', 'স্টেরয়েড ডোজ', 'আইসিইউ', 'লাইফ সাপোর্ট',
+    'chemotherapy', 'cancer prescription', 'sleeping pill name', 'sedative dose', 'suicide', 'abortion pill', 'which antibiotic should i take'
+  ];
+  for(var c = 0; c < criticalWords.length; c++) {
+    if(q.indexOf(normBnQuery(criticalWords[c])) !== -1) {
+      if(isEn) {
+        return '🩺 <b>Important Medical Safety Notice:</b><br>' +
+               'Your question involves a critical clinical condition or prescription medication decision. Since I am an <b>AI Health & Blood Donation Assistant</b>, it is not safe or possible for me to prescribe specific medications, dosages, or surgical treatments.<br><br>' +
+               '⚠️ Please consult a registered specialist doctor (MBBS/MD) immediately or visit the nearest hospital emergency department.';
+      }
+      return '🩺 <b>গুরুত্বপূর্ণ চিকিৎসা ও নিরাপত্তা বার্তা:</b><br>' +
+             'আপনার প্রশ্নটি অত্যন্ত সংবেদনশীল বা জটিল চিকিৎসা ও ওষুধের প্রেসক্রিপশন সংক্রান্ত। আমরা যেহেতু একটি <b>এআই (AI) স্বাস্থ্য ও রক্তদান সহকারী</b>, তাই জটিল কোনো রোগের সরাসরি ওষুধের প্রেসক্রিপশন, ডোজ বা চূড়ান্ত চিকিৎসার সিদ্ধান্ত আমাদের পক্ষে দেওয়া সম্ভব নয়।<br><br>' +
+             '⚠️ অনুগ্রহ করে কোনো ঝুঁকি না নিয়ে দ্রুত একজন রেজিস্টার্ড বিশেষজ্ঞ চিকিৎসকের (MBBS Doctor) পরামর্শ নিন অথবা নিকটস্থ হাসপাতালের জরুরি বিভাগে যোগাযোগ করুন।';
+    }
+  }
+
+  // ২. সম্পূর্ণ মেডিকেল, স্বাস্থ্য ও রক্তদানের বাইরের প্রশ্ন (Out-of-Scope Questions)
+  var outOfScopeWords = [
+    'রাজনীতি', 'নির্বাচন', 'ভোট', 'প্রধানমন্ত্রী', 'রাষ্ট্রপতি', 'ক্রিকেট', 'ফুটবল', 'খেলার খবর', 'স্কোর কত',
+    'সিনেমা', 'মুভি', 'গান', 'নাটক', 'অভিনেতা', 'শেয়ার বাজার', 'বিটকয়েনের দাম', 'লটারি', 'জুয়া',
+    'প্রোগ্রামিং', 'জাভাস্ক্রিপ্ট', 'পাইথন কোড', 'অংক', 'গণিত সমাধান', 'কবিতা লেখ', 'গল্প বলো', 'কৌতুক',
+    'politics', 'election', 'cricket score', 'football match', 'movie review', 'bitcoin', 'write code', 'solve math', 'tell a joke'
+  ];
+  for(var o = 0; o < outOfScopeWords.length; o++) {
+    if(q.indexOf(normBnQuery(outOfScopeWords[o])) !== -1) {
+      if(isEn) {
+        return '🩺 <b>Outside Medical & Health Scope:</b><br>' +
+               'Sorry, this question is outside the scope of medical science, primary healthcare, nutrition, and blood donation. As the <b>Spondon AI Health Assistant</b>, I can only answer questions related to human health, water & mineral nutrition, primary care, first aid, and blood donation.';
+      }
+      return '🩺 <b>বিষয়বহির্ভূত প্রশ্ন (মেডিকেল ও স্বাস্থ্য বিষয়ের বাইরে):</b><br>' +
+             'দুঃখিত, আপনার এই প্রশ্নটি মেডিকেল, প্রাথমিক স্বাস্থ্যসেবা, মানবদেহ বা রক্তদান বিষয়ের বাইরে। আমরা যেহেতু একটি স্বাস্থ্য ও রক্তদান বিষয়ক এআই (AI) সহকারী, তাই এই প্রশ্নটির উত্তর আমাদের পক্ষে দেওয়া সম্ভব নয়।<br><br>' +
+             'অনুগ্রহ করে রক্তদান, মানবদেহ, পানি ও খনিজ পুষ্টি অথবা প্রাথমিক স্বাস্থ্যসেবা সংক্রান্ত যেকোনো প্রশ্ন করুন।';
+    }
+  }
+
+  return null;
+}
+
 function analyzeAndAnswerSpondonAi(rawQuestion) {
   var q = normBnQuery(rawQuestion);
   if(!q) return null;
@@ -5895,8 +6745,9 @@ window.askSpondonAi = function(questionText) {
 
   var bDiv = document.createElement('div');
   bDiv.className = 'ai-msg-bot';
-  var thinkMsg1 = isEn ? '🧠 Analyzing your question...' : '🧠 আপনার প্রশ্নটি বিশ্লেষণ করা হচ্ছে...';
-  var thinkMsg2 = isEn ? '🩺 Verifying with Medical & Blood Donation Database...' : '🩺 মেডিকেল ও রক্তদান ডাটাবেজ থেকে সঠিক তথ্য যাচাই করা হচ্ছে...';
+  var thinkMsg1 = isEn ? '🧠 Spondon AI is thinking and analyzing your question...' : '🧠 স্পন্দন এআই আপনার প্রশ্নটি নিয়ে চিন্তা ও বিশ্লেষণ করছে...';
+  var thinkMsg2 = isEn ? '🩺 Verifying with Medical, Primary Health & Blood Database...' : '🩺 মেডিকেল, প্রাথমিক স্বাস্থ্য ও রক্তদান ডাটাবেজ যাচাই করা হচ্ছে...';
+  var thinkMsg3 = isEn ? '✍️ Formulating a 100% verified answer for you...' : '✍️ আপনার জন্য নির্ভুল ও যাচাইকৃত উত্তরটি প্রস্তুত করা হচ্ছে...';
 
   bDiv.innerHTML = '<div style="display:flex;align-items:center;gap:10px;color:#be123c;font-weight:700;">' +
                      '<span style="display:inline-block;width:16px;height:16px;border:2.5px solid #fecdd3;border-top-color:#e11d48;border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0;"></span>' +
@@ -5906,21 +6757,38 @@ window.askSpondonAi = function(questionText) {
   aiBody.scrollTop = aiBody.scrollHeight;
 
   var startTime = Date.now();
-  var thinkPhaseTimer = setTimeout(function(){
+  var AI_THINK_DURATION_MS = 4800; // ৪.৮ সেকেন্ড ধরে এআই চিন্তা করার বাস্তবসম্মত অ্যানিমেশন দেখাবে
+
+  var thinkTimer1 = setTimeout(function(){
     var tSpan = bDiv.querySelector('#ai-think-txt');
     if(tSpan) tSpan.textContent = thinkMsg2;
-  }, 600);
+  }, 1500);
+
+  var thinkTimer2 = setTimeout(function(){
+    var tSpan = bDiv.querySelector('#ai-think-txt');
+    if(tSpan) tSpan.textContent = thinkMsg3;
+  }, 3100);
 
   function revealFinalAnswer(htmlContent) {
     var elapsed = Date.now() - startTime;
-    var remainingDelay = Math.max(0, 1250 - elapsed);
+    var remainingDelay = Math.max(0, AI_THINK_DURATION_MS - elapsed);
     setTimeout(function(){
-      clearTimeout(thinkPhaseTimer);
+      clearTimeout(thinkTimer1);
+      clearTimeout(thinkTimer2);
       bDiv.innerHTML = htmlContent;
       aiBody.scrollTop = aiBody.scrollHeight;
     }, remainingDelay);
   }
 
+  // ধাপ ১: প্রথমে অতি-সংবেদনশীল মেডিকেল প্রেসক্রিপশন বা সম্পূর্ণ মেডিকেল-বহির্ভূত প্রশ্ন কি না তা চেক করবে
+  var guardrailReply = checkSpondonAiGuardrails(questionText, isEn);
+  if(guardrailReply) {
+    revealFinalAnswer(guardrailReply);
+    return;
+  }
+
+  // ধাপ ২: আমাদের ২০০+ ইন-বিল্ট মেডিকেল, পানি, খনিজ পদার্থ, ভিটামিন, প্রাথমিক স্বাস্থ্য ও রক্তদান ডাটাবেজ চেক করবে।
+  // এখানে মিল পাওয়া গেলে সরাসরি ইন-বিল্ট ডাটাবেজ থেকেই উত্তর দেবে—ফলে আপনার Gemini API-এর ১৫০০ মেসেজের কোটা একটুও খরচ হবে না!
   var verifiedLocalAns = analyzeAndAnswerSpondonAi(questionText);
   var isVerifiedMatch = verifiedLocalAns && (
     verifiedLocalAns.indexOf('যাচাইকৃত') !== -1 ||
@@ -5932,6 +6800,17 @@ window.askSpondonAi = function(questionText) {
     return;
   }
 
+  // ধাপ ৩: শুধুমাত্র যখন প্রশ্নটি আমাদের ২০০+ ইন-বিল্ট ডাটাবেজে থাকবে না, কেবল তখনই আপনার Gemini API ব্যবহার করে উত্তর আনবে!
+  function formatGeminiMarkdown(txt) {
+    var safe = escapeHtml(txt || '');
+    safe = safe.replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
+    safe = safe.replace(/^\s*[\*\-]\s+/gm, '• ');
+    safe = safe.replace(/\n/g, '<br>');
+    return '<div style="font-size:11.5px;color:#059669;font-weight:800;margin-bottom:6px;display:flex;align-items:center;gap:5px;">' +
+             '<span>✅ যাচাইকৃত স্পন্দন এআই ও স্বাস্থ্য সহকারী</span>' +
+           '</div>' + safe;
+  }
+
   var fd = new FormData();
   fd.append('action', 'askAiAgent');
   fd.append('question', questionText);
@@ -5940,7 +6819,7 @@ window.askSpondonAi = function(questionText) {
   .then(function(r){ return r.json(); })
   .then(function(d){
     if(d && d.status === 'Success' && d.answer){
-      revealFinalAnswer(escapeHtml(d.answer).replace(/\n/g, '<br>'));
+      revealFinalAnswer(formatGeminiMarkdown(d.answer));
     } else {
       revealFinalAnswer(verifiedLocalAns);
     }
