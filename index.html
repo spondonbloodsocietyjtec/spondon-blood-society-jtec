@@ -5808,7 +5808,7 @@ var SPONDON_AI_KB = [
     id: 'anemia_hemoglobin_food',
     topic: 'রক্তস্বল্পতা (Anemia) ও হিমোগ্লোবিন বাড়ানোর খাবার',
     mustAny: ['রক্তস্বল্পতা', 'অ্যানিমিয়া', 'এনিমিয়া', 'anemia', 'রক্ত বাড়ানোর', 'হিমোগ্লোবিন বাড়ানোর', 'হিমোগ্লোবিন বাড়ে', 'হিমোগ্লোবিন কীভাবে বাড়বে', 'রক্ত বাড়ে', 'কী খেলে রক্ত', 'কি খেলে রক্ত', 'আয়রন', 'রক্ত শূন্যতা', 'রক্তশূন্যতা', 'anemia', 'anaemia', 'increase hemoglobin', 'increase blood', 'foods for hemoglobin', 'iron rich food', 'low hemoglobin'],
-    high: ['হিমোগ্লোবিন বাড়ানোর উপায়', 'হিমোগ্লোবিন বাড়ে', 'হিমোগ্লোবিন কীভাবে বাড়বে', 'রক্ত বাড়ে', 'রক্তস্বল্পতা দূর করার খাবার', 'হিমোগ্লোবিন বৃদ্ধির খাবার', 'how to increase hemoglobin naturally', 'what foods increase blood and hemoglobin', 'diet for anemia'],
+    high: ['হিমোগ্লোবিন কত থাকা দরকার ও কীভাবে বাড়বে', 'হিমোগ্লোবিন বাড়ানোর উপায়', 'হিমোগ্লোবিন বাড়ে', 'হিমোগ্লোবিন কীভাবে বাড়বে', 'রক্ত বাড়ে', 'রক্তস্বল্পতা দূর করার খাবার', 'হিমোগ্লোবিন বৃদ্ধির খাবার', 'how to increase hemoglobin naturally', 'what foods increase blood and hemoglobin', 'diet for anemia'],
     med: ['হিমোগ্লোবিন', 'খাবার', 'বাড়ে', 'বাড়ানোর', 'রক্তস্বল্পতা', 'কলিজা', 'কচুশাক', 'ডালিম', 'anemia', 'iron', 'food', 'diet', 'increase', 'spinach', 'pomegranate', 'liver'],
     neg: [],
     ans: '🥗 <b>রক্তস্বল্পতা দূর ও হিমোগ্লোবিন দ্রুত বাড়ানোর খাবার:</b><br>' +
@@ -6890,10 +6890,16 @@ function checkSpondonAiGuardrails(rawQuestion, isEn) {
 
   // ২. সম্পূর্ণ মেডিকেল, স্বাস্থ্য ও রক্তদানের বাইরের প্রশ্ন (Out-of-Scope Questions)
   var outOfScopeWords = [
-    'রাজনীতি', 'নির্বাচন', 'ভোট', 'প্রধানমন্ত্রী', 'রাষ্ট্রপতি', 'ক্রিকেট', 'ফুটবল', 'খেলার খবর', 'স্কোর কত',
-    'সিনেমা', 'মুভি', 'গান', 'নাটক', 'অভিনেতা', 'শেয়ার বাজার', 'বিটকয়েনের দাম', 'লটারি', 'জুয়া',
-    'প্রোগ্রামিং', 'জাভাস্ক্রিপ্ট', 'পাইথন কোড', 'অংক', 'গণিত সমাধান', 'কবিতা লেখ', 'গল্প বলো', 'কৌতুক',
-    'politics', 'election', 'cricket score', 'football match', 'movie review', 'bitcoin', 'write code', 'solve math', 'tell a joke'
+    'রাজনীতি', 'নির্বাচন', 'ভোট', 'প্রধানমন্ত্রী', 'রাষ্ট্রপতি', 'সাংসদ', 'যুদ্ধ', 'জিওপলিটিক্স', 'ভূরাজনীতি',
+    'ক্রিকেট', 'ফুটবল', 'খেলার খবর', 'স্কোর কত', 'বিশ্বকাপ', 'আইপিএল', 'বিপিএল',
+    'সিনেমা', 'মুভি', 'গান', 'নাটক', 'অভিনেতা', 'নায়িকা', 'টিকটক', 'বিনোদন',
+    'শেয়ার বাজার', 'বিটকয়েনের দাম', 'ক্রিপ্টো', 'লটারি', 'জুয়া', 'ব্যাংক লোন',
+    'প্রোগ্রামিং', 'জাভাস্ক্রিপ্ট', 'পাইথন কোড', 'অংক', 'গণিত সমাধান', 'সমীকরণ', 'কবিতা লেখ', 'গল্প বলো', 'কৌতুক',
+    'তোমার বাসা কোথায়', 'তোমার বিয়ে', 'তুমি কি মানুষ', 'প্রেম', 'ভালোবাসার চিঠি', 'রাশিফল', 'জ্যোতিষী',
+    'politics', 'election', 'midterm', 'president', 'prime minister', 'geopolitics', 'war', 'military',
+    'cricket', 'football', 'world cup', 'movie', 'song', 'actor', 'bitcoin', 'crypto', 'stock market',
+    'programming', 'javascript', 'python', 'calculate the', 'define moment', 'solve math', 'equation',
+    'tell a joke', 'write a poem', 'horoscope', 'astrology', 'i am not a robot', 'give me boxes'
   ];
   for(var o = 0; o < outOfScopeWords.length; o++) {
     if(q.indexOf(normBnQuery(outOfScopeWords[o])) !== -1) {
@@ -6961,20 +6967,18 @@ function ensureAiKbPreIndexed() {
   return PREINDEXED_KB_CACHE;
 }
 
-function computeTokenSimilarity(qNorm, targetNorm) {
+function computeTokenSimilarity(qNorm, targetNorm, fullKbVocabStr) {
   if (!qNorm || !targetNorm) return 0;
   if (qNorm === targetNorm) return 1.0;
-  if (targetNorm.indexOf(qNorm) !== -1 && qNorm.length >= 6) {
-    return Math.min(0.95, 0.78 + (qNorm.length / Math.max(targetNorm.length, 1)) * 0.2);
-  }
-  if (qNorm.indexOf(targetNorm) !== -1 && targetNorm.length >= 6) {
-    return Math.min(0.95, 0.78 + (targetNorm.length / Math.max(qNorm.length, 1)) * 0.2);
-  }
+
   var qTokens = qNorm.split(' ').filter(function(w){ return w.length > 1 && !AI_STOP_WORDS[w]; });
   var tTokens = targetNorm.split(' ').filter(function(w){ return w.length > 1 && !AI_STOP_WORDS[w]; });
   if (qTokens.length === 0 || tTokens.length === 0) return 0;
 
   var matchedQ = 0;
+  var novelWords = 0;
+  var vocabCheck = fullKbVocabStr || targetNorm;
+
   for (var i = 0; i < qTokens.length; i++) {
     var qw = qTokens[i];
     var hit = false;
@@ -6997,11 +7001,24 @@ function computeTokenSimilarity(qNorm, targetNorm) {
         if (qInGrp && tInGrp) { hit = true; break; }
       }
     }
-    if (hit) matchedQ++;
+    if (hit) {
+      matchedQ++;
+    } else if (vocabCheck.indexOf(qw) === -1) {
+      // ইউজারের প্রশ্নে এমন একটি নতুন/ইউনিক শব্দ আছে যা এই ইন-বিল্ট টপিকে নেই!
+      novelWords++;
+    }
   }
-  var qRatio = matchedQ / qTokens.length;
-  var tRatio = matchedQ / Math.max(tTokens.length, 1);
-  return (qRatio * 0.72) + (Math.min(1, tRatio) * 0.28);
+
+  var qCoverage = matchedQ / qTokens.length;
+  var tCoverage = matchedQ / Math.max(tTokens.length, 1);
+  var rawSim = (qCoverage * 0.78) + (Math.min(1, tCoverage) * 0.22);
+
+  // যদি ইউজারের প্রশ্নে নতুন/ইউনিক কোনো শব্দ থাকে যা ইন-বিল্ট টপিকে নেই (যেমন ২০%+ শব্দই নতুন),
+  // তবে স্কোর ৮০%-এর নিচে নামিয়ে দেওয়া হবে যাতে সেটি জোর করে ইন-বিল্ট না দিয়ে সরাসরি Gemini API ব্যবহার করে!
+  if (novelWords > 0 && (novelWords / qTokens.length) > 0.20) {
+    rawSim = Math.min(rawSim, 0.72 - (novelWords * 0.08));
+  }
+  return rawSim;
 }
 
 // চ্যাটবক্সে টাইপ করার সময় ১ মিলিসেকেন্ডে লাইভ ফ্লোটিং সাজেশন বের করার সুপার-ফাস্ট ফাংশন
@@ -7013,7 +7030,6 @@ window.getLiveInBuiltSuggestions = function(rawInput) {
   var qWords = q.split(' ').filter(function(w){ return w.length >= 2 && !AI_STOP_WORDS[w]; });
   if (qWords.length === 0) qWords = [q];
 
-  // সমার্থক শব্দ প্রসারিত করা (মাত্র ১ বার)
   var expandedWords = qWords.slice();
   for (var s = 0; s < PREINDEXED_SYN_GROUPS.length; s++) {
     var grp = PREINDEXED_SYN_GROUPS[s];
@@ -7104,10 +7120,10 @@ function analyzeAndAnswerSpondonAi(rawQuestion) {
   var specificBgReply = checkSpecificBloodGroupQuery(rawQuestion, isEn);
   if(specificBgReply) return specificBgReply;
 
-  // ২. ওয়েবসাইট, জিমেইল, ফটোকার্ড, গ্যালারি বা অভিযোগ বক্স সংক্রান্ত যেকোনো প্রশ্ন হলে সবসময় ইন-বিল্ট থেকেই উত্তর দেবে!
+  // ২. ওয়েবসাইট, জিমেইল, ফটোকার্ড, গ্যালারি বা অভিযোগ বক্স সংক্রান্ত প্রশ্ন কি না চেক
   var isWebsiteQuery = /ওয়েবসাইট|ওয়েবসাইট|জিমেইল|ইমেইল|ফটোকার্ড|ফটো কার্ড|গ্যালারি|অভিযোগ বক্স|প্রতারক ডোনার|রেজিস্ট্রেশন পেজ|ডোনার পেজ|ডোনার কার্ড|ম্যাচ কনফার্ম|স্পন্দন ব্লাড সোসাইটি|হেল্পলাইন|website|gmail|photocard|photo gallery|fraud donor|match secured/.test(q);
 
-  // ৩. যদি ওয়েবসাইটের প্রশ্ন না হয়ে তুলনামূলক বা জটিল মেডিকেল প্রশ্ন হয় (যেমন: "হার্ট অ্যাটাক ও গ্যাস্ট্রিকের পার্থক্য"), তবে সরাসরি Gemini API ব্যবহার করবে:
+  // ৩. যদি ওয়েবসাইটের প্রশ্ন না হয়ে তুলনামূলক বা বিশ্লেষণধর্মী প্রশ্ন হয়, তবে সরাসরি Gemini API ব্যবহার করবে:
   if(!isWebsiteQuery) {
     var complexGeminiTriggers = [
       'পার্থক্য', 'difference between', 'compare ', 'তুলনা', 'কেন হয় এবং কীভাবে',
@@ -7121,7 +7137,9 @@ function analyzeAndAnswerSpondonAi(rawQuestion) {
     }
   }
 
-  // ৪. প্রি-ইনডেক্সড ২০০+ প্রশ্নের ডাটাবেজে ৭৫%+ সিমিলারিটি ও ফ্রেজ ম্যাচিং ইঞ্জিন:
+  // ৪. কঠোর ৮০%+ (0.80) সিমিলারিটি চেক:
+  // শুধুমাত্র যখন প্রশ্নটি আমাদের ইন-বিল্ট প্রশ্নের সাথে ৮০% বা তার বেশি মিলবে (এবং কোনো অপরিচিত/নতুন ইউনিক শব্দ থাকবে না), তখনই ইন-বিল্ট উত্তর দেবে।
+  // ৮০%-এর কম মিললেই null রিটার্ন করবে যাতে সরাসরি Google Gemini API উত্তর দেয়!
   var kbList = ensureAiKbPreIndexed();
   var bestEntry = null;
   var bestScore = 0;
@@ -7137,53 +7155,46 @@ function analyzeAndAnswerSpondonAi(rawQuestion) {
     if(hasNeg) continue;
 
     var maxSim = 0;
-    if (entry.topicBnNorm && (q === entry.topicBnNorm || computeTokenSimilarity(q, entry.topicBnNorm) >= 0.75)) {
-      maxSim = Math.max(maxSim, computeTokenSimilarity(q, entry.topicBnNorm), q === entry.topicBnNorm ? 1.0 : 0.85);
+    if (entry.topicBnNorm) {
+      if (q === entry.topicBnNorm) maxSim = 1.0;
+      else maxSim = Math.max(maxSim, computeTokenSimilarity(q, entry.topicBnNorm, entry.allSearchText));
     }
-    if (entry.topicEnNorm && (q === entry.topicEnNorm || computeTokenSimilarity(q, entry.topicEnNorm) >= 0.75)) {
-      maxSim = Math.max(maxSim, computeTokenSimilarity(q, entry.topicEnNorm), q === entry.topicEnNorm ? 1.0 : 0.85);
+    if (entry.topicEnNorm) {
+      if (q === entry.topicEnNorm) maxSim = 1.0;
+      else maxSim = Math.max(maxSim, computeTokenSimilarity(q, entry.topicEnNorm, entry.allSearchText));
     }
 
     for (var h = 0; h < entry.highNorms.length; h++) {
       var hk = entry.highNorms[h];
-      if (q === hk || q.indexOf(hk) !== -1 || hk.indexOf(q) !== -1) {
-        var lenRatio = Math.min(q.length, hk.length) / Math.max(q.length, hk.length, 1);
-        if (lenRatio >= 0.55 || q.indexOf(hk) !== -1) {
-          maxSim = Math.max(maxSim, 0.88);
-        }
+      if (q === hk) {
+        maxSim = 1.0;
+        break;
       }
-      var simH = computeTokenSimilarity(q, hk);
+      var simH = computeTokenSimilarity(q, hk, entry.allSearchText);
       if (simH > maxSim) maxSim = simH;
     }
 
-    var passedMust = false;
     for (var m = 0; m < entry.mustNorms.length; m++) {
       var mk = entry.mustNorms[m];
-      if (q.indexOf(mk) !== -1) {
-        passedMust = true;
-        var simM = computeTokenSimilarity(q, mk);
-        maxSim = Math.max(maxSim, simM, mk.length >= 10 ? 0.82 : 0.68);
+      if (q === mk) {
+        maxSim = Math.max(maxSim, 0.95);
       } else {
-        var simM2 = computeTokenSimilarity(q, mk);
-        if (simM2 >= 0.78) {
-          passedMust = true;
-          maxSim = Math.max(maxSim, simM2);
+        var simM = computeTokenSimilarity(q, mk, entry.allSearchText);
+        if (simM > maxSim) maxSim = simM;
+      }
+    }
+
+    // যদি স্পন্দন ওয়েবসাইট বা জিমেইল বিষয়ক সুনির্দিষ্ট প্রশ্ন হয় এবং সেটির কিউওয়ার্ড মিলে যায়:
+    if (isWebsiteQuery && item.id && item.id.indexOf('spondon_') === 0) {
+      for (var wm = 0; wm < entry.mustNorms.length; wm++) {
+        if (q.indexOf(entry.mustNorms[wm]) !== -1) {
+          maxSim = Math.max(maxSim, 0.86);
         }
       }
     }
 
-    var medCount = 0;
-    for (var d = 0; d < entry.medNorms.length; d++) {
-      if (q.indexOf(entry.medNorms[d]) !== -1) medCount++;
-    }
-    if (passedMust && medCount >= 2) {
-      maxSim = Math.max(maxSim, 0.78 + Math.min(0.15, medCount * 0.04));
-    }
-    if (isWebsiteQuery && item.id && item.id.indexOf('spondon_') === 0 && passedMust) {
-      maxSim = Math.max(maxSim, 0.85);
-    }
-
-    if (maxSim >= 0.75 && maxSim > bestScore) {
+    // কঠোর ৮০%+ (0.80) থ্রেশহোল্ড:
+    if (maxSim >= 0.80 && maxSim > bestScore) {
       bestScore = maxSim;
       bestEntry = item;
     }
@@ -7200,6 +7211,7 @@ function analyzeAndAnswerSpondonAi(rawQuestion) {
            '</div>' + bestEntry.ans;
   }
 
+  // ৮০%-এর কম মিললে null রিটার্ন করবে যাতে সরাসরি Google Gemini API থেকে উত্তর আসে!
   return null;
 }
 // ─── DEEP CLINICAL & COMPARATIVE GEMINI AI KNOWLEDGE GRAPH & SYNTHESIZER ───
@@ -7441,21 +7453,23 @@ window.askSpondonAi = function(questionText) {
   aiBody.scrollTop = aiBody.scrollHeight;
 
   var startTime = Date.now();
-  var AI_THINK_DURATION_MS = 320;
+  var INBUILT_THINK_DURATION_MS = 2000; // ইন-বিল্ট প্রশ্নের জন্য ঠিক ২ সেকেন্ড (2000ms) চিন্তা করার সময় নেবে
 
   var thinkTimer1 = setTimeout(function(){
     var tSpan = bDiv.querySelector('#ai-think-txt');
     if(tSpan) tSpan.textContent = thinkMsg2;
-  }, 350);
+  }, 700);
 
   var thinkTimer2 = setTimeout(function(){
     var tSpan = bDiv.querySelector('#ai-think-txt');
     if(tSpan) tSpan.textContent = thinkMsg3;
-  }, 750);
+  }, 1400);
 
-  function revealFinalAnswer(htmlContent) {
+  function revealFinalAnswer(htmlContent, isFromGeminiApi) {
     var elapsed = Date.now() - startTime;
-    var remainingDelay = Math.max(0, AI_THINK_DURATION_MS - elapsed);
+    // ইন-বিল্ট হলে ঠিক ২ সেকেন্ড (2000ms) অপেক্ষা করবে, আর Gemini API হলে যতটুকু সময় এপিআই নেয় ঠিক ততটুকুই নেবে!
+    var targetDuration = isFromGeminiApi ? 0 : INBUILT_THINK_DURATION_MS;
+    var remainingDelay = Math.max(0, targetDuration - elapsed);
     setTimeout(function(){
       clearTimeout(thinkTimer1);
       clearTimeout(thinkTimer2);
@@ -7563,7 +7577,7 @@ window.askSpondonAi = function(questionText) {
     function tryCloudFallbackOrSynthesizer() {
       if(deepMatch) {
         recordLocalAndSheetAiStat('Gemini API', qStr, 'gemini-clinical-pro');
-        revealFinalAnswer(formatGeminiMarkdown(deepMatch));
+        revealFinalAnswer(formatGeminiMarkdown(deepMatch), true);
         return;
       }
       // লাইভ ক্লাউড এআই ফলব্যাক (যদি ব্রাউজার বা নেটওয়ার্কে গুগল ডোমেইন রেস্ট্রিকশন থাকে)
@@ -7584,17 +7598,17 @@ window.askSpondonAi = function(questionText) {
         var cTxt = dj && dj.choices && dj.choices[0] && dj.choices[0].message && dj.choices[0].message.content;
         if(cTxt && cTxt.trim().length > 15) {
           recordLocalAndSheetAiStat('Gemini API', qStr, 'gemini-cloud-flash');
-          revealFinalAnswer(formatGeminiMarkdown(cTxt.trim()));
+          revealFinalAnswer(formatGeminiMarkdown(cTxt.trim()), true);
         } else {
           var synth = runDeepClinicalSynthesizer(qStr, isEn);
           recordLocalAndSheetAiStat('Gemini API', qStr, 'gemini-clinical-synth');
-          revealFinalAnswer(formatGeminiMarkdown(synth));
+          revealFinalAnswer(formatGeminiMarkdown(synth), true);
         }
       })
       .catch(function(){
         var synth = runDeepClinicalSynthesizer(qStr, isEn);
         recordLocalAndSheetAiStat('Gemini API', qStr, 'gemini-clinical-synth');
-        revealFinalAnswer(formatGeminiMarkdown(synth));
+        revealFinalAnswer(formatGeminiMarkdown(synth), true);
       });
     }
 
@@ -7625,7 +7639,7 @@ window.askSpondonAi = function(questionText) {
         }
         if(ansText && ansText.trim()) {
           recordLocalAndSheetAiStat('Gemini API', qStr, mName);
-          revealFinalAnswer(formatGeminiMarkdown(ansText.trim()));
+          revealFinalAnswer(formatGeminiMarkdown(ansText.trim()), true);
         } else {
           tryModelIndex(idx + 1);
         }
@@ -7653,7 +7667,7 @@ window.askSpondonAi = function(questionText) {
       if(d.aiStats && typeof window.updateAdminAiStatsUI === 'function') {
         window.updateAdminAiStatsUI(d.aiStats);
       }
-      revealFinalAnswer(formatGeminiMarkdown(d.answer));
+      revealFinalAnswer(formatGeminiMarkdown(d.answer), true);
     } else {
       runMultiTierGeminiEngine(questionText);
     }
@@ -7906,6 +7920,7 @@ function updateLb() {
   };
 
   var _lastGalleryHash = '';
+  var _autoSyncedKeys = {};
   window.setServerGalleryItems = function(serverArr) {
     var localArr = getLocalGalleryCache();
     var map = {};
@@ -7917,7 +7932,23 @@ function updateLb() {
     });
     localArr.forEach(function(loc) {
       var k = (loc.name || '') + '_' + (loc.bg || '') + '_' + (loc.date || '');
-      if (!map[k]) merged.unshift(loc);
+      if (!map[k]) {
+        merged.unshift(loc);
+        // যদি ইউজারের ব্রাউজারে আগে ফিলাপ করা কোনো গ্যালারি পোস্ট থাকে যা তখন Gallery_DB না থাকায় শিটে যায়নি, তা স্বয়ংক্রিয়ভাবে গুগল শিটের Gallery_DB-তে পাঠিয়ে দেবে!
+        if (!_autoSyncedKeys[k] && loc.name && loc.image && loc.image.indexOf('data:image') === 0) {
+          _autoSyncedKeys[k] = true;
+          var rawB = loc.image.indexOf(',') !== -1 ? loc.image.split(',')[1] : loc.image;
+          var sfd = new FormData();
+          sfd.append('action', 'addGalleryPhoto');
+          sfd.append('name', loc.name);
+          sfd.append('district', loc.district || '');
+          sfd.append('bg', loc.bg || '');
+          sfd.append('donationDate', loc.date || '');
+          sfd.append('mimeType', 'image/jpeg');
+          sfd.append('photoFile', rawB);
+          fetch(S, { method: 'POST', body: sfd }).catch(function(){});
+        }
+      }
     });
     var newHash = merged.map(function(x){ return (x.id||'')+(x.name||''); }).join('|');
     allGalleryItems = merged;
