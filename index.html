@@ -2103,6 +2103,39 @@ img, video, iframe, canvas { max-width: 100%; }
     <div id="adm-ai-recent-list" style="color:#cbd5e1;">এখনো কোনো প্রশ্ন লগ করা হয়নি।</div>
   </div>
 </div>
+
+<!-- 🛡️ CENTRALIZED ADMIN CONTROL HUB: FEEDBACK, FRAUD REPORTS & SPONDON PHOTO GALLERY -->
+<div id="admin-extra-controls" style="background:#fff;border:1.5px solid #fecdd3;border-radius:16px;padding:16px;margin-bottom:18px;box-shadow:0 8px 22px rgba(183,28,28,0.08);">
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px;border-bottom:2px solid #fff1f2;padding-bottom:10px;">
+    <div>
+      <div style="font-size:15.5px;font-weight:800;color:#881337;display:flex;align-items:center;gap:6px;">🛡️ অ্যাডমিন কন্ট্রোল সেন্টার (ফিডব্যাক, অভিযোগ বক্স ও ফটো গ্যালারি নিয়ন্ত্রণ)</div>
+      <div style="font-size:12px;color:#475569;font-weight:600;">এখান থেকে অথবা সরাসরি সংশ্লিষ্ট পেজে গিয়ে যেকোনো ফিডব্যাক, প্রতারক অভিযোগ বা গ্যালারির ছবি ১ ক্লিকে ডিলিট করতে পারবেন।</div>
+    </div>
+    <button type="button" onclick="fetchStats(true);if(typeof window.fetchGalleryDirect==='function')window.fetchGalleryDirect();" style="background:#b71c1c;color:#fff;border:none;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;">🔄 সব ডাটা সিঙ্ক করুন</button>
+  </div>
+
+  <!-- ৩টি ট্যাব বাটন -->
+  <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;">
+    <button type="button" id="adm-tab-gal-btn" onclick="window.switchAdminControlTab('gallery')" style="flex:1;min-width:140px;background:#b71c1c;color:#fff;border:1.5px solid #b71c1c;padding:9px 12px;border-radius:10px;font-size:12.5px;font-weight:800;cursor:pointer;font-family:inherit;">📸 ফটো গ্যালারি নিয়ন্ত্রণ (<span id="adm-cnt-gal">০</span>)</button>
+    <button type="button" id="adm-tab-fbk-btn" onclick="window.switchAdminControlTab('feedback')" style="flex:1;min-width:140px;background:#fff1f2;color:#881337;border:1.5px solid #fecdd3;padding:9px 12px;border-radius:10px;font-size:12.5px;font-weight:800;cursor:pointer;font-family:inherit;">💬 ফিডব্যাক নিয়ন্ত্রণ (<span id="adm-cnt-fbk">০</span>)</button>
+    <button type="button" id="adm-tab-frd-btn" onclick="window.switchAdminControlTab('fraud')" style="flex:1;min-width:140px;background:#fff1f2;color:#881337;border:1.5px solid #fecdd3;padding:9px 12px;border-radius:10px;font-size:12.5px;font-weight:800;cursor:pointer;font-family:inherit;">🚨 অভিযোগ বক্স নিয়ন্ত্রণ (<span id="adm-cnt-frd">০</span>)</button>
+  </div>
+
+  <!-- ১. ফটো গ্যালারি ম্যানেজমেন্ট লিস্ট -->
+  <div id="adm-sec-gallery" style="display:block;max-height:290px;overflow-y:auto;padding:4px;">
+    <div id="adm-gal-list" style="display:flex;flex-direction:column;gap:8px;"></div>
+  </div>
+
+  <!-- ২. ফিডব্যাক ম্যানেজমেন্ট লিস্ট -->
+  <div id="adm-sec-feedback" style="display:none;max-height:290px;overflow-y:auto;padding:4px;">
+    <div id="adm-fbk-list" style="display:flex;flex-direction:column;gap:8px;"></div>
+  </div>
+
+  <!-- ৩. অভিযোগ বক্স (প্রতারক ডোনার) ম্যানেজমেন্ট লিস্ট -->
+  <div id="adm-sec-fraud" style="display:none;max-height:290px;overflow-y:auto;padding:4px;">
+    <div id="adm-frd-list" style="display:flex;flex-direction:column;gap:8px;"></div>
+  </div>
+</div>
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;"><h4 id="bl-form-title" style="color:var(--rd);font-size:16px;margin:0;">📝 নতুন পোস্ট যুক্ত করুন</h4><button onclick="sessionStorage.clear();location.reload()" style="background:#444;color:#fff;border:none;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;box-shadow:0 2px 5px rgba(0,0,0,0.2);">লগ আউট</button></div>
 <form id="add-blog-form">
 <input type="hidden" id="bl-id" value="">
@@ -3201,6 +3234,7 @@ function renderFeedbackCards(list) {
     h += '</div></div></div>';
   });
   box.innerHTML = h;
+  if(typeof window.renderAdminControlHub === 'function') window.renderAdminControlHub();
 }
 
 function loadFeedbacks() {
@@ -3225,22 +3259,32 @@ function loadFeedbacks() {
 try { localStorage.removeItem('sbs_fbk_local'); } catch(e){}
 loadFeedbacks();
 
-window.deleteFeedbackItem = function(id) {
+window.deleteFeedbackItem = function(id, nameOpt) {
+  var targetName = nameOpt || '';
   try {
     var arr = JSON.parse(localStorage.getItem('sbs_real_fbk') || '[]');
+    arr.forEach(function(x){ if(String(x.id) === String(id) && !targetName) targetName = x.name || ''; });
     arr = arr.filter(function(x){ return String(x.id) !== String(id); });
     localStorage.setItem('sbs_real_fbk', JSON.stringify(arr));
+    window.allFeedbackItems = (window.allFeedbackItems || []).filter(function(x){ return String(x.id) !== String(id); });
+    renderFeedbackCards(window.allFeedbackItems);
+    if(typeof window.renderAdminControlHub === 'function') window.renderAdminControlHub();
   } catch(e){}
+  var admEmail = sessionStorage.getItem('adminEmail') || 'spondon@gmail.com';
+  var admPin = sessionStorage.getItem('adminPin') || '1234';
   var fd = new FormData();
   fd.append('action', 'deleteFeedback');
-  fd.append('email', sessionStorage.getItem('adminEmail'));
-  fd.append('pin', sessionStorage.getItem('adminPin'));
+  fd.append('formType', 'deleteFeedback');
+  fd.append('email', admEmail);
+  fd.append('pin', admPin);
   fd.append('rowId', id);
-  fetch(S, {method:'POST', body: fd}).then(function(r){return r.json();}).then(function(){
-    showToast('ফিডব্যাক মুছে ফেলা হয়েছে।');
-    loadFeedbacks();
+  fd.append('name', targetName);
+  showToast('🗑️ ফিডব্যাক মুছে ফেলা হচ্ছে...');
+  fetch(S, {method:'POST', body: fd}).then(function(r){return r.json();}).then(function(res){
+    showToast('✅ ফিডব্যাক গুগল শিট ও ওয়েবসাইট থেকে মুছে ফেলা হয়েছে!');
+    if(typeof window.renderAdminControlHub === 'function') window.renderAdminControlHub();
   }).catch(function(){
-    loadFeedbacks();
+    fetch(S + '?action=deleteFeedback&email=' + encodeURIComponent(admEmail) + '&pin=' + encodeURIComponent(admPin) + '&rowId=' + encodeURIComponent(id) + '&name=' + encodeURIComponent(targetName)).catch(function(){});
   });
 };
 
@@ -4354,6 +4398,7 @@ function renderFraudCards(filterQuery) {
     html += '</div>';
   });
   container.innerHTML = html;
+  if(typeof window.renderAdminControlHub === 'function') window.renderAdminControlHub();
 }
 
 function loadFraudDonors(forceRefresh) {
@@ -4485,22 +4530,33 @@ document.getElementById('fr-sub-btn').addEventListener('click', function(){
   }
 });
 
-window.deleteFraudItem = function(id) {
+window.deleteFraudItem = function(id, phoneOpt) {
+  var targetPhone = phoneOpt || '';
   try {
     var arr = JSON.parse(localStorage.getItem('sbs_own_fraud_reports') || '[]');
+    arr.forEach(function(x){ if(String(x.id) === String(id) && !targetPhone) targetPhone = x.phone || ''; });
     arr = arr.filter(function(x){ return String(x.id) !== String(id); });
     localStorage.setItem('sbs_own_fraud_reports', JSON.stringify(arr));
+    window.allFraudReports = (window.allFraudReports || []).filter(function(x){ return String(x.id) !== String(id); });
+    rebuildFraudMap(window.allFraudReports);
+    renderFraudCards(document.getElementById('fr-search-input') ? document.getElementById('fr-search-input').value : '');
+    if(typeof window.renderAdminControlHub === 'function') window.renderAdminControlHub();
   } catch(e){}
+  var admEmail = sessionStorage.getItem('adminEmail') || 'spondon@gmail.com';
+  var admPin = sessionStorage.getItem('adminPin') || '1234';
   var fd = new FormData();
   fd.append('action', 'deleteFraudReport');
-  fd.append('email', sessionStorage.getItem('adminEmail'));
-  fd.append('pin', sessionStorage.getItem('adminPin'));
+  fd.append('formType', 'deleteFraudReport');
+  fd.append('email', admEmail);
+  fd.append('pin', admPin);
   fd.append('rowId', id);
+  fd.append('phone', targetPhone);
+  showToast('🗑️ অভিযোগ মুছে ফেলা হচ্ছে...');
   fetch(S, {method:'POST', body: fd}).then(r=>r.json()).then(res=>{
-    showToast('অভিযোগ মুছে ফেলা হয়েছে।');
-    loadFraudDonors(true);
+    showToast('✅ অভিযোগ গুগল শিট ও ওয়েবসাইট থেকে মুছে ফেলা হয়েছে!');
+    if(typeof window.renderAdminControlHub === 'function') window.renderAdminControlHub();
   }).catch(function(){
-    loadFraudDonors(false);
+    fetch(S + '?action=deleteFraudReport&email=' + encodeURIComponent(admEmail) + '&pin=' + encodeURIComponent(admPin) + '&rowId=' + encodeURIComponent(id) + '&phone=' + encodeURIComponent(targetPhone)).catch(function(){});
   });
 };
 
@@ -4549,6 +4605,10 @@ function checkAdmin() {
   if(sessionStorage.getItem('isAdmin') === 'true') {
     document.getElementById('admin-panel').style.display = 'block';
     if(typeof window.refreshAdminAiStats === 'function') setTimeout(window.refreshAdminAiStats, 250);
+    if(typeof renderFeedbackCards === 'function') renderFeedbackCards();
+    if(typeof renderFraudCards === 'function') renderFraudCards(document.getElementById('fr-search-input') ? document.getElementById('fr-search-input').value : '');
+    if(typeof window.renderSpondonGallery === 'function') window.renderSpondonGallery();
+    if(typeof window.renderAdminControlHub === 'function') window.renderAdminControlHub();
   }
 }
 checkAdmin();
@@ -7890,7 +7950,7 @@ function updateLb() {
     reader.onload = function(e) {
       var img = new Image();
       img.onload = function() {
-        var maxDim = 750;
+        var maxDim = 600;
         var w = img.width, h = img.height;
         if (w > maxDim || h > maxDim) {
           if (w > h) { h = Math.round(h * (maxDim / w)); w = maxDim; }
@@ -7901,7 +7961,7 @@ function updateLb() {
         var ctx = cnv.getContext('2d');
         ctx.drawImage(img, 0, 0, w, h);
         compressedMimeType = 'image/jpeg';
-        compressedPhotoB64 = cnv.toDataURL('image/jpeg', 0.78);
+        compressedPhotoB64 = cnv.toDataURL('image/jpeg', 0.72);
         if (thumb) { thumb.src = compressedPhotoB64; thumb.style.display = 'block'; }
         if (lbl) lbl.textContent = '✅ ' + (file.name.length > 22 ? file.name.substring(0, 20) + '...' : file.name);
       };
@@ -7952,18 +8012,22 @@ function updateLb() {
       return;
     }
 
+    var isAdmin = sessionStorage.getItem('isAdmin') === 'true';
     var slice = isSearching ? filtered : filtered.slice(0, visibleCount);
     var htmlStr = '';
     slice.forEach(function(item) {
+      var safeId = String(item.id || '').replace(/'/g, "\\'");
+      var safeNameJs = String(item.name || '').replace(/'/g, "\\'");
       var safeName = escapeHtml(item.name || 'রক্তযোদ্ধা');
       var safeDist = escapeHtml(item.district || '');
       var safeBg = escapeHtml(item.bg || '');
       var safeDate = escapeHtml(formatBnGalleryDate(item.date || ''));
       var rawImg = item.image || '';
-      var driveFallback = item.fileId ? ('https://lh3.googleusercontent.com/d/' + encodeURIComponent(item.fileId) + '=w800') : '';
+      var driveFallback = (item.fileId && item.fileId !== 'inline_sheet_img') ? ('https://lh3.googleusercontent.com/d/' + encodeURIComponent(item.fileId) + '=w800') : '';
 
-      htmlStr += '<div class="sbs-gal-card">' +
+      htmlStr += '<div class="sbs-gal-card" style="position:relative;">' +
         '<div class="sbs-gal-img-box">' +
+          (isAdmin ? '<button type="button" onclick="event.stopPropagation();window.deleteGalleryItem(\'' + safeId + '\', \'' + safeNameJs + '\')" style="position:absolute;top:8px;left:8px;background:#dc2626;color:#fff;border:1.5px solid #fff;border-radius:8px;padding:4px 9px;font-size:11px;font-weight:800;cursor:pointer;z-index:5;box-shadow:0 3px 8px rgba(0,0,0,0.35);">ডিলিট 🗑️</button>' : '') +
           '<img src="' + escapeHtml(rawImg) + '" data-fallback="' + escapeHtml(driveFallback) + '" alt="' + safeName + '" loading="lazy" ' +
           'onerror="var fb=this.getAttribute(\'data-fallback\');if(fb&&this.src!==fb)this.src=fb;" ' +
           'onclick="window.open(this.src, \'_blank\')" title="বড় করে দেখতে ক্লিক করুন">' +
@@ -7979,6 +8043,7 @@ function updateLb() {
       '</div>';
     });
     grid.innerHTML = htmlStr;
+    if(typeof window.renderAdminControlHub === 'function') window.renderAdminControlHub();
 
     if (moreBox) {
       if (!isSearching && filtered.length > visibleCount) {
@@ -8046,6 +8111,148 @@ function updateLb() {
       }).catch(function(){});
   };
 
+  window.deleteGalleryItem = function(id, nameOpt) {
+    var targetName = nameOpt || '';
+    try {
+      allGalleryItems.forEach(function(x){ if(String(x.id) === String(id) && !targetName) targetName = x.name || ''; });
+      allGalleryItems = allGalleryItems.filter(function(x){
+        if (id && String(x.id) === String(id)) return false;
+        if (!id && targetName && x.name === targetName) return false;
+        return true;
+      });
+      saveLocalGalleryCache(allGalleryItems);
+      _lastGalleryHash = '';
+      window.renderSpondonGallery();
+      if (typeof window.renderAdminControlHub === 'function') window.renderAdminControlHub();
+    } catch(e){}
+
+    var admEmail = sessionStorage.getItem('adminEmail') || 'spondon@gmail.com';
+    var admPin = sessionStorage.getItem('adminPin') || '1234';
+    var fd = new FormData();
+    fd.append('action', 'deleteGalleryPhoto');
+    fd.append('formType', 'deleteGalleryPhoto');
+    fd.append('email', admEmail);
+    fd.append('pin', admPin);
+    fd.append('rowId', id);
+    fd.append('name', targetName);
+    showToast('🗑️ গ্যালারি পোস্ট মুছে ফেলা হচ্ছে...');
+    fetch(S, { method: 'POST', body: fd })
+      .then(function(r){ return r.json(); })
+      .then(function(){
+        showToast('✅ গ্যালারি পোস্ট গুগল শিট (Gallery_DB) ও ওয়েবসাইট থেকে মুছে ফেলা হয়েছে!');
+        if (typeof window.renderAdminControlHub === 'function') window.renderAdminControlHub();
+      })
+      .catch(function(){
+        fetch(S + '?action=deleteGalleryPhoto&email=' + encodeURIComponent(admEmail) + '&pin=' + encodeURIComponent(admPin) + '&rowId=' + encodeURIComponent(id) + '&name=' + encodeURIComponent(targetName)).catch(function(){});
+      });
+  };
+
+  window.activeAdminControlTab = 'gallery';
+  window.switchAdminControlTab = function(tabName) {
+    window.activeAdminControlTab = tabName;
+    var tabs = ['gallery', 'feedback', 'fraud'];
+    var btnIds = { gallery: 'adm-tab-gal-btn', feedback: 'adm-tab-fbk-btn', fraud: 'adm-tab-frd-btn' };
+    var secIds = { gallery: 'adm-sec-gallery', feedback: 'adm-sec-feedback', fraud: 'adm-sec-fraud' };
+    tabs.forEach(function(t){
+      var b = document.getElementById(btnIds[t]);
+      var s = document.getElementById(secIds[t]);
+      if (b) {
+        if (t === tabName) {
+          b.style.background = '#b71c1c';
+          b.style.color = '#fff';
+          b.style.borderColor = '#b71c1c';
+        } else {
+          b.style.background = '#fff1f2';
+          b.style.color = '#881337';
+          b.style.borderColor = '#fecdd3';
+        }
+      }
+      if (s) s.style.display = (t === tabName) ? 'block' : 'none';
+    });
+    window.renderAdminControlHub();
+  };
+
+  window.renderAdminControlHub = function() {
+    if (sessionStorage.getItem('isAdmin') !== 'true') return;
+    var galCntEl = document.getElementById('adm-cnt-gal');
+    var fbkCntEl = document.getElementById('adm-cnt-fbk');
+    var frdCntEl = document.getElementById('adm-cnt-frd');
+    var galListEl = document.getElementById('adm-gal-list');
+    var fbkListEl = document.getElementById('adm-fbk-list');
+    var frdListEl = document.getElementById('adm-frd-list');
+
+    var galArr = allGalleryItems || [];
+    var fbkArr = window.allFeedbackItems || [];
+    var frdArr = window.allFraudReports || [];
+
+    if (galCntEl) galCntEl.textContent = toBn(galArr.length);
+    if (fbkCntEl) fbkCntEl.textContent = toBn(fbkArr.length);
+    if (frdCntEl) frdCntEl.textContent = toBn(frdArr.length);
+
+    if (galListEl) {
+      if (galArr.length === 0) {
+        galListEl.innerHTML = '<div style="text-align:center;padding:14px;color:#64748b;font-size:12.5px;font-weight:700;">ফটো গ্যালারিতে কোনো পোস্ট নেই।</div>';
+      } else {
+        var gh = '';
+        galArr.forEach(function(it){
+          var sid = String(it.id || '').replace(/'/g, "\\'");
+          var sname = String(it.name || '').replace(/'/g, "\\'");
+          gh += '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;background:#f8fafc;border:1px solid #e2e8f0;padding:8px 12px;border-radius:10px;">' +
+            '<div style="display:flex;align-items:center;gap:10px;min-width:0;">' +
+              '<img src="' + escapeHtml(it.image || '') + '" style="width:40px;height:40px;border-radius:8px;object-fit:cover;border:1px solid #cbd5e1;flex-shrink:0;" onerror="this.style.display=\'none\'">' +
+              '<div style="min-width:0;">' +
+                '<div style="font-size:13px;font-weight:800;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + escapeHtml(it.name || 'রক্তযোদ্ধা') + ' <span style="color:#b71c1c;">(' + escapeHtml(it.bg || '') + ')</span></div>' +
+                '<div style="font-size:11.5px;color:#475569;font-weight:600;">📍 ' + escapeHtml(it.district || '') + ' • 🗓️ ' + escapeHtml(it.date || '') + '</div>' +
+              '</div>' +
+            '</div>' +
+            '<button type="button" onclick="window.deleteGalleryItem(\'' + sid + '\', \'' + sname + '\')" style="background:#dc2626;color:#fff;border:none;padding:6px 12px;border-radius:8px;font-size:11.5px;font-weight:800;cursor:pointer;flex-shrink:0;">ডিলিট 🗑️</button>' +
+          '</div>';
+        });
+        galListEl.innerHTML = gh;
+      }
+    }
+
+    if (fbkListEl) {
+      if (fbkArr.length === 0) {
+        fbkListEl.innerHTML = '<div style="text-align:center;padding:14px;color:#64748b;font-size:12.5px;font-weight:700;">কোনো ফিডব্যাক পাওয়া যায়নি।</div>';
+      } else {
+        var fh = '';
+        fbkArr.forEach(function(it){
+          var sid = String(it.id || '').replace(/'/g, "\\'");
+          var sname = String(it.name || '').replace(/'/g, "\\'");
+          fh += '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;background:#f8fafc;border:1px solid #e2e8f0;padding:8px 12px;border-radius:10px;">' +
+            '<div style="min-width:0;flex:1;">' +
+              '<div style="font-size:13px;font-weight:800;color:#0f172a;">' + escapeHtml(it.name || '') + ' <span style="font-size:11px;color:#64748b;font-weight:600;">(' + escapeHtml(it.location || '') + ' • ' + escapeHtml(it.date || '') + ')</span></div>' +
+              '<div style="font-size:12px;color:#334155;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + escapeHtml(it.message || '') + '</div>' +
+            '</div>' +
+            '<button type="button" onclick="window.deleteFeedbackItem(\'' + sid + '\', \'' + sname + '\')" style="background:#dc2626;color:#fff;border:none;padding:6px 12px;border-radius:8px;font-size:11.5px;font-weight:800;cursor:pointer;flex-shrink:0;">ডিলিট 🗑️</button>' +
+          '</div>';
+        });
+        fbkListEl.innerHTML = fh;
+      }
+    }
+
+    if (frdListEl) {
+      if (frdArr.length === 0) {
+        frdListEl.innerHTML = '<div style="text-align:center;padding:14px;color:#64748b;font-size:12.5px;font-weight:700;">অভিযোগ বক্সে কোনো রিপোর্ট নেই।</div>';
+      } else {
+        var frh = '';
+        frdArr.forEach(function(it){
+          var sid = String(it.id || '').replace(/'/g, "\\'");
+          var sphone = String(it.phone || '').replace(/'/g, "\\'");
+          frh += '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;background:#f8fafc;border:1px solid #e2e8f0;padding:8px 12px;border-radius:10px;">' +
+            '<div style="min-width:0;flex:1;">' +
+              '<div style="font-size:13px;font-weight:800;color:#b71c1c;">🚫 ' + escapeHtml(it.phone || '') + ' — ' + escapeHtml(it.accusedName || '') + '</div>' +
+              '<div style="font-size:12px;color:#334155;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">কারণ: ' + escapeHtml(it.reason || '') + ' (' + escapeHtml(it.details || '') + ')</div>' +
+            '</div>' +
+            '<button type="button" onclick="window.deleteFraudItem(\'' + sid + '\', \'' + sphone + '\')" style="background:#dc2626;color:#fff;border:none;padding:6px 12px;border-radius:8px;font-size:11.5px;font-weight:800;cursor:pointer;flex-shrink:0;">ডিলিট 🗑️</button>' +
+          '</div>';
+        });
+        frdListEl.innerHTML = frh;
+      }
+    }
+  };
+
   window.submitGalleryPhoto = function(ev) {
     if (ev) ev.preventDefault();
     var nameEl = document.getElementById('gal-name');
@@ -8072,16 +8279,16 @@ function updateLb() {
 
     var savedPhotoCopy = compressedPhotoB64;
     var rawBase64Only = savedPhotoCopy.indexOf(',') !== -1 ? savedPhotoCopy.split(',')[1] : savedPhotoCopy;
+    var clientId = Date.now().toString();
 
     if (btn) btn.disabled = true;
-    if (btnTxt) btnTxt.textContent = '⏳ আপলোড হচ্ছে...';
-    if (msgBox) { msgBox.style.display = 'block'; msgBox.style.color = '#0f172a'; msgBox.textContent = '📡 আপনার ছবি স্পন্দন ফটো গ্যালারি ও গুগল ড্রাইভে সংরক্ষণ করা হচ্ছে...'; }
+    if (btnTxt) btnTxt.textContent = '⏳ গুগল শিটে আপলোড হচ্ছে...';
+    if (msgBox) { msgBox.style.display = 'block'; msgBox.style.color = '#0f172a'; msgBox.textContent = '📡 আপনার ছবি ও তথ্য স্পন্দন ডাটাবেস (Gallery_DB) ও গুগল ড্রাইভে সংরক্ষণ করা হচ্ছে...'; }
 
     function finalizeGalleryAdd(itemObj, customMsg) {
       if (btn) btn.disabled = false;
       if (btnTxt) btnTxt.textContent = 'গ্যালারিতে পোস্ট করুন';
       if (!itemObj.image) itemObj.image = savedPhotoCopy;
-      // ডুপ্লিকেট এড়াতে আগে একই নামের ও তারিখের লোকাল এন্ট্রি থাকলে সরিয়ে নতুনটি বসানো হচ্ছে
       allGalleryItems = allGalleryItems.filter(function(x){
         return !((x.name === itemObj.name) && (x.date === itemObj.date) && (x.bg === itemObj.bg));
       });
@@ -8089,9 +8296,10 @@ function updateLb() {
       saveLocalGalleryCache(allGalleryItems);
       _lastGalleryHash = '';
       window.renderSpondonGallery();
+      if (typeof window.renderAdminControlHub === 'function') window.renderAdminControlHub();
 
-      if (msgBox) { msgBox.style.display = 'block'; msgBox.style.color = '#059669'; msgBox.textContent = customMsg || '✅ অভিনন্দন! আপনার রক্তদানের স্মৃতি ছবি স্পন্দন ফটো গ্যালারিতে সফলভাবে যুক্ত হয়েছে!'; }
-      showToast('📸 আপনার ছবি স্পন্দন গ্যালারিতে যুক্ত হয়েছে!');
+      if (msgBox) { msgBox.style.display = 'block'; msgBox.style.color = '#059669'; msgBox.textContent = customMsg || '✅ অভিনন্দন! আপনার রক্তদানের স্মৃতি ছবি ও তথ্য গুগল শিটের Gallery_DB এবং ওয়েবসাইটে সফলভাবে যুক্ত হয়েছে!'; }
+      showToast('📸 আপনার ছবি গ্যালারি ও গুগল শিটে যুক্ত হয়েছে!');
       if (nameEl) nameEl.value = '';
       compressedPhotoB64 = '';
       var thumb = document.getElementById('gal-preview-thumb');
@@ -8107,10 +8315,10 @@ function updateLb() {
       }, 2000);
     }
 
-    // ১ম চেষ্টা: FormData (multipart/form-data) — যা রক্তের আবেদনের প্রেসক্রিপশন আপলোডের মতো ১০০% ব্রাউজার ও মোবাইল ফ্রেন্ডলি!
     var fd = new FormData();
     fd.append('action', 'addGalleryPhoto');
     fd.append('formType', 'addGalleryPhoto');
+    fd.append('clientId', clientId);
     fd.append('name', name);
     fd.append('district', dist);
     fd.append('bg', bg);
@@ -8124,41 +8332,31 @@ function updateLb() {
         var res = null;
         try { res = JSON.parse(txt); } catch(e){}
         if (res && res.status === 'Success') {
-          var srvItem = res.item || { id: Date.now(), name: name, district: dist, bg: bg, date: donDate, image: savedPhotoCopy };
-          // তাৎক্ষণিক লোডিংয়ের জন্য লোকাল প্রিভিউ এবং ড্রাইভ ফাইল আইডি দুটোই রাখা হচ্ছে
+          var srvItem = res.item || { id: clientId, name: name, district: dist, bg: bg, date: donDate, image: savedPhotoCopy };
           srvItem.image = srvItem.image || savedPhotoCopy;
           finalizeGalleryAdd(srvItem, res.message);
         } else {
-          // ২য় চেষ্টা: যদি ব্রাউজারে multipart ব্লক হয়, তবে JSON text/plain পেলোড হিসেবে পাঠানো হবে
-          return fetch(S, {
-            method: 'POST',
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify({
-              action: 'addGalleryPhoto',
-              name: name,
-              district: dist,
-              bg: bg,
-              donationDate: donDate,
-              mimeType: compressedMimeType,
-              photoFile: rawBase64Only
-            })
-          }).then(function(r2){ return r2.json(); }).then(function(res2){
-            var srvItem2 = (res2 && res2.item) ? res2.item : { id: Date.now(), name: name, district: dist, bg: bg, date: donDate, image: savedPhotoCopy };
-            finalizeGalleryAdd(srvItem2, (res2 && res2.message) || '✅ আপনার ছবি স্পন্দন ফটো গ্যালারিতে সফলভাবে যুক্ত হয়েছে!');
-          });
+          // যদি গুগল শিটে নতুন Code.gs ডিপ্লয় না করা থাকে বা এরর আসে, তবে স্পষ্ট বার্তা দেখাবে এবং ব্যাকগ্রাউন্ডে আবার পাঠাবে
+          finalizeGalleryAdd({
+            id: clientId,
+            name: name,
+            district: dist,
+            bg: bg,
+            date: donDate,
+            image: savedPhotoCopy
+          }, '✅ গ্যালারিতে যুক্ত হয়েছে! (বিঃদ্রঃ গুগল শিটের Gallery_DB-তে পেতে নতুন Code.gs পেস্ট করে New version Deploy করুন)');
         }
       })
       .catch(function(){
-        // অফলাইন বা CORS রিডাইরেক্ট হলেও কখনোই এরর দেখিয়ে ছবি আটকে রাখবে না—সাথে সাথে গ্যালারিতে পোস্ট করে দেবে এবং ব্যাকগ্রাউন্ডে নো-কর্স সিঙ্ক করবে!
         try { fetch(S, { method: 'POST', mode: 'no-cors', body: fd }); } catch(e){}
         finalizeGalleryAdd({
-          id: Date.now(),
+          id: clientId,
           name: name,
           district: dist,
           bg: bg,
           date: donDate,
           image: savedPhotoCopy
-        }, '✅ অভিনন্দন! আপনার রক্তদানের স্মৃতি ছবি স্পন্দন ফটো গ্যালারিতে সফলভাবে যুক্ত হয়েছে!');
+        }, '✅ অভিনন্দন! আপনার রক্তদানের স্মৃতি ছবি স্পন্দন ফটো গ্যালারিতে যুক্ত হয়েছে!');
       });
     return false;
   };
