@@ -8101,7 +8101,38 @@ function updateLb() {
     }
   };
 
+  window.syncUnsyncedLocalGallery = function() {
+    var localArr = getLocalGalleryCache();
+    localArr.forEach(function(loc) {
+      var k = (loc.name || '') + '_' + (loc.bg || '') + '_' + (loc.date || '');
+      if (!_autoSyncedKeys[k] && !loc.fileId && loc.name && loc.image && loc.image.indexOf('data:image') === 0) {
+        _autoSyncedKeys[k] = true;
+        var rawB = loc.image.indexOf(',') !== -1 ? loc.image.split(',')[1] : loc.image;
+        var sfd = new FormData();
+        sfd.append('action', 'addGalleryPhoto');
+        sfd.append('formType', 'addGalleryPhoto');
+        sfd.append('clientId', String(loc.id || Date.now()));
+        sfd.append('name', loc.name);
+        sfd.append('district', loc.district || '');
+        sfd.append('bg', loc.bg || '');
+        sfd.append('donationDate', loc.date || '');
+        sfd.append('mimeType', 'image/jpeg');
+        sfd.append('photoFile', rawB);
+        fetch(S, { method: 'POST', body: sfd })
+          .then(function(r){ return r.json(); })
+          .then(function(res){
+            if (res && res.status === 'Success' && res.item) {
+              loc.fileId = res.item.fileId || 'synced';
+              if (res.item.image) loc.image = res.item.image;
+              saveLocalGalleryCache(allGalleryItems);
+            }
+          }).catch(function(){});
+      }
+    });
+  };
+
   window.fetchGalleryDirect = function() {
+    window.syncUnsyncedLocalGallery();
     fetch(S + '?action=getGallery&_t=' + Date.now())
       .then(function(r){ return r.json(); })
       .then(function(d){
