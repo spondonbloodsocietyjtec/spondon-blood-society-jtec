@@ -1156,17 +1156,24 @@ img, video, iframe, canvas { max-width: 100%; }
 
 <!-- ===== EMERGENCY TICKER + GPS POPUP (self-contained, scoped CSS) ===== -->
 <style>
-#ticker{position:fixed;top:0;left:0;right:0;height:40px;background:#fff1f2;border-bottom:2px solid #fecdd3;display:flex;align-items:center;z-index:999;padding:0 12px;box-shadow:0 2px 10px rgba(211,47,47,.1)}
-#ticker .t-badge{background:linear-gradient(135deg,#b71c1c,#881337);color:#fff;padding:0 14px;height:28px;line-height:28px;border-radius:6px;font-size:12px;font-weight:800;display:flex;align-items:center;gap:5px;cursor:pointer;flex-shrink:0;white-space:nowrap}
-#ticker .t-dot{animation:tkBlink 1.2s step-end infinite}
-#ticker .t-track{flex:1;overflow:hidden;height:100%;display:flex;align-items:center;position:relative;margin-left:10px}
+#ticker{position:fixed;top:0;left:0;right:0;height:36px;background:#fff1f2;border-bottom:1.5px solid #fecdd3;display:flex;align-items:center;z-index:999;padding:0 6px;box-shadow:0 2px 8px rgba(211,47,47,.08)}
+#ticker .t-badge{background:linear-gradient(135deg,#b71c1c,#881337);color:#fff;padding:0 7px;height:23px;line-height:23px;border-radius:5px;font-size:10.5px;font-weight:800;display:flex;align-items:center;gap:2.5px;cursor:pointer;flex-shrink:0;white-space:nowrap;letter-spacing:-0.1px}
+#ticker .t-dot{font-size:10.5px;line-height:1;animation:tkBlink 1.2s step-end infinite}
+#ticker .t-track{flex:1;overflow:hidden;height:100%;display:flex;align-items:center;position:relative;margin-left:6px}
 #ticker .t-sk{width:55%;height:10px;border-radius:6px;background:linear-gradient(90deg,#ffcdd2 25%,#ffebee 50%,#ffcdd2 75%);background-size:200%;animation:tkShimmer 1.4s infinite}
-#ticker .t-msg{display:none;padding-left:100%;font-weight:700;font-size:14px;white-space:nowrap;will-change:transform}
+#ticker .t-msg{display:none;padding-left:100%;font-weight:700;font-size:12.5px;white-space:nowrap;will-change:transform}
 #ticker .t-msg.on{display:inline-block;animation:smoothTickerMarquee var(--ticker-dur,22s) linear infinite !important}
 #ticker .t-msg:hover{animation-play-state:paused}
 #ticker .t-marquee-seg{display:inline-block;padding-right:40px;color:#991b1b}
-#ticker .t-dtag{display:none;position:absolute;right:6px;top:50%;transform:translateY(-50%);background:#1e293b;color:#fff;padding:3px 9px;border-radius:6px;font-size:11.5px;font-weight:700;cursor:pointer;z-index:10}
+#ticker .t-dtag{display:none;position:absolute;right:2px;top:50%;transform:translateY(-50%);background:#1e293b;color:#fff;padding:2px 6px;border-radius:5px;font-size:10px;font-weight:700;cursor:pointer;z-index:10;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,0.15)}
 #ticker .t-dtag.show{display:block}
+@media(min-width:900px){
+  #ticker{height:38px;padding:0 12px}
+  #ticker .t-badge{padding:0 10px;height:25px;line-height:25px;font-size:11.5px;gap:4px}
+  #ticker .t-dot{font-size:11.5px}
+  #ticker .t-msg{font-size:13.5px}
+  #ticker .t-dtag{font-size:11px;padding:2.5px 8px;right:6px}
+}
 #ticker .t-man{display:none;position:absolute;inset:0;background:#fff1f2;align-items:center;gap:6px;z-index:4}
 #ticker .t-man.show{display:flex}
 #ticker .t-man .lbl{font-size:11px;color:#881337;font-weight:700;white-space:nowrap;flex-shrink:0}
@@ -1673,6 +1680,127 @@ img, video, iframe, canvas { max-width: 100%; }
     </div>
   </div>
 </div>
+
+<!-- ═══ SPONDON PHOTO GALLERY SECTION (রক্তদাতা ও গ্রহীতাদের স্মৃতি গ্যালারি) ═══ -->
+<style>
+.sbs-gal-wrap{margin-top:28px;background:#fff;border-radius:22px;padding:24px 20px;border:1px solid rgba(211,47,47,0.12);box-shadow:0 10px 30px rgba(0,0,0,0.05)}
+.sbs-gal-hdr{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;padding-bottom:16px;border-bottom:2px solid #fff1f2;margin-bottom:20px}
+.sbs-gal-title-box h3{font-size:21px;font-weight:800;color:#881337;margin:0 0 4px;display:flex;align-items:center;gap:8px}
+.sbs-gal-title-box p{font-size:13px;color:#475569;margin:0;font-weight:600}
+.sbs-gal-toggle-btn{background:linear-gradient(135deg,#b71c1c,#881337);color:#fff;border:none;padding:11px 18px;border-radius:12px;font-size:13.5px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:7px;box-shadow:0 6px 16px rgba(183,28,28,0.25);transition:0.2s;font-family:inherit}
+.sbs-gal-toggle-btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(183,28,28,0.35)}
+.sbs-gal-form-card{background:#fff8f8;border:1.5px dashed #fda4af;border-radius:16px;padding:18px;margin-bottom:22px;display:none}
+.sbs-gal-form-card.open{display:block;animation:pageSmoothEnter 0.3s ease}
+.sbs-gal-form-grid{display:grid;grid-template-columns:1fr;gap:12px}
+@media(min-width:680px){.sbs-gal-form-grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:960px){.sbs-gal-form-grid{grid-template-columns:repeat(4,1fr)}}
+.sbs-gal-upload-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-top:14px;padding-top:12px;border-top:1px solid #fecdd3}
+.sbs-gal-file-lbl{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1.5px solid #b71c1c;color:#b71c1c;padding:9px 15px;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;transition:0.2s}
+.sbs-gal-file-lbl:hover{background:#fff1f2}
+.sbs-gal-submit-btn{background:linear-gradient(135deg,#059669,#047857);color:#fff;border:none;padding:10px 22px;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:7px;box-shadow:0 4px 14px rgba(5,150,105,0.28);font-family:inherit}
+.sbs-gal-submit-btn:disabled{opacity:0.65;cursor:wait}
+.sbs-gal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(235px,1fr));gap:16px}
+@media(max-width:520px){.sbs-gal-grid{grid-template-columns:repeat(2,1fr);gap:10px}}
+.sbs-gal-card{background:#fff;border-radius:15px;overflow:hidden;border:1px solid #e2e8f0;box-shadow:0 4px 12px rgba(0,0,0,0.04);transition:transform 0.22s,box-shadow 0.22s;display:flex;flex-direction:column}
+.sbs-gal-card:hover{transform:translateY(-3px);box-shadow:0 10px 22px rgba(183,28,28,0.12);border-color:#fecdd3}
+.sbs-gal-img-box{position:relative;width:100%;padding-top:88%;background:#f1f5f9;overflow:hidden}
+.sbs-gal-img-box img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 0.35s ease;cursor:pointer}
+.sbs-gal-card:hover .sbs-gal-img-box img{transform:scale(1.04)}
+.sbs-gal-bg-badge{position:absolute;top:8px;right:8px;background:linear-gradient(135deg,#dc2626,#991b1b);color:#fff;font-size:12px;font-weight:900;padding:4px 9px;border-radius:20px;box-shadow:0 3px 8px rgba(0,0,0,0.28);border:1.5px solid #fff;letter-spacing:0.3px}
+.sbs-gal-info{padding:11px 12px;display:flex;flex-direction:column;gap:4px;flex:1;justify-content:space-between;background:#fff}
+.sbs-gal-name{font-size:14px;font-weight:800;color:#0f172a;line-height:1.3;word-break:break-word}
+.sbs-gal-meta{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px;font-size:11.5px;color:#475569;font-weight:700;margin-top:3px;padding-top:6px;border-top:1px dashed #e2e8f0}
+.sbs-gal-more-wrap{text-align:center;margin-top:22px}
+.sbs-gal-more-btn{background:#fff1f2;color:#b71c1c;border:1.5px solid #fecdd3;padding:11px 28px;border-radius:30px;font-size:14px;font-weight:800;cursor:pointer;transition:0.2s;display:inline-flex;align-items:center;gap:8px;font-family:inherit}
+.sbs-gal-more-btn:hover{background:#b71c1c;color:#fff;border-color:#b71c1c;box-shadow:0 6px 16px rgba(183,28,28,0.22)}
+</style>
+
+<div class="sbs-gal-wrap" id="spondon-photo-gallery-sec">
+  <div class="sbs-gal-hdr">
+    <div class="sbs-gal-title-box">
+      <h3>📸 স্পন্দন ফটো গ্যালারি (রক্তদানের স্মৃতি অ্যালবাম)</h3>
+      <p>রক্তদাতা ও গ্রহীতাদের রক্তদানের আনন্দঘন মুহূর্তগুলো এখানে স্মৃতি হিসেবে আজীবন সংরক্ষিত থাকবে।</p>
+    </div>
+    <button type="button" class="sbs-gal-toggle-btn" onclick="window.toggleGalleryUploadForm()">
+      <span>➕</span><span id="gal-toggle-txt">গ্যালারিতে আপনার ছবি যোগ করুন</span>
+    </button>
+  </div>
+
+  <!-- Upload Form -->
+  <form id="sbs-gallery-form" class="sbs-gal-form-card" onsubmit="return window.submitGalleryPhoto(event)">
+    <div style="font-size:14px;font-weight:800;color:#881337;margin-bottom:12px;display:flex;align-items:center;gap:6px;">
+      <span>🩸</span><span>আপনার রক্তদানের স্মৃতি ছবি ও তথ্য দিন (সবাই দেখতে পাবে):</span>
+    </div>
+    <div class="sbs-gal-form-grid">
+      <div class="ig" style="margin-bottom:0;">
+        <label>আপনার নাম *</label>
+        <input type="text" id="gal-name" required placeholder="যেমন: মো: জয়নাল আবেদীন">
+      </div>
+      <div class="ig" style="margin-bottom:0;">
+        <label>জেলা *</label>
+        <select id="gal-district" required><option value="">নির্বাচন করুন</option></select>
+      </div>
+      <div class="ig" style="margin-bottom:0;">
+        <label>রক্তের গ্রুপ *</label>
+        <select id="gal-bg" required>
+          <option value="">নির্বাচন করুন</option>
+          <option value="A+">A+</option><option value="A-">A-</option>
+          <option value="B+">B+</option><option value="B-">B-</option>
+          <option value="O+">O+</option><option value="O-">O-</option>
+          <option value="AB+">AB+</option><option value="AB-">AB-</option>
+        </select>
+      </div>
+      <div class="ig" style="margin-bottom:0;">
+        <label>রক্তদানের তারিখ *</label>
+        <input type="date" id="gal-date" required>
+      </div>
+    </div>
+
+    <div class="sbs-gal-upload-row">
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <label class="sbs-gal-file-lbl" for="gal-file-inp">
+          <span>🖼️</span><span id="gal-file-name">একটি ছবি নির্বাচন করুন *</span>
+        </label>
+        <input type="file" id="gal-file-inp" accept="image/*" style="display:none;" onchange="window.previewGallerySelectedFile(this)">
+        <img id="gal-preview-thumb" src="" alt="Preview" style="display:none;width:48px;height:48px;object-fit:cover;border-radius:8px;border:2px solid #b71c1c;">
+      </div>
+      <button type="submit" class="sbs-gal-submit-btn" id="gal-submit-btn">
+        <span>📤</span><span id="gal-submit-txt">গ্যালারিতে পোস্ট করুন</span>
+      </button>
+    </div>
+    <div id="gal-status-msg" style="margin-top:10px;font-size:13px;font-weight:700;text-align:center;display:none;"></div>
+  </form>
+
+  <!-- Search & Filter Bar for Spondon Photo Gallery History -->
+  <div class="sbs-gal-search-bar" style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:18px;background:#f8fafc;padding:12px 14px;border-radius:14px;border:1px solid #e2e8f0;">
+    <div style="flex:1;min-width:220px;position:relative;display:flex;align-items:center;">
+      <span style="position:absolute;left:12px;font-size:15px;pointer-events:none;">🔍</span>
+      <input type="text" id="gal-search-inp" oninput="window.filterSpondonGallery()" placeholder="নাম দিয়ে সার্চ করুন (যেমন: জয়নাল / Joynal / Mohammad Joynal Abedin)..." style="width:100%;padding:10px 34px 10px 36px;border-radius:10px;border:1.5px solid #cbd5e1;font-size:13.5px;font-family:inherit;background:#fff;color:#0f172a;outline:none;transition:border-color 0.2s;" onfocus="this.style.borderColor='#b71c1c'" onblur="this.style.borderColor='#cbd5e1'">
+      <button type="button" id="gal-search-clear" onclick="window.clearGallerySearch()" style="display:none;position:absolute;right:8px;background:#e2e8f0;border:none;width:22px;height:22px;border-radius:50%;font-size:12px;font-weight:800;color:#475569;cursor:pointer;line-height:22px;text-align:center;" title="সার্চ মুছুন">✕</button>
+    </div>
+    <select id="gal-filter-bg" onchange="window.filterSpondonGallery()" style="padding:10px 12px;border-radius:10px;border:1.5px solid #cbd5e1;font-size:13px;font-weight:700;font-family:inherit;background:#fff;color:#1e293b;cursor:pointer;">
+      <option value="">🩸 সব রক্তের গ্রুপ</option>
+      <option value="A+">A+</option><option value="A-">A-</option>
+      <option value="B+">B+</option><option value="B-">B-</option>
+      <option value="O+">O+</option><option value="O-">O-</option>
+      <option value="AB+">AB+</option><option value="AB-">AB-</option>
+    </select>
+    <div id="gal-search-count" style="font-size:12.5px;font-weight:800;color:#881337;padding:4px 10px;background:#fff1f2;border-radius:8px;border:1px solid #fecdd3;display:none;"></div>
+  </div>
+
+  <!-- Gallery Cards Grid (Shows 16 initially, +16 on each "আরও দেখুন" click) -->
+  <div id="sbs-gallery-grid" class="sbs-gal-grid">
+    <div style="grid-column:1/-1;text-align:center;padding:28px;color:#64748b;font-weight:700;">⏳ স্পন্দন ফটো গ্যালারি লোড হচ্ছে...</div>
+  </div>
+
+  <!-- View More ("আরও দেখুন") Button -->
+  <div class="sbs-gal-more-wrap" id="sbs-gal-more-box" style="display:none;">
+    <button type="button" class="sbs-gal-more-btn" id="sbs-gal-more-btn" onclick="window.loadMoreGalleryPhotos()">
+      <span>🔄</span><span id="sbs-gal-more-txt">আরও দেখুন (পূর্ববর্তী ছবিগুলো এক্সপ্লোর করুন)</span>
+    </button>
+  </div>
+</div>
+
 </div>
 
 <!-- ═══ FRAUD DONOR & COMPLAINT PAGE (p-complaint) ═══ -->
@@ -2049,7 +2177,9 @@ img, video, iframe, canvas { max-width: 100%; }
   <div class="ai-body" id="ai-chat-body">
     <!-- Messages Render Here -->
   </div>
-  <div class="ai-foot">
+  <div class="ai-foot" style="position:relative;">
+    <!-- ইন-বিল্ট ২০০+ প্রশ্নের লাইভ অটো-সাজেশন ফ্লোটিং বক্স -->
+    <div id="ai-live-sugg" style="display:none;position:absolute;left:8px;right:8px;bottom:calc(100% + 4px);background:#ffffff;border:1.5px solid #fecdd3;border-radius:14px;box-shadow:0 -10px 28px rgba(183,28,28,0.18);max-height:225px;overflow-y:auto;z-index:100;padding:6px;"></div>
     <div class="ai-inp-row">
       <button type="button" class="ai-reset-btn" id="ai-reset-btn" title="চ্যাট রিসেট করুন">↻</button>
       <div class="ai-inp-box">
@@ -2194,13 +2324,13 @@ function popDist(){
     o+='<option value="'+BD[i]+'">'+BD[i]+'</option>';
     oPc+='<option value="'+BD[i]+'">'+BD[i]+'</option>';
   }
-  ['mds','dd','brd','dp-district'].forEach(function(id){var e=document.getElementById(id);if(e)e.innerHTML=o;});
+  ['mds','dd','brd','dp-district','gal-district'].forEach(function(id){var e=document.getElementById(id);if(e)e.innerHTML=o;});
   var pcd = document.getElementById('pc-dist');
   if(pcd) pcd.innerHTML = oPc;
 }
 popDist();
 
-function autoSetDist(d){if(!d)return;['dd','brd'].forEach(function(id){var e=document.getElementById(id);if(e&&e.value!==d){e.value=d;e.dispatchEvent(new Event('change'))}})}
+function autoSetDist(d){if(!d)return;['dd','brd','gal-district'].forEach(function(id){var e=document.getElementById(id);if(e&&e.value!==d){e.value=d;e.dispatchEvent(new Event('change'))}})}
 
 // FULL-WIDTH UNIVERSAL FOOTER STYLES (100% viewport width & bottom coverage)
 (function injectFooterCss(){
@@ -2309,7 +2439,8 @@ function hsk(){var s=$('tsk');if(s)s.style.display='none'}
 function sman(){hsk();$('tdt').classList.remove('show');$('tmsg').className='t-msg';$('tman').classList.add('show')}
 function stk(a,d,ap){
   hsk();$('tman').classList.remove('show');
-  if(d){$('tdn').textContent=d+(ap?' (আনুমানিক)':'');$('tdt').classList.add('show')}else{$('tdt').classList.remove('show')}
+  // ডানপাশের ব্যাজে কখনোই '(আনুমানিক)' লেখা থাকবে না—শুধুমাত্র জেলার নাম থাকবে যাতে নোটিশ দেখার জন্য পর্যাপ্ত জায়গা থাকে:
+  if(d){$('tdn').textContent=d;$('tdt').classList.add('show')}else{$('tdt').classList.remove('show')}
   var m=$('tmsg'),t=a.join('   🔴   '),sig=(d||'')+(ap?'~':'')+'::'+t;
   if(lastSig===sig&&m.classList.contains('on'))return;
   lastSig=sig;
@@ -2424,62 +2555,87 @@ function fail(e){
   });
 }
 
-/* ---------- MULTI-LAYERED LOCAL ISP & SUBDIVISION IP FALLBACK (যখন GPS সম্পূর্ণ ব্যর্থ হয়) ---------- */
-// সাধারণ IP-তে অনেক সময় মোবাইল সিমের গেটওয়ে ঢাকায় দেখায়। তাই এখানে ৪টি ভিন্ন জিও-লোকেশন ও লোকাল রাউটিং এপিআই
-// মিলিয়ে যদি স্থানীয় জেলা (যেমন ব্রাহ্মণবাড়িয়া, ঝিনাইদহ, পাবনা, সিলেট) পাওয়া যায় তবে সেটিকেই অগ্রাধিকার দেওয়া হয়:
+/* ---------- PRECISE MULTI-SOURCE IP GEOLOCATION ENGINE (যখন GPS পারমিশন দেওয়া হয় না) ---------- */
+// কেন আগে বাগেরহাট এসেছিল? কারণ BigDataCloud অনেক সময় জিপিএস ছাড়া বাংলাদেশের ভৌগোলিক মধ্যবিন্দু (22.65, 89.78 = বাগেরহাট) রিটার্ন করে!
+// তাই BigDataCloud-এর ডিফল্ট মধ্যবিন্দু বাদ দিয়ে শুধুমাত্র প্রকৃত ISP রাউটার (ipwho.is, ipapi.co, geojs.io, freeipapi.com) থেকে
+// শহরের নাম ও নিখুঁত কোঅর্ডিনেট ভেরিফাই করে সঠিক জেলা (যেমন চট্টগ্রাম থাকলে চট্টগ্রামই) নির্ধারণ করা হচ্ছে:
 var IPS=[
-  ['https://api.bigdatacloud.net/data/reverse-geocode-client?localityLanguage=en',function(j){
-    if(!j||j.countryCode!=='BD')return null;
-    var txt=(j.locality||'')+' '+(j.city||'')+' '+(j.principalSubdivision||'');
-    return {lat:j.latitude,lon:j.longitude,dist:matchTextToDistrict(txt)};
-  }],
   ['https://ipwho.is/',function(j){
     if(!j||j.success===false||j.country_code!=='BD')return null;
-    var txt=(j.city||'')+' '+(j.region||'');
-    return {lat:j.latitude,lon:j.longitude,dist:matchTextToDistrict(txt)};
+    var cityDist=matchTextToDistrict(j.city||'');
+    var regDist=matchTextToDistrict(j.region||'');
+    var coordDist='';
+    if(!isNaN(parseFloat(j.latitude))&&!isNaN(parseFloat(j.longitude))){
+      var nr=nearest(parseFloat(j.latitude),parseFloat(j.longitude));
+      if(nr.km<=150)coordDist=nr.name;
+    }
+    return cityDist||coordDist||regDist||'';
   }],
   ['https://ipapi.co/json/',function(j){
     if(!j||j.country_code!=='BD')return null;
-    var txt=(j.city||'')+' '+(j.region||'');
-    return {lat:j.latitude,lon:j.longitude,dist:matchTextToDistrict(txt)};
+    var cityDist=matchTextToDistrict(j.city||'');
+    var regDist=matchTextToDistrict(j.region||'');
+    var coordDist='';
+    if(!isNaN(parseFloat(j.latitude))&&!isNaN(parseFloat(j.longitude))){
+      var nr=nearest(parseFloat(j.latitude),parseFloat(j.longitude));
+      if(nr.km<=150)coordDist=nr.name;
+    }
+    return cityDist||coordDist||regDist||'';
+  }],
+  ['https://freeipapi.com/api/json',function(j){
+    if(!j||j.countryCode!=='BD')return null;
+    var cityDist=matchTextToDistrict(j.cityName||'');
+    var regDist=matchTextToDistrict(j.regionName||'');
+    var coordDist='';
+    if(!isNaN(parseFloat(j.latitude))&&!isNaN(parseFloat(j.longitude))){
+      var nr=nearest(parseFloat(j.latitude),parseFloat(j.longitude));
+      if(nr.km<=150)coordDist=nr.name;
+    }
+    return cityDist||coordDist||regDist||'';
   }],
   ['https://get.geojs.io/v1/ip/geo.json',function(j){
     if(!j||j.country_code!=='BD')return null;
-    var txt=(j.city||'')+' '+(j.region||'');
-    return {lat:j.latitude,lon:j.longitude,dist:matchTextToDistrict(txt)};
+    var cityDist=matchTextToDistrict((j.city||'')+' '+(j.region||''));
+    var coordDist='';
+    if(!isNaN(parseFloat(j.latitude))&&!isNaN(parseFloat(j.longitude))){
+      var nr=nearest(parseFloat(j.latitude),parseFloat(j.longitude));
+      if(nr.km<=150)coordDist=nr.name;
+    }
+    return cityDist||coordDist||'';
   }]
 ];
 
 function ipNote(){
-  return '<br><div style="margin-top:8px;padding:8px 10px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;color:#92400e;font-size:12px;">ℹ️ আপনার ডিভাইসের GPS বন্ধ থাকায় ইন্টারনেট আইপি থেকে আনুমানিক <b>'+ipDist+'</b> জেলা শনাক্ত হয়েছে। মোবাইল ডাটার আইপি অনেক সময় মূল সার্ভার (যেমন ঢাকা) দেখাতে পারে। আপনি যদি অন্য জেলায় থাকেন, তবে <b>ফোনের GPS অন করুন</b> অথবা নিচে <b>ম্যানুয়ালি আপনার সঠিক জেলা</b> নির্বাচন করুন।</div>';
+  return '<br><div style="margin-top:8px;padding:8px 10px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;color:#92400e;font-size:12px;">ℹ️ জিপিএস বন্ধ থাকায় আপনার ইন্টারনেট আইপি থেকে <b>'+ipDist+'</b> জেলা শনাক্ত হয়েছে। শতভাগ নিখুঁত লোকেশনের জন্য <b>ফোনের GPS অন করুন</b> অথবা নিচে জেলা নির্বাচন করুন।</div>';
 }
 function ipShow(){var p=$('pdm');if(p)p.innerHTML=lastMsg+ipNote();var c=$('pclose');if(c)c.style.display='block'}
 
 function ipFallback(){
   if(done||manual||ipBusy||ipDist)return;
   ipBusy=true;
-  var candidates=[];
+  var votes={};
+  var order=[];
   var completed=0;
   IPS.forEach(function(item){
     fetch(item[0],{cache:'no-store'}).then(function(r){return r.json()}).then(function(j){
-      var res=item[1](j);
-      if(res){
-        var dName=res.dist;
-        if(!dName&&!isNaN(parseFloat(res.lat))&&!isNaN(parseFloat(res.lon))){
-          var nr=nearest(parseFloat(res.lat),parseFloat(res.lon));
-          if(nr.km<=180)dName=nr.name;
-        }
-        if(dName)candidates.push(dName);
+      var dName=item[1](j);
+      if(dName&&C[dName]){
+        votes[dName]=(votes[dName]||0)+1;
+        order.push(dName);
       }
     }).catch(function(){}).finally(function(){
       completed++;
       if(completed===IPS.length){
         ipBusy=false;
-        if(done||manual||!candidates.length)return;
-        // যদি কোনো প্রোভাইডার ঢাকার বাইরে সুনির্দিষ্ট লোকাল জেলা (যেমন ব্রাহ্মণবাড়িয়া, পাবনা, ঝিনাইদহ, সিলেট ইত্যাদি) রিটার্ন করে,
-        // তবে ISP-এর কেন্দ্রীয় ঢাকা গেটওয়ের চেয়ে সেই লোকাল জেলাটিকেই অগ্রাধিকার দেওয়া হবে:
-        var nonDhaka=candidates.filter(function(c){return c!=='Dhaka'});
-        var chosen=nonDhaka.length>0?nonDhaka[0]:candidates[0];
+        if(done||manual||!order.length)return;
+        // সংখ্যাগরিষ্ঠ ভোটে (Majority Consensus) অথবা আঞ্চলিক সুনির্দিষ্ট জেলা নির্বাচন:
+        var best='',maxV=0;
+        var nonDhakaOrder=order.filter(function(d){return d!=='Dhaka'});
+        var pool=nonDhakaOrder.length>0?nonDhakaOrder:order;
+        pool.forEach(function(d){
+          if(votes[d]>maxV){maxV=votes[d];best=d}
+        });
+        var chosen=best||pool[0];
         ipDist=chosen;
         ldN(chosen,true);
         ipShow();
@@ -2609,6 +2765,9 @@ function fetchStats() {
     }
     if (d.aiStats && typeof window.updateAdminAiStatsUI === 'function') {
       window.updateAdminAiStatsUI(d.aiStats);
+    }
+    if (Array.isArray(d.gallery) && typeof window.setServerGalleryItems === 'function') {
+      window.setServerGalleryItems(d.gallery);
     }
     if (Array.isArray(d.feedbacks) && typeof renderFeedbackCards === 'function') {
       var localFb = [];
@@ -4812,13 +4971,16 @@ var aiSend = document.getElementById('ai-send-btn');
 
 var aiQuickQuestions = [
   'এই ওয়েবসাইট ও Gmail সিস্টেম কীভাবে কাজ করে?',
-  'একজন পুরুষ মানুষের শরীরে রক্তের পরিমাণ কত?',
-  'How much blood is in the human body?',
+  'ব্লাড ডোনার পেজ ও রক্তের আবেদন কীভাবে কাজ করে?',
+  'ডোনার রেজিস্ট্রেশন ও প্রোফাইল আপডেট (OTP) কীভাবে কাজ করে?',
+  'ফটোকার্ড ও স্পন্দন ফটো গ্যালারি কীভাবে কাজ করে?',
+  'অভিযোগ বক্স ও আমাদের কার্যক্রম কীভাবে কাজ করে?',
+  'বিপি (Blood Pressure) মাপার সঠিক নিয়ম ও স্বাভাবিক মাত্রা কত?',
+  'ডায়াবেটিসের নরমাল মাত্রা কত ও হলে কী কী করতে হবে?',
   'কোন গ্রুপ কাকে রক্ত দিতে ও নিতে পারে?',
-  'Who can donate blood? (Age & Weight)',
   'হিমোগ্লোবিন কত থাকা দরকার ও কীভাবে বাড়বে?',
-  'ডেঙ্গু রোগীর প্লাটিলেট ও করণীয় কী?',
-  'কেটে গেলে বা সাপে কামড়ালে প্রাথমিক চিকিৎসা কী?'
+  'ডেঙ্গু ও থ্যালাসেমিয়া রোগীদের করণীয় কী?',
+  'হাত-পা কেটে গেলে, হাড় ভাঙলে বা সাপে কামড়ালে প্রাথমিক চিকিৎসা কী?'
 ];
 
 function resetAiChat() {
@@ -6609,6 +6771,58 @@ function checkSpecificBloodGroupQuery(rawQuestion, isEn) {
     ['blood_donation_empty_stomach', 'খালি পেটে রক্তদান করা যাবে কি না', ['খালি পেটে রক্ত দেওয়া যায়', 'রক্ত দেওয়ার আগে কী খাব'], '🍽️ <b>রক্তদানের আগে খাবার নিয়ম:</b><br>• কখনোই সম্পূর্ণ খালি পেটে রক্তদান করবেন না। রক্তদানের ১–২ ঘণ্টা আগে স্বাভাবিক হালকা খাবার (ভাত, রুটি, ফল বা বিস্কুট) এবং অন্তত ২–৩ গ্লাস (৫০০ মি.লি.) পানি পান করে রক্তদান করুন।'],
     ['blood_donation_bruise_ice', 'রক্তদানের পর সূঁচ ফোটানো স্থানে নীলচে দাগ বা ব্যথা হলে করণীয়', ['রক্ত দেওয়ার পর হাত ফুলে গেলে', 'সূঁচের জায়গায় ব্যথা', 'হাতে নীল দাগ রক্তদান'], '🩹 <b>রক্তদানের পর সূঁচ ফোটানো স্থানে ব্যথা বা ফোলা হলে করণীয়:</b><br>• প্রথম ২৪ ঘণ্টায় পরিষ্কার কাপড়ে পেঁচিয়ে ১০–১৫ মিনিট <b>বরফের সেঁক (Cold Compress)</b> দিন এবং পরবর্তী ২৪ ঘণ্টা পর কুসুম গরম পানির সেঁক দিন। ওই হাতে ২৪ ঘণ্টা ভারী ব্যাগ বা ওজন তুলবেন না।'],
     ['blood_group_inheritance', 'বাবা-মায়ের রক্তের গ্রুপ থেকে সন্তানের রক্তের গ্রুপ কেমন হয়', ['বাবা মায়ের রক্তের গ্রুপ', 'সন্তানের রক্তের গ্রুপ', 'স্বামী স্ত্রীর রক্তের গ্রুপ এক হলে'], '🧬 <b>বাবা-মায়ের রক্তের গ্রুপ ও সন্তান:</b><br>• স্বামী-স্ত্রীর রক্তের গ্রুপ একই (যেমন দুজনেই B+ বা O+) হলে সন্তানের কোনো ক্ষতি হয় না! কেবল মা যদি <b>Rh নেগেটিভ (-)</b> এবং বাবা <b>Rh পজিটিভ (+)</b> হন, তবে প্রথম সন্তান জন্মের পর মাকে চিকিৎসকের পরামর্শে ১টি <b>Anti-D (RhoGAM)</b> ইনজেকশন নিতে হয়।'],
+    ['spondon_website_and_gmail_combined', 'এই ওয়েবসাইট ও Gmail সিস্টেম কীভাবে কাজ করে?', ['এই ওয়েবসাইট ও gmail সিস্টেম কীভাবে কাজ করে', 'ওয়েবসাইট ও জিমেইল সিস্টেম কিভাবে কাজ করে', 'এই ওয়েবসাইট ও gmail সিস্টেম কিভাবে কাজ করে', 'website and gmail system', 'জিমেইল সিস্টেম কীভাবে কাজ করে'], '🌐📧 <b>স্পন্দন ব্লাড সোসাইটি ওয়েবসাইট ও স্বয়ংক্রিয় Gmail সিস্টেম যেভাবে কাজ করে:</b><br><br>' +
+      '<b>১. ওয়েবসাইটের মূল কার্যক্রম (৪টি ধাপ):</b><br>' +
+      '• <b>ডোনার রেজিস্ট্রেশন (<a class="ai-link" onclick="go(\'donor-reg\');document.getElementById(\'ai-chat-win\').classList.remove(\'open\')">Donor Registration</a>):</b> রক্তদাতারা নাম, মোবাইল নাম্বার, ইমেইল, জেলা ও রক্তের গ্রুপ দিয়ে নিবন্ধন করলে তা সরাসরি গুগল শিটের <code>Donor_DB</code>-তে জমা হয়।<br>' +
+      '• <b>জরুরি রক্তের আবেদন (<a class="ai-link" onclick="go(\'blood-request\');document.getElementById(\'ai-chat-win\').classList.remove(\'open\')">Blood Request</a>):</b> রোগীর স্বজন রক্তের গ্রুপ ও জেলা দিয়ে আবেদন করা মাত্র ওই জেলার সকল প্রস্তুত (Active) ডোনারের কার্ড (কল ও রেডিমেড WhatsApp বাটনসহ) স্ক্রিনে চলে আসে।<br>' +
+      '• <b>ডোনার কনফার্মেশন (<a class="ai-link" onclick="go(\'match-secured\');document.getElementById(\'ai-chat-win\').classList.remove(\'open\')">Match Secured</a>):</b> কোনো ডোনার রক্ত দিতে রাজি হলে স্বজন ও ডোনারের নাম্বার দিয়ে সাবমিট করলে আবেদনটি <code>Assigned</code> হয়।<br>' +
+      '• <b>রক্তদান সম্পন্ন (<a class="ai-link" onclick="go(\'confirm\');document.getElementById(\'ai-chat-win\').classList.remove(\'open\')">Confirm Donation</a>):</b> রক্তদান শেষে স্ট্যাটাস আপডেট করলে ডোনারের প্রোফাইল স্বয়ংক্রিয়ভাবে পরবর্তী <b>১২০ দিনের (৪ মাস) জন্য Resting</b> হয়ে যায়।<br><br>' +
+      '<b>২. স্বয়ংক্রিয় Gmail নোটিফিকেশন সিস্টেম (মোট ৬টি ইমেইল):</b><br>' +
+      '• <b>স্বাগতম মেইল:</b> ডোনার রেজিস্ট্রেশন করলেই স্পন্দনের অফিসিয়াল লোগোসহ কনফার্মেশন মেইল যায়।<br>' +
+      '• <b>রোগীর তথ্য মেইল (Match Secured):</b> ডোনার কনফার্ম হওয়া মাত্র ডোনারের Gmail-এ রোগীর নাম, হাসপাতাল, সময় ও স্বজনের নাম্বারসহ মেইল যায়।<br>' +
+      '• <b>৬ ঘণ্টা ও ১২ ঘণ্টা ফলোআপ মেইল:</b> রক্তের আবেদন <code>Pending</code> থাকলে ৬ ও ১২ ঘণ্টা পর রোগীর স্বজনের ইমেইলে খোঁজখবর ও ডোনার কনফার্ম করার লিংক যায়।<br>' +
+      '• <b>২৪ ঘণ্টা ও ৪৮ ঘণ্টা রিমাইন্ডার মেইল:</b> ডোনার অ্যাসাইন হওয়ার ২৪ ও ৪৮ ঘণ্টা পর ডোনারের ইমেইলে স্ট্যাটাস আপডেটের রিমাইন্ডার যায়।<br>' +
+      '• <b>কৃতজ্ঞতা ও ফটোকার্ড মেইল:</b> রক্তদান সম্পন্ন করলে ধন্যবাদ মেইল ও ফটোকার্ড তৈরির লিংক যায়।<br>' +
+      '• <b>৪-ডিজিট OTP মেইল:</b> ডোনার নিজের প্রোফাইল আপডেট করতে চাইলে তাঁর জিমেইলে গোপন পিন (OTP) যায়।'],
+    ['spondon_donor_card_and_page_work', 'ব্লাড ডোনার পেজ ও রক্তের আবেদন কীভাবে কাজ করে?', ['ব্লাড ডোনার পেজ ও রক্তের আবেদন কীভাবে কাজ করে', 'ব্লাড ডোনার কার্ড কিভাবে কাজ করে', 'ব্লাড ডোনার পেজ কিভাবে কাজ করে', 'ডোনার কার্ড কিভাবে কাজ করে', 'blood donor page', 'donor card kivabe kaj kore'], '🩸 <b>ব্লাড ডোনার পেজ ও ডোনার কার্ড যেভাবে কাজ করে:</b><br>' +
+      '• আপনি যখন <a class="ai-link" onclick="go(\'blood-request\');document.getElementById(\'ai-chat-win\').classList.remove(\'open\')">রক্তের আবেদন</a> পেজে রোগীর রক্তের গ্রুপ ও জেলা দিয়ে সাবমিট করেন, সিস্টেম সাথে সাথে গুগল শিট চেক করে ওই জেলার সব <b>Active</b> ও প্রতারকমুক্ত ডোনারদের খুঁজে বের করে।<br>' +
+      '• প্রতিটি <b>ডোনার কার্ডে</b> ডোনারের নাম, রক্তের গ্রুপ, জেলা-উপজেলা, শেষ রক্তদানের তারিখ এবং ৩টি অ্যাকশন বাটন থাকে:<br>' +
+      '  ১. <b>📞 কল করুন:</b> ১ ট্যাপে সরাসরি ডোনারের নাম্বারে কল যাবে।<br>' +
+      '  ২. <b>💬 WhatsApp:</b> ক্লিক করলেই রোগীর রক্তের গ্রুপ ও এলাকা লেখা রেডিমেড বাংলা মেসেজসহ ডোনারের WhatsApp ওপেন হবে।<br>' +
+      '  ৩. <b>🏳️ অভিযোগ:</b> কোনো ডোনার টাকা চাইলে ১ ক্লিকেই তার বিরুদ্ধে অভিযোগ করা যাবে।'],
+    ['spondon_photocard_and_gallery_work', 'ফটোকার্ড ও স্পন্দন ফটো গ্যালারি কীভাবে কাজ করে?', ['ফটোকার্ড ও স্পন্দন ফটো গ্যালারি কীভাবে কাজ করে', 'ফটো গ্যালারি কিভাবে কাজ করে', 'গ্যালারিটা কিভাবে কাজ করতেছে', 'স্পন্দন ফটো গ্যালারি', 'photo gallery kivabe kaj kore', 'how does photo gallery work'], '📸 <b>রক্তদান ফটোকার্ড ও স্পন্দন ফটো গ্যালারি যেভাবে কাজ করে:</b><br>' +
+      '• <b>১. ফটোকার্ড জেনারেটর (<a class="ai-link" onclick="go(\'photocard\');document.getElementById(\'ai-chat-win\').classList.remove(\'open\')">Photo Card</a>):</b> ডোনার নিজের নাম, রক্তের গ্রুপ, মোট রক্তদান সংখ্যা ও ছবি দিলে পদবি (রক্তবন্ধু, ব্রোঞ্জ/সিলভার/গোল্ড রক্তযোদ্ধা, প্লাটিনাম রক্তবীর) এবং ইউনিক QR কোডসহ ফটোকার্ড তৈরি ও ডাউনলোড করা যায়।<br>' +
+      '• <b>২. স্পন্দন ফটো গ্যালারি (স্মৃতি অ্যালবাম):</b> ফটোকার্ড পেজের নিচে থাকা গ্যালারিতে যেকোনো ডোনার বা গ্রহীতা তাঁর <b>নাম, জেলা, রক্তের গ্রুপ, তারিখ ও ১টি ছবি</b> আপলোড করতে পারেন।<br>' +
+      '• ছবিটি সরাসরি স্পন্দনের <b>Google Drive ফোল্ডারে</b> এবং গুগল শিটের <code>Gallery_DB</code>-তে আজীবন সংরক্ষিত থাকে। গ্যালারির <b>🔍 সার্চবারে</b> নিজের নাম (বাংলায় বা ইংরেজিতে, যেমন: "জয়নাল" বা "Joynal") লিখে সার্চ দিলে কয়েক মাস আগের ছবিও ১ সেকেন্ডে সামনে চলে আসে!'],
+    ['spondon_complaint_and_activities_work', 'অভিযোগ বক্স ও আমাদের কার্যক্রম কীভাবে কাজ করে?', ['অভিযোগ বক্স ও আমাদের কার্যক্রম কীভাবে কাজ করে', 'অভিযোগ বক্সটা কিভাবে কাজ করতেছে', 'আমাদের কার্যক্রম কি কি চলতেছে', 'স্পন্দনের কার্যক্রম', 'complaint box and activities'], '🛡️🏥 <b>অভিযোগ বক্স ও স্পন্দনের কার্যক্রম যেভাবে কাজ করে:</b><br>' +
+      '• <b>অভিযোগ বক্স (<a class="ai-link" onclick="go(\'complaint\');document.getElementById(\'ai-chat-win\').classList.remove(\'open\')">প্রতারক ডোনার তালিকা</a>):</b> কেউ রক্ত দেওয়ার কথা বলে বিকাশ/নগদে গাড়ি ভাড়া বা টেস্টের টাকা নিয়ে প্রতারণা করলে ভুক্তভোগী সেখানে নাম্বার ও বিবরণ দিয়ে রিপোর্ট করতে পারেন। সাথে সাথে ওই নাম্বারটি <code>Fraud_DB</code> ও <code>Donor_DB</code>-তে কালো তালিকাভুক্ত (Blacklisted) হয়ে সব ডোনার সার্চ থেকে চিরতরে ব্লক হয়ে যায়।<br>' +
+      '• <b>আমাদের কার্যক্রম (<a class="ai-link" onclick="go(\'activities\');document.getElementById(\'ai-chat-win\').classList.remove(\'open\')">কার্যক্রম ও ব্লগ</a>):</b> ঝিনাইদহ টেক্সটাইল ইঞ্জিনিয়ারিং কলেজ (JTEC) ক্যাম্পাসে বিনামূল্যে ব্লাড গ্রুপিং ক্যাম্পেইন, ফার্স্ট-এইড ও সিপিআর ট্রেনিং (রেড ক্রিসেন্টের সহযোগিতায়), থ্যালাসেমিয়া সচেতনতা এবং মুমূর্ষু রোগীদের জরুরি রক্তদান কার্যক্রম নিয়মিত পরিচালিত হচ্ছে।'],
+    ['bp_measurement_and_normal_range', 'বিপি (Blood Pressure) মাপার সঠিক নিয়ম ও স্বাভাবিক মাত্রা কত?', ['বিপি মাপার নিয়ম', 'বিপি কিভাবে মাপবো', 'বিপি কীভাবে মাপে', 'ব্লাড প্রেশার মেজারমেন্ট', 'how to measure blood pressure', 'how to measure bp', 'bp measurement', 'বিপি নরমাল কত', 'ব্লাড প্রেশার মাপার নিয়ম', 'বিপি (blood pressure) মাপার সঠিক নিয়ম ও স্বাভাবিক মাত্রা কত'], '🩺 <b>বিপি (Blood Pressure) মাপার সঠিক নিয়ম ও স্বাভাবিক মাত্রা:</b><br>' +
+      '• <b>স্বাভাবিক রক্তচাপ (Normal BP):</b> <b>১২০/৮০ mmHg</b> (ওপরের সিস্টোলিক ৯০–১২০ এবং নিচের ডায়াস্টোলিক ৬০–৮০ mmHg)। ১৪০/৯০ বা তার বেশি হলে উচ্চ রক্তচাপ (High BP) এবং ৯০/৬০-এর নিচে নামলে নিম্ন রক্তচাপ (Low BP)।<br>' +
+      '• <b>বিপি মাপার সঠিক নিয়ম (How to Measure BP):</b><br>' +
+      '  ১. মাপার অন্তত ৩০ মিনিট আগে চা, কফি, ধূমপান বা ব্যায়াম করা যাবে না; ৫ মিনিট চেয়ারে পিঠ হেলান দিয়ে শান্ত হয়ে বসুন।<br>' +
+      '  ২. পা মেঝেতে সমান করে রাখুন (পা ক্রস করবেন না) এবং বাম হাত হার্টের সমান্তরালে (Heart Level) টেবিলের ওপর রাখুন।<br>' +
+      '  ৩. কাফটি (Cuff) কনুইয়ের ভাঁজ থেকে ১ ইঞ্চি (২ আঙুল) ওপরে এমনভাবে বাঁধুন যেন খুব ঢিলা বা অতিরিক্ত শক্ত না হয়, এরপর ডিজিটাল মেশিন চালু করুন বা স্টেথোস্কোপ দিয়ে রিডিং নিন।'],
+    ['diabetes_normal_range_and_care', 'ডায়াবেটিসের নরমাল মাত্রা কত ও হলে কী কী করতে হবে?', ['ডায়াবেটিসের নরমাল মাত্রা কত', 'ডায়াবেটিসের স্বাভাবিক মাত্রা কত', 'ডায়াবেটিস হলে কি কি করতে হবে', 'ডায়াবেটিস নিয়ন্ত্রণের উপায়', 'normal blood sugar level', 'diabetes normal range', 'ডায়াবেটিসের নরমাল মাত্রা কত ও হলে কী কী করতে হবে'], '🩸 <b>ডায়াবেটিসের স্বাভাবিক মাত্রা (Normal Blood Sugar) ও করণীয়:</b><br>' +
+      '• <b>স্বাভাবিক রক্তের সুগার মাত্রা:</b><br>' +
+      '  — <b>খালি পেটে (Fasting / FBS):</b> <b>৪.৪ থেকে ৫.৫ mmol/L</b> (বা <b>৮০ থেকে ৯৯ mg/dL</b>)। ৭.০ mmol/L (১২৬ mg/dL)-এর বেশি হলে ডায়াবেটিস।<br>' +
+      '  — <b>খাবার ২ ঘণ্টা পর (2h ABF / PPBS):</b> <b>৭.৮ mmol/L (১৪০ mg/dL)-এর নিচে</b>। ১১.১ mmol/L (২০০ mg/dL) বা তার বেশি হলে ডায়াবেটিস।<br>' +
+      '  — <b>HbA1c (৩ মাসের গড়):</b> <b>৫.৭%-এর নিচে স্বাভাবিক</b>; ৬.৫% বা তার বেশি হলে ডায়াবেটিস।<br>' +
+      '• <b>ডায়াবেটিস হলে করণীয় (3D Rule):</b><br>' +
+      '  ১. <b>খাদ্যভ্যাস (Diet):</b> চিনি, মিষ্টি, কোমল পানীয় ও সাদা ভাত কমিয়ে লাল আটার রুটি, প্রচুর সবুজ শাকসবজি, সালাদ, ডাল, মাছ ও টক ফল খান।<br>' +
+      '  ২. <b>শৃঙ্খলা ও ব্যায়াম (Discipline):</b> প্রতিদিন অন্তত ৩০–৪৫ মিনিট জোরে হাঁটুন এবং ওজন নিয়ন্ত্রণে রাখুন।<br>' +
+      '  ৩. <b>চিকিৎসা (Drug & Care):</b> চিকিৎসকের পরামর্শ অনুযায়ী নিয়মিত ওষুধ/ইনসুলিন নিন এবং পায়ের যত্ন নিন।'],
+    ['first_aid_cuts_fracture_snakebite_combined', 'হাত-পা কেটে গেলে, হাড় ভাঙলে বা সাপে কামড়ালে প্রাথমিক চিকিৎসা কী?', ['হাত-পা কেটে গেলে হাড় ভাঙলে বা সাপে কামড়ালে প্রাথমিক চিকিৎসা কী', 'কেটে গেলে বা সাপে কামড়ালে প্রাথমিক চিকিৎসা কী', 'হাত কাটা পা কাটা হাড় ভাঙ্গা প্রাথমিক চিকিৎসা', 'first aid for cuts fracture and snakebite'], '🚑 <b>হাত-পা কেটে গেলে, হাড় ভাঙলে এবং সাপে কামড়ালে জরুরি প্রাথমিক চিকিৎসা:</b><br><br>' +
+      '• <b>১. হাত বা পা কেটে রক্তপাত হলে:</b> পরিষ্কার জীবাণুমুক্ত কাপড় বা গজ দিয়ে কাটা স্থানে টানা <b>১০–১৫ মিনিট সরাসরি চেপে ধরুন (Direct Pressure)</b> এবং অঙ্গটি হার্টের চেয়ে উঁচুতে রাখুন। রক্ত বন্ধ হলে অ্যান্টিসেপটিক লাগিয়ে ব্যান্ডেজ করুন।<br>' +
+      '• <b>২. হাড় ভেঙে গেলে বা মচকালে (Fracture):</b> ভাঙা হাত বা পা একদম নাড়াচাড়া বা টানাটানি করবেন না। কাঠের স্কেল, শক্ত বোর্ড বা কার্ডবোর্ড দিয়ে ভাঙা অংশে <b>স্প্লিন্ট (Splint)</b> বেঁধে স্থির রাখুন, বরফের প্যাক দিন এবং দ্রুত হাসপাতালে নিন।<br>' +
+      '• <b>৩. সাপে কামড়ালে (Snakebite):</b> রোগীকে সম্পূর্ণ শান্ত রাখুন এবং কামড়ানো অঙ্গটি নড়াচড়া বন্ধ রাখুন। <b>কখনোই রশি বা গামছা দিয়ে শক্ত করে বাঁধবেন না, ব্লেড দিয়ে কাটবেন না এবং ওঝার কাছে যাবেন না!</b> দ্রুততম সময়ে নিকটস্থ সরকারি হাসপাতালে নিয়ে <b>অ্যান্টিভেনম (Antivenom)</b> ইনজেকশন দিন।'],
+    ['dengue_and_thalassemia_combined_guide', 'ডেঙ্গু ও থ্যালাসেমিয়া রোগীদের করণীয় কী?', ['ডেঙ্গু ও থ্যালাসেমিয়া রোগীদের করণীয় কী', 'থ্যালাসেমিয়া ও ডেঙ্গু', 'dengue and thalassemia care'], '🦟🧬 <b>ডেঙ্গু এবং থ্যালাসেমিয়া রোগীদের জরুরি গাইডলাইন:</b><br><br>' +
+      '• <b>১. ডেঙ্গু জ্বরে করণীয়:</b><br>' +
+      '  — প্রচুর তরল খাবার (ওআরএস স্যালাইন, ডাবের পানি, স্যুপ, ফলের রস — প্রতিদিন ২.৫–৩ লিটার) পান করুন এবং পূর্ণ বিশ্রামে থাকুন।<br>' +
+      '  — জ্বরের জন্য শুধুমাত্র <b>প্যারাসিটামল</b> খাবেন; কোনো অবস্থাতেই ব্যথানাশক ওষুধ (Aspirin, Ibuprofen, Diclofenac) খাবেন না। প্লাটিলেট ২০,০০০-এর নিচে নামলে বা দাঁতের মাড়ি/নাক দিয়ে রক্তপাত হলে দ্রুত হাসপাতালে ভর্তি হোন।<br><br>' +
+      '• <b>২. থ্যালাসেমিয়া (Thalassemia) রোগীদের করণীয় ও প্রতিরোধ:</b><br>' +
+      '  — থ্যালাসেমিয়া একটি বংশগত রক্তের রোগ যেখানে শরীরে স্বাভাবিক হিমোগ্লোবিন তৈরি হয় না এবং রোগীকে প্রতি মাসে <b>নিরাপদ রক্ত (Washed/Filtered Packed Red Cells)</b> নিতে হয়।<br>' +
+      '  — শরীরে অতিরিক্ত আয়রন জমে ক্ষতি এড়াতে থ্যালাসেমিয়া রোগীদের আয়রনযুক্ত ট্যাবলেট খাওয়া নিষেধ এবং চিকিৎসকের পরামর্শে আয়রন চিলেশন থেরাপি নিতে হয়। বিয়ের আগে বর ও কনের <b>Hb Electrophoresis</b> পরীক্ষা করলেই থ্যালাসেমিয়া ১০০% প্রতিরোধ সম্ভব।'],
     ['whole_blood_vs_component', 'হোল ব্লাড (Whole Blood) এবং রেড সেল/প্লাজমা/প্লাটিলেটের পার্থক্য', ['হোল ব্লাড কী', 'প্যাকড রেড সেল', 'ফ্রেশ ফ্রোজেন প্লাজমা', 'ffp blood'], '🩸 <b>হোল ব্লাড বনাম রক্তের উপাদান (Components):</b><br>• <b>Whole Blood:</b> সরাসরি দান করা পূর্ণ রক্ত (দুর্ঘটনা বা অতিরিক্ত রক্তক্ষরণে ব্যবহৃত হয়)।<br>• <b>PRBC (Red Cells):</b> থ্যালাসেমিয়া ও রক্তশূন্যতা রোগীদের দেওয়া হয়।<br>• <b>Platelets:</b> ডেঙ্গু ও ক্যান্সার রোগীদের রক্তক্ষরণ রোধে দেওয়া হয়।<br>• <b>FFP (Plasma):</b> পোড়া রোগী ও রক্ত জমাট বাঁধার সমস্যায় দেওয়া হয়।']
   ];
 
@@ -6675,6 +6889,142 @@ function checkSpondonAiGuardrails(rawQuestion, isEn) {
   return null;
 }
 
+// ─── LIVE AUTO-SUGGESTION ENGINE & 75%+ SIMILARITY IN-BUILT MATCHER ───
+var BILINGUAL_TOPIC_SYNONYMS = [
+  ['বিপি', 'ব্লাড প্রেশার', 'প্রেসার', 'রক্তচাপ', 'bp', 'blood pressure', 'hypertension', 'low bp', 'high bp', 'মাপার', 'মাপবো', 'measure', 'measurement'],
+  ['ডায়াবেটিস', 'ডায়াবেটিস', 'সুগার', 'ব্লাড সুগার', 'diabetes', 'blood sugar', 'glucose', 'ইনসুলিন', 'insulin', 'hba1c', 'ডায়াবেটিক'],
+  ['হিমোগ্লোবিন', 'রক্তশূন্যতা', 'অ্যানিমিয়া', 'anemia', 'hemoglobin', 'hb', 'রক্ত কম'],
+  ['ডেঙ্গু', 'প্লাটিলেট', 'অনুচক্রিকা', 'dengue', 'platelet', 'এডিস'],
+  ['থ্যালাসেমিয়া', 'থ্যালাসেমিয়া', 'thalassemia', 'ইলেক্ট্রোফোরেসিস'],
+  ['ওয়েবসাইট', 'ওয়েবসাইট', 'জিমেইল', 'ইমেইল', 'website', 'gmail', 'email', 'otp', 'কীভাবে কাজ করে', 'কিভাবে কাজ করে'],
+  ['ফটোকার্ড', 'ফটো গ্যালারি', 'গ্যালারি', 'photocard', 'photo card', 'gallery', 'রক্তবন্ধু', 'রক্তযোদ্ধা'],
+  ['প্রতারক', 'অভিযোগ', 'বিকাশ', 'fraud', 'complaint', 'scam'],
+  ['ডোনার', 'রেজিস্ট্রেশন', 'রক্তের আবেদন', 'donor', 'registration', 'blood request'],
+  ['কেটে গেলে', 'হাত কাটা', 'পা কাটা', 'রক্তপাত', 'cut', 'bleeding', 'wound'],
+  ['হাড় ভাঙা', 'হাড় ভাঙ্গা', 'মচকানো', 'fracture', 'broken bone', 'sprain'],
+  ['সাপে কামড়ালে', 'সাপের কামড়', 'snake', 'snakebite', 'antivenom'],
+  ['পোড়া', 'পুড়ে গেলে', 'আগুনে পোড়া', 'burn', 'ফোসকা'],
+  ['সিপিআর', 'cpr', 'হৃৎস্পন্দন বন্ধ', 'কৃত্রিম শ্বাস'],
+  ['পানি', 'তৃষ্ণা', 'পানিশূন্যতা', 'water', 'hydration', 'dehydration', 'ors', 'স্যালাইন'],
+  ['ভিটামিন', 'vitamin', 'ক্যালসিয়াম', 'আয়রন', 'জিংক', 'পটাশিয়াম', 'ম্যাগনেশিয়াম', 'খনিজ', 'mineral']
+];
+
+function computeTokenSimilarity(qNorm, targetNorm) {
+  if (!qNorm || !targetNorm) return 0;
+  if (qNorm === targetNorm) return 1.0;
+  if (targetNorm.indexOf(qNorm) !== -1 && qNorm.length >= 6) {
+    return Math.min(0.95, 0.78 + (qNorm.length / Math.max(targetNorm.length, 1)) * 0.2);
+  }
+  if (qNorm.indexOf(targetNorm) !== -1 && targetNorm.length >= 6) {
+    return Math.min(0.95, 0.78 + (targetNorm.length / Math.max(qNorm.length, 1)) * 0.2);
+  }
+  var stopWords = {'কী':1,'কি':1,'কীভাবে':1,'কিভাবে':1,'কেন':1,'কত':1,'হলে':1,'করব':1,'করবো':1,'উপায়':1,'নিয়ম':1,'এবং':1,'ও':1,'বা':1,'এর':1,'জন্য':1,'থেকে':1,'এই':1,'আমার':1,'what':1,'how':1,'to':1,'is':1,'the':1,'in':1,'of':1,'and':1,'for':1,'can':1,'i':1,'a':1};
+  var qTokens = qNorm.split(' ').filter(function(w){ return w.length > 1 && !stopWords[w]; });
+  var tTokens = targetNorm.split(' ').filter(function(w){ return w.length > 1 && !stopWords[w]; });
+  if (qTokens.length === 0 || tTokens.length === 0) return 0;
+
+  var matchedQ = 0;
+  for (var i = 0; i < qTokens.length; i++) {
+    var qw = qTokens[i];
+    var hit = false;
+    for (var j = 0; j < tTokens.length; j++) {
+      var tw = tTokens[j];
+      if (qw === tw || (qw.length >= 4 && tw.indexOf(qw) !== -1) || (tw.length >= 4 && qw.indexOf(tw) !== -1)) {
+        hit = true;
+        break;
+      }
+    }
+    if (!hit) {
+      // Check bilingual synonym group
+      for (var s = 0; s < BILINGUAL_TOPIC_SYNONYMS.length; s++) {
+        var grp = BILINGUAL_TOPIC_SYNONYMS[s];
+        var qInGrp = false, tInGrp = false;
+        for (var g = 0; g < grp.length; g++) {
+          var gw = normBnQuery(grp[g]);
+          if (gw === qw || (qw.length >= 3 && gw.indexOf(qw) !== -1)) qInGrp = true;
+          if (targetNorm.indexOf(gw) !== -1) tInGrp = true;
+        }
+        if (qInGrp && tInGrp) { hit = true; break; }
+      }
+    }
+    if (hit) matchedQ++;
+  }
+  var qRatio = matchedQ / qTokens.length;
+  var tRatio = matchedQ / Math.max(tTokens.length, 1);
+  return (qRatio * 0.72) + (Math.min(1, tRatio) * 0.28);
+}
+
+// চ্যাটবক্সে টাইপ করার সাথে সাথে নিচে ফ্লোটিং সাজেশন দেখানোর ফাংশন (যেমন: বিপি / ডায়াবেটিস / ডেঙ্গু / জিমেইল / গ্যালারি)
+window.getLiveInBuiltSuggestions = function(rawInput) {
+  var q = normBnQuery(rawInput);
+  if (!q || q.length < 2) return [];
+  var isEn = isEnglishQuery(rawInput);
+  var results = [];
+  var seenTopics = {};
+
+  for (var i = 0; i < SPONDON_AI_KB.length; i++) {
+    var item = SPONDON_AI_KB[i];
+    var bestItemSim = 0;
+    var displayQuestion = (isEn && item.topicEn) ? item.topicEn : item.topic;
+    if (item.high && item.high.length > 0) {
+      // Pick the most natural question phrase from high or topic
+      for (var h = 0; h < item.high.length; h++) {
+        var hNorm = normBnQuery(item.high[h]);
+        var simH = computeTokenSimilarity(q, hNorm);
+        if (hNorm.indexOf(q) !== -1) simH = Math.max(simH, 0.88);
+        if (simH > bestItemSim) bestItemSim = simH;
+      }
+    }
+    if (item.mustAny && item.mustAny.length > 0) {
+      for (var m = 0; m < item.mustAny.length; m++) {
+        var mNorm = normBnQuery(item.mustAny[m]);
+        var simM = computeTokenSimilarity(q, mNorm);
+        if (mNorm.indexOf(q) !== -1 || q.indexOf(mNorm) !== -1) simM = Math.max(simM, 0.82);
+        if (simM > bestItemSim) bestItemSim = simM;
+      }
+    }
+    var tNorm = normBnQuery(item.topic + ' ' + (item.topicEn || ''));
+    var simT = computeTokenSimilarity(q, tNorm);
+    if (tNorm.indexOf(q) !== -1) simT = Math.max(simT, 0.85);
+    if (simT > bestItemSim) bestItemSim = simT;
+
+    if (bestItemSim >= 0.35 && !seenTopics[displayQuestion]) {
+      seenTopics[displayQuestion] = true;
+      results.push({ question: displayQuestion, score: bestItemSim, id: item.id });
+    }
+  }
+
+  results.sort(function(a, b){ return b.score - a.score; });
+  return results.slice(0, 6);
+};
+
+window.renderAiLiveSuggestions = function(val) {
+  var box = document.getElementById('ai-live-sugg');
+  if (!box) return;
+  var list = window.getLiveInBuiltSuggestions(val);
+  if (!list || list.length === 0) {
+    box.style.display = 'none';
+    box.innerHTML = '';
+    return;
+  }
+  var h = '<div style="font-size:11px;font-weight:800;color:#881337;padding:4px 8px 6px;border-bottom:1px dashed #fecdd3;display:flex;align-items:center;justify-content:space-between;">' +
+            '<span>💡 প্রাসঙ্গিক ইন-বিল্ট প্রশ্ন (ক্লিক করলেই উত্তর পাবেন):</span>' +
+            '<span style="cursor:pointer;color:#64748b;padding:0 4px;" onclick="document.getElementById(\'ai-live-sugg\').style.display=\'none\'">✕</span>' +
+          '</div>';
+  list.forEach(function(it) {
+    var safeQ = escapeHtml(it.question);
+    var jsQ = String(it.question).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+    h += '<button type="button" onclick="document.getElementById(\'ai-live-sugg\').style.display=\'none\';window.askSpondonAi(\'' + jsQ + '\')" ' +
+         'style="display:flex;align-items:center;gap:7px;width:100%;text-align:left;background:#fff;border:none;border-bottom:1px solid #fff1f2;padding:8px 10px;font-size:12.5px;font-weight:700;color:#1e293b;cursor:pointer;border-radius:8px;font-family:inherit;transition:background 0.15s;" ' +
+         'onmouseover="this.style.background=\'#fff1f2\';this.style.color=\'#b71c1c\'" onmouseout="this.style.background=\'#fff\';this.style.color=\'#1e293b\'">' +
+           '<span style="color:#b71c1c;font-size:13px;flex-shrink:0;">🩸</span>' +
+           '<span style="flex:1;line-height:1.35;">' + safeQ + '</span>' +
+         '</button>';
+  });
+  box.innerHTML = h;
+  box.style.display = 'block';
+};
+
 function analyzeAndAnswerSpondonAi(rawQuestion) {
   var q = normBnQuery(rawQuestion);
   if(!q) return null;
@@ -6684,104 +7034,125 @@ function analyzeAndAnswerSpondonAi(rawQuestion) {
   var specificBgReply = checkSpecificBloodGroupQuery(rawQuestion, isEn);
   if(specificBgReply) return specificBgReply;
 
-  // ২. যদি ইউজার এমন কোনো তুলনামূলক, জটিল বা বিশ্লেষণধর্মী প্রশ্ন করেন (যেমন: "difference between", "পার্থক্য কী", "কেন হয় বিস্তারিত", "খাদ্যতালিকা কেমন হওয়া উচিত"),
-  // তবে জোরপূর্বক ইন-বিল্ট কার্ড না দেখিয়ে সরাসরি Gemini API-তে পাঠাবে যাতে ১০০% প্রাসঙ্গিক উত্তর পাওয়া যায়!
-  var complexGeminiTriggers = [
-    'পার্থক্য', 'difference between', 'compare ', 'তুলনা', 'কেন হয় এবং কীভাবে',
-    'পাশাপাশি আর কী', 'কোন টেস্ট করানো', 'what happens if', 'why does ', 'how does ',
-    'বিস্তারিত ব্যাখ্যা', 'explain in detail', 'কোন ডাক্তার দেখাব', 'which specialist'
-  ];
-  for(var ct = 0; ct < complexGeminiTriggers.length; ct++) {
-    if(q.indexOf(normBnQuery(complexGeminiTriggers[ct])) !== -1) {
-      return null; // সরাসরি ব্যাকএন্ডের Gemini API ব্যবহার করবে
+  // ২. ওয়েবসাইট, জিমেইল, ফটোকার্ড, গ্যালারি বা অভিযোগ বক্স সংক্রান্ত যেকোনো প্রশ্ন হলে সবসময় ইন-বিল্ট থেকেই উত্তর দেবে!
+  var isWebsiteQuery = /ওয়েবসাইট|ওয়েবসাইট|জিমেইল|ইমেইল|ফটোকার্ড|ফটো কার্ড|গ্যালারি|অভিযোগ বক্স|প্রতারক ডোনার|রেজিস্ট্রেশন পেজ|ডোনার পেজ|ডোনার কার্ড|ম্যাচ কনফার্ম|স্পন্দন ব্লাড সোসাইটি|হেল্পলাইন|website|gmail|photocard|photo gallery|fraud donor|match secured/.test(q);
+
+  // ৩. যদি ওয়েবসাইটের প্রশ্ন না হয়ে তুলনামূলক বা জটিল মেডিকেল প্রশ্ন হয় (যেমন: "হার্ট অ্যাটাক ও গ্যাস্ট্রিকের পার্থক্য"), তবে সরাসরি Gemini API ব্যবহার করবে:
+  if(!isWebsiteQuery) {
+    var complexGeminiTriggers = [
+      'পার্থক্য', 'difference between', 'compare ', 'তুলনা', 'কেন হয় এবং কীভাবে',
+      'পাশাপাশি আর কী', 'কোন টেস্ট করানো', 'what happens if', 'why does ',
+      'বিস্তারিত ব্যাখ্যা', 'explain in detail', 'কোন ডাক্তার দেখাব', 'which specialist'
+    ];
+    for(var ct = 0; ct < complexGeminiTriggers.length; ct++) {
+      if(q.indexOf(normBnQuery(complexGeminiTriggers[ct])) !== -1) {
+        return null; // সরাসরি Gemini API ব্যবহার করবে
+      }
     }
   }
 
-  // ৩. ইন-বিল্ট ২০০+ টপিকের মধ্যে শুধুমাত্র তখনই ম্যাচ করবে যখন প্রশ্নের মূল বিষয়বস্তু (mustAny + high phrase) সুনির্দিষ্টভাবে মিলে যাবে!
-  // শুধুমাত্র একটি সাধারণ শব্দ (যেমন শুধু 'পানি' বা 'রক্ত' বা 'ব্যথা') মিলে যাওয়ার কারণে আর কখনোই অপ্রাসঙ্গিক ইন-বিল্ট উত্তর দেবে না।
+  // ৪. ইন-বিল্ট ২০০+ প্রশ্নের ডাটাবেজে ৭০%–৮০%+ সিমিলারিটি ও ফ্রেজ ম্যাচিং ইঞ্জিন:
+  // যদি কোনো প্রশ্ন আমাদের ইন-বিল্ট প্রশ্নের সাথে ৭৫%+ মিলে যায় (অথবা সাজেশন/চিপস থেকে ক্লিক করা হয়), তবে ১০০% নিশ্চিতভাবে ইন-বিল্ট থেকেই উত্তর দেবে!
+  // আর যদি সিমিলারিটি কম হয় (<৭০%), তবে জোর করে ভুল ইন-বিল্ট উত্তর না দিয়ে সরাসরি Gemini API কল করবে!
   var bestEntry = null;
   var bestScore = 0;
 
   for(var i = 0; i < SPONDON_AI_KB.length; i++) {
     var item = SPONDON_AI_KB[i];
-    var score = 0;
 
     // নেগেটিভ কিউওয়ার্ড থাকলে বাদ
     var hasNeg = false;
     if(item.neg && item.neg.length > 0) {
       for(var n = 0; n < item.neg.length; n++) {
         var nk = normBnQuery(item.neg[n]);
-        if(nk && q.indexOf(nk) !== -1) {
-          hasNeg = true;
-          break;
-        }
+        if(nk && q.indexOf(nk) !== -1) { hasNeg = true; break; }
       }
     }
     if(hasNeg) continue;
 
-    // mustAny চেক (সর্বোচ্চ ১ বার +6 পয়েন্ট যোগ হবে যাতে ডুপ্লিকেট শব্দের কারণে ভুল স্কোর না বাড়ে)
-    var passedMust = false;
-    if(item.mustAny && item.mustAny.length > 0) {
-      for(var m = 0; m < item.mustAny.length; m++) {
-        var mk = normBnQuery(item.mustAny[m]);
-        if(mk && q.indexOf(mk) !== -1) {
-          passedMust = true;
-          score += 6;
-          break;
-        }
-      }
-      if(!passedMust) continue;
+    var maxSim = 0;
+    // Check exact/near match against topic and topicEn
+    var topicBnNorm = normBnQuery(item.topic || '');
+    var topicEnNorm = normBnQuery(item.topicEn || '');
+    if (topicBnNorm && (q === topicBnNorm || computeTokenSimilarity(q, topicBnNorm) >= 0.75)) {
+      maxSim = Math.max(maxSim, computeTokenSimilarity(q, topicBnNorm), q === topicBnNorm ? 1.0 : 0.85);
+    }
+    if (topicEnNorm && (q === topicEnNorm || computeTokenSimilarity(q, topicEnNorm) >= 0.75)) {
+      maxSim = Math.max(maxSim, computeTokenSimilarity(q, topicEnNorm), q === topicEnNorm ? 1.0 : 0.85);
     }
 
-    // high-confidence সুনির্দিষ্ট প্রশ্ন/টপিক ফ্রেজ চেক (ম্যাচ করার জন্য অন্তত ১টি high ফ্রেজ বা ২+ med শব্দসহ সুনির্দিষ্ট টপিক মিলতে হবে)
-    var passedHigh = false;
-    if(item.high && item.high.length > 0) {
-      for(var h = 0; h < item.high.length; h++) {
+    // Check against high-confidence phrases
+    if (item.high && item.high.length > 0) {
+      for (var h = 0; h < item.high.length; h++) {
         var hk = normBnQuery(item.high[h]);
-        if(hk && q.indexOf(hk) !== -1) {
-          passedHigh = true;
-          score += 16;
+        if (!hk) continue;
+        if (q === hk || q.indexOf(hk) !== -1 || hk.indexOf(q) !== -1) {
+          var lenRatio = Math.min(q.length, hk.length) / Math.max(q.length, hk.length, 1);
+          if (lenRatio >= 0.55 || q.indexOf(hk) !== -1) {
+            maxSim = Math.max(maxSim, 0.88);
+          }
+        }
+        var simH = computeTokenSimilarity(q, hk);
+        if (simH > maxSim) maxSim = simH;
+      }
+    }
+
+    // Check against mustAny phrases
+    var passedMust = false;
+    if (item.mustAny && item.mustAny.length > 0) {
+      for (var m = 0; m < item.mustAny.length; m++) {
+        var mk = normBnQuery(item.mustAny[m]);
+        if (!mk) continue;
+        if (q.indexOf(mk) !== -1) {
+          passedMust = true;
+          var simM = computeTokenSimilarity(q, mk);
+          maxSim = Math.max(maxSim, simM, mk.length >= 10 ? 0.82 : 0.68);
+        } else {
+          var simM2 = computeTokenSimilarity(q, mk);
+          if (simM2 >= 0.78) {
+            passedMust = true;
+            maxSim = Math.max(maxSim, simM2);
+          }
         }
       }
     }
 
-    var medMatches = 0;
-    if(item.med && item.med.length > 0) {
-      for(var d = 0; d < item.med.length; d++) {
+    // Count supporting med keywords
+    var medCount = 0;
+    if (item.med && item.med.length > 0) {
+      for (var d = 0; d < item.med.length; d++) {
         var dk = normBnQuery(item.med[d]);
-        if(dk && q.indexOf(dk) !== -1) {
-          medMatches++;
-          score += 4;
-        }
+        if (dk && q.indexOf(dk) !== -1) medCount++;
       }
     }
+    if (passedMust && medCount >= 2) {
+      maxSim = Math.max(maxSim, 0.78 + Math.min(0.15, medCount * 0.04));
+    }
+    if (isWebsiteQuery && item.id && item.id.indexOf('spondon_') === 0 && passedMust) {
+      maxSim = Math.max(maxSim, 0.85);
+    }
 
-    // কঠোর প্রাসঙ্গিকতা শর্ত (Strict Relevance Filter):
-    // ইন-বিল্ট উত্তর দেওয়ার জন্য অবশ্যই সুনির্দিষ্ট `high` ফ্রেজ মিলতে হবে (score >= 22) অথবা অন্তত ২টি সুনির্দিষ্ট প্রাসঙ্গিক শব্দসহ টপিক মিলতে হবে (score >= 18)।
-    // অন্যথায় এটি জোরপূর্বক ইন-বিল্ট উত্তর না দিয়ে Gemini API-কে কল করবে!
-    if((passedHigh && score >= 22) || (passedMust && medMatches >= 2 && score >= 18)) {
-      if(score > bestScore) {
-        bestScore = score;
-        bestEntry = item;
-      }
+    // থ্রেশহোল্ড: ৭৫%+ (0.75) মিল থাকলেই ইন-বিল্ট উত্তর নির্বাচিত হবে!
+    if (maxSim >= 0.75 && maxSim > bestScore) {
+      bestScore = maxSim;
+      bestEntry = item;
     }
   }
 
   if(bestEntry) {
     if(isEn && bestEntry.ansEn) {
       return '<div style="font-size:11.5px;color:#059669;font-weight:800;margin-bottom:6px;display:flex;align-items:center;gap:5px;">' +
-               '<span>✅ Verified In-Built Medical Database • ' + (bestEntry.topicEn || bestEntry.topic) + '</span>' +
+               '<span>✅ Verified In-Built Medical & Website Database • ' + (bestEntry.topicEn || bestEntry.topic) + '</span>' +
              '</div>' + bestEntry.ansEn;
     }
     return '<div style="font-size:11.5px;color:#059669;font-weight:800;margin-bottom:6px;display:flex;align-items:center;gap:5px;">' +
-             '<span>✅ যাচাইকৃত ইন-বিল্ট মেডিকেল ডাটাবেজ • ' + bestEntry.topic + '</span>' +
+             '<span>✅ যাচাইকৃত ইন-বিল্ট ডাটাবেজ • ' + bestEntry.topic + '</span>' +
            '</div>' + bestEntry.ans;
   }
 
-  // কোনো সুনির্দিষ্ট ইন-বিল্ট ম্যাচ না পাওয়া গেলে null রিটার্ন করবে, যাতে সাথে সাথে ব্যাকএন্ডের Gemini API ব্যবহৃত হয়!
+  // ৭৫%-এর কম মিল হলে null রিটার্ন করবে, যাতে সাথে সাথে ব্যাকএন্ডের Google Gemini API ব্যবহৃত হয়!
   return null;
 }
-
 // ─── DEEP CLINICAL & COMPARATIVE GEMINI AI KNOWLEDGE GRAPH & SYNTHESIZER ───
 var SPONDON_GEMINI_DEEP_KB = [
   {
@@ -6970,8 +7341,15 @@ document.getElementById('ai-exp-btn').addEventListener('click', function(){
 document.getElementById('ai-reset-btn').addEventListener('click', resetAiChat);
 
 aiInp.addEventListener('input', function(){
-  if(this.value.trim().length > 0) aiSend.classList.add('active');
-  else aiSend.classList.remove('active');
+  var val = this.value.trim();
+  if(val.length > 0) {
+    aiSend.classList.add('active');
+    if(typeof window.renderAiLiveSuggestions === 'function') window.renderAiLiveSuggestions(val);
+  } else {
+    aiSend.classList.remove('active');
+    var sb = document.getElementById('ai-live-sugg');
+    if(sb) sb.style.display = 'none';
+  }
 });
 aiInp.addEventListener('keydown', function(e){
   if(e.key === 'Enter'){
@@ -6986,6 +7364,7 @@ aiSend.addEventListener('click', function(){
 window.askSpondonAi = function(questionText) {
   if(!questionText) return;
   aiInp.value = '';
+  var sb = document.getElementById('ai-live-sugg'); if(sb) sb.style.display = 'none';
   aiSend.classList.remove('active');
 
   var isEn = isEnglishQuery(questionText);
@@ -7120,7 +7499,7 @@ window.askSpondonAi = function(questionText) {
 
     var sysPrompt = [
       'You are the official Smart Medical, Primary Health & Blood Donation AI Assistant of "Spondon Blood Society, Jhenaidah Textile Engineering College (JTEC)".',
-      '1. ALLOWED TOPICS: Answer accurately and clearly ONLY if the question relates to human body, water/hydration, minerals, electrolytes, vitamins, food/nutrition, primary health, common illnesses, chest pain, heart attack, gastric, pathology/blood tests, first aid, CPR, blood science, blood donation, or Spondon Blood Society (JTEC).',
+      '1. ALLOWED TOPICS: Answer accurately and clearly if the question relates to Spondon Blood Society website, its pages (Donor Registration, Blood Request, Match Secured, Donation Confirmation, Photo Card, Spondon Photo Gallery, Fraud Complaint Box, Activities), automated Gmail/OTP/reminder system, OR human body, water/hydration, minerals, electrolytes, vitamins, food/nutrition, daily routine, blood pressure (BP), diabetes, primary health, common illnesses, chest pain, heart attack, gastric, pathology/blood tests, first aid, CPR, thalassemia, dengue, blood science, or blood donation.',
       '2. OUT-OF-SCOPE TOPICS: If the question is completely outside medical, health, human body, nutrition, or blood donation, reply ONLY with: "দুঃখিত, এই প্রশ্নটি মেডিকেল, প্রাথমিক স্বাস্থ্যসেবা ও রক্তদান বিষয়ের বাইরে। আমরা যেহেতু একটি স্বাস্থ্য ও রক্তদান বিষয়ক এআই (AI) সহকারী, তাই এই বিষয়ের বাইরের প্রশ্নের উত্তর আমাদের পক্ষে দেওয়া সম্ভব নয়।"',
       '3. OVERLY CRITICAL / PRESCRIPTION TOPICS: If the user asks for dangerous drug prescriptions or critical surgical decisions, reply ONLY with: "গুরুত্বপূর্ণ স্বাস্থ্য সতর্কবার্তা: আপনার প্রশ্নটি জটিল চিকিৎসা ও প্রেসক্রিপশন সংক্রান্ত। আমরা যেহেতু একটি এআই (AI) সহকারী, তাই কোনো জটিল রোগের সরাসরি ওষুধের প্রেসক্রিপশন বা চূড়ান্ত চিকিৎসা সিদ্ধান্ত আমাদের পক্ষে দেওয়া সম্ভব নয়। অনুগ্রহ করে দ্রুত একজন রেজিস্টার্ড বিশেষজ্ঞ চিকিৎসকের (MBBS Doctor) পরামর্শ নিন।"',
       '4. If asked in Bangla or Banglish, reply in polite Bangla with bullet points (•) and **bold** key terms. If asked in English, reply in clear English.'
@@ -7306,6 +7685,372 @@ function updateLb() {
   img.src = hiRes;
   document.getElementById('lb-cnt').textContent = (lbIdx + 1) + ' / ' + lbUrls.length;
 }
+
+// ═══════════════════════════════════════════════════════════════════════
+// 📸 SPONDON PHOTO GALLERY ENGINE (Google Drive Folder Upload + "আরও দেখুন" History Pagination)
+// ═══════════════════════════════════════════════════════════════════════
+(function(){
+  var GALLERY_PAGE_SIZE = 16; // প্রথমবার ১৬টি ছবি দেখাবে, এরপর প্রতি ক্লিকে আরও ১৬টি করে যোগ হবে
+  var visibleCount = GALLERY_PAGE_SIZE;
+  var allGalleryItems = [];
+  var compressedPhotoB64 = '';
+  var compressedMimeType = 'image/jpeg';
+
+  // ডিফল্ট তারিখ আজ সেট করা
+  try {
+    var gd = document.getElementById('gal-date');
+    if (gd && !gd.value) gd.value = new Date().toISOString().split('T')[0];
+  } catch(e){}
+
+  function getLocalGalleryCache() {
+    try { return JSON.parse(localStorage.getItem('sbs_gallery_cache_v1') || '[]'); } catch(e){ return []; }
+  }
+  function saveLocalGalleryCache(arr) {
+    try { localStorage.setItem('sbs_gallery_cache_v1', JSON.stringify(arr.slice(0, 150))); } catch(e){}
+  }
+
+  function formatBnGalleryDate(dStr) {
+    if (!dStr) return '';
+    try {
+      var p = String(dStr).substring(0, 10).split('-');
+      if (p.length === 3) {
+        var mNames = ['জানু','ফেব্রু','মার্চ','এপ্রিল','মে','জুন','জুলাই','আগস্ট','সেপ্টে','অক্টো','নভে','ডিসে'];
+        var mIdx = parseInt(p[1], 10) - 1;
+        var dayBn = toBn(parseInt(p[2], 10));
+        var yrBn = toBn(p[0]);
+        if (mIdx >= 0 && mIdx < 12) return dayBn + ' ' + mNames[mIdx] + ', ' + yrBn;
+      }
+    } catch(e){}
+    return dStr;
+  }
+
+  window.toggleGalleryUploadForm = function() {
+    var f = document.getElementById('sbs-gallery-form');
+    if (!f) return;
+    f.classList.toggle('open');
+    var txt = document.getElementById('gal-toggle-txt');
+    if (txt) {
+      txt.textContent = f.classList.contains('open') ? 'ফর্ম বন্ধ করুন ✕' : 'গ্যালারিতে আপনার ছবি যোগ করুন';
+    }
+  };
+
+  // ছবি দ্রুত আপলোড ও গুগল ড্রাইভে সেভ করার জন্য স্মার্ট ক্লায়েন্ট-সাইড কম্প্রেশন (সর্বোচ্চ 900px, পরিষ্কার ও ঝকঝকে)
+  window.previewGallerySelectedFile = function(input) {
+    var file = input && input.files && input.files[0];
+    if (!file) return;
+    var lbl = document.getElementById('gal-file-name');
+    var thumb = document.getElementById('gal-preview-thumb');
+    if (lbl) lbl.textContent = '⏳ ছবি প্রস্তুত হচ্ছে...';
+
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var img = new Image();
+      img.onload = function() {
+        var maxDim = 900;
+        var w = img.width, h = img.height;
+        if (w > maxDim || h > maxDim) {
+          if (w > h) { h = Math.round(h * (maxDim / w)); w = maxDim; }
+          else { w = Math.round(w * (maxDim / h)); h = maxDim; }
+        }
+        var cnv = document.createElement('canvas');
+        cnv.width = w; cnv.height = h;
+        var ctx = cnv.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        compressedMimeType = 'image/jpeg';
+        compressedPhotoB64 = cnv.toDataURL('image/jpeg', 0.84);
+        if (thumb) { thumb.src = compressedPhotoB64; thumb.style.display = 'block'; }
+        if (lbl) lbl.textContent = '✅ ' + (file.name.length > 22 ? file.name.substring(0, 20) + '...' : file.name);
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // বাংলা ও ইংরেজি নামের স্মার্ট ফোনেটিক ও কিওয়ার্ড ম্যাচিং (যেমন: "জয়নাল" লিখলে "জয়নাল" এবং "Joynal" উভয়ই খুঁজে পাবে!)
+  var BN_EN_NAME_PAIRS = [
+    ['জয়নাল','জয়নাল','joynal','zaynal','jainal'],
+    ['আবেদীন','আবেদিন','abedin','abedeen'],
+    ['মোহাম্মদ','মুহাম্মদ','মোঃ','মো:','md','mohammad','muhammad','mohammed'],
+    ['আকিব','akib','aqib'],
+    ['সাকিব','sakib','shakib','saqib'],
+    ['নাঈম','নাইম','nayem','naim','naeem'],
+    ['হাসান','hasan','hassan'],
+    ['হোসেন','হোসাইন','hossain','hosain','husain'],
+    ['আহমেদ','আহমদ','ahmed','ahmad'],
+    ['রহমান','rahman','rohman'],
+    ['ইসলাম','islam'],
+    ['লিটু','litu'],
+    ['তানজিম','tanzim','tanjim'],
+    ['তাসিন','tasin','tahsin'],
+    ['ফরহাদ','farhad'],
+    ['পারভেজ','parvez','parvej'],
+    ['অর্ণব','arnob','arnab'],
+    ['সাফাত','safat','shafat'],
+    ['ইমন','emon','imon'],
+    ['খালিদ','khalid','khaled'],
+    ['হামিদ','হামিদুল্লাহ','hamid','hamidullah'],
+    ['মোল্লা','molla','mollah'],
+    ['রাফি','rafi'],
+    ['রাকিব','rakib','raqib'],
+    ['তানভীর','tanvir','tanveer']
+  ];
+
+  function expandSearchTerms(queryStr) {
+    var q = String(queryStr || '').toLowerCase().trim();
+    if (!q) return [];
+    var words = q.split(/\s+/);
+    return words.map(function(w) {
+      var equivalents = [w];
+      for (var i = 0; i < BN_EN_NAME_PAIRS.length; i++) {
+        var grp = BN_EN_NAME_PAIRS[i];
+        var found = false;
+        for (var j = 0; j < grp.length; j++) {
+          if (grp[j].indexOf(w) !== -1 || w.indexOf(grp[j]) !== -1) { found = true; break; }
+        }
+        if (found) {
+          for (var k = 0; k < grp.length; k++) {
+            if (equivalents.indexOf(grp[k]) === -1) equivalents.push(grp[k]);
+          }
+        }
+      }
+      return equivalents;
+    });
+  }
+
+  function matchesGallerySearch(item, qStr, bgFilter) {
+    if (bgFilter && String(item.bg || '').toUpperCase() !== bgFilter.toUpperCase()) return false;
+    if (!qStr) return true;
+    var haystack = ((item.name || '') + ' ' + (item.district || '') + ' ' + (item.bg || '') + ' ' + (item.date || '')).toLowerCase();
+    var expandedGroups = expandSearchTerms(qStr);
+    for (var i = 0; i < expandedGroups.length; i++) {
+      var group = expandedGroups[i];
+      var wordMatched = false;
+      for (var j = 0; j < group.length; j++) {
+        if (haystack.indexOf(group[j]) !== -1) { wordMatched = true; break; }
+      }
+      if (!wordMatched) return false;
+    }
+    return true;
+  }
+
+  window.filterSpondonGallery = function() {
+    window.renderSpondonGallery();
+  };
+
+  window.clearGallerySearch = function() {
+    var inp = document.getElementById('gal-search-inp');
+    var bgSel = document.getElementById('gal-filter-bg');
+    if (inp) inp.value = '';
+    if (bgSel) bgSel.value = '';
+    window.renderSpondonGallery();
+  };
+
+  window.renderSpondonGallery = function() {
+    var grid = document.getElementById('sbs-gallery-grid');
+    var moreBox = document.getElementById('sbs-gal-more-box');
+    var moreTxt = document.getElementById('sbs-gal-more-txt');
+    var sInp = document.getElementById('gal-search-inp');
+    var bgSel = document.getElementById('gal-filter-bg');
+    var clrBtn = document.getElementById('gal-search-clear');
+    var cntBadge = document.getElementById('gal-search-count');
+    if (!grid) return;
+
+    var qStr = sInp ? sInp.value.trim() : '';
+    var bgFilter = bgSel ? bgSel.value.trim() : '';
+    var isSearching = (qStr.length > 0 || bgFilter.length > 0);
+    if (clrBtn) clrBtn.style.display = qStr.length > 0 ? 'block' : 'none';
+
+    if (!allGalleryItems || allGalleryItems.length === 0) {
+      if (cntBadge) cntBadge.style.display = 'none';
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:32px 16px;background:#fff8f8;border-radius:14px;border:1px dashed #fecdd3;color:#881337;font-weight:700;">📸 স্পন্দন ফটো গ্যালারিতে এখনো কোনো ছবি যুক্ত হয়নি। উপরের <b>"গ্যালারিতে আপনার ছবি যোগ করুন"</b> বাটনে ক্লিক করে প্রথম স্মৃতি ছবিটি পোস্ট করুন! ❤️</div>';
+      if (moreBox) moreBox.style.display = 'none';
+      return;
+    }
+
+    var filtered = isSearching
+      ? allGalleryItems.filter(function(it){ return matchesGallerySearch(it, qStr, bgFilter); })
+      : allGalleryItems;
+
+    if (cntBadge) {
+      if (isSearching) {
+        cntBadge.style.display = 'block';
+        cntBadge.textContent = 'পাওয়া গেছে: ' + toBn(filtered.length) + ' টি ছবি';
+      } else {
+        cntBadge.style.display = 'block';
+        cntBadge.textContent = 'মোট স্মৃতি: ' + toBn(allGalleryItems.length) + ' টি ছবি';
+      }
+    }
+
+    if (filtered.length === 0) {
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:28px 16px;background:#fff8f8;border-radius:14px;border:1px dashed #fecdd3;color:#881337;font-weight:700;">🔍 <b>"' + escapeHtml(qStr || bgFilter) + '"</b> নামে কোনো ছবি পাওয়া যায়নি। অনুগ্রহ করে বানান চেক করুন বা নিচের বাটনে ক্লিক করে সব ছবি দেখুন।<br><button type="button" onclick="window.clearGallerySearch()" style="margin-top:10px;background:#b71c1c;color:#fff;border:none;padding:7px 16px;border-radius:8px;font-weight:800;cursor:pointer;">সব ছবি দেখুন</button></div>';
+      if (moreBox) moreBox.style.display = 'none';
+      return;
+    }
+
+    // সার্চ করা অবস্থায় ওই নামের সব ছবি (২ মাস বা ১ বছর আগের হলেও) একসাথে সামনে চলে আসবে, আর সাধারণ অবস্থায় ১৬টি করে দেখাবে:
+    var slice = isSearching ? filtered : filtered.slice(0, visibleCount);
+    var htmlStr = '';
+    slice.forEach(function(item) {
+      var safeName = escapeHtml(item.name || 'রক্তযোদ্ধা');
+      var safeDist = escapeHtml(item.district || '');
+      var safeBg = escapeHtml(item.bg || '');
+      var safeDate = escapeHtml(formatBnGalleryDate(item.date || ''));
+      var rawImg = item.image || '';
+      var driveFallback = item.fileId ? ('https://lh3.googleusercontent.com/d/' + encodeURIComponent(item.fileId) + '=w800') : '';
+
+      htmlStr += '<div class="sbs-gal-card">' +
+        '<div class="sbs-gal-img-box">' +
+          '<img src="' + escapeHtml(rawImg) + '" data-fallback="' + escapeHtml(driveFallback) + '" alt="' + safeName + '" loading="lazy" ' +
+          'onerror="var fb=this.getAttribute(\'data-fallback\');if(fb&&this.src!==fb)this.src=fb;" ' +
+          'onclick="window.open(this.src, \'_blank\')" title="বড় করে দেখতে ক্লিক করুন">' +
+          (safeBg ? '<div class="sbs-gal-bg-badge">🩸 ' + safeBg + '</div>' : '') +
+        '</div>' +
+        '<div class="sbs-gal-info">' +
+          '<div class="sbs-gal-name">' + safeName + '</div>' +
+          '<div class="sbs-gal-meta">' +
+            '<span>📍 ' + (safeDist || 'বাংলাদেশ') + '</span>' +
+            '<span>🗓️ ' + (safeDate || 'রক্তদান') + '</span>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    });
+    grid.innerHTML = htmlStr;
+
+    if (moreBox) {
+      if (!isSearching && filtered.length > visibleCount) {
+        var rem = filtered.length - visibleCount;
+        moreBox.style.display = 'block';
+        if (moreTxt) moreTxt.textContent = 'আরও দেখুন (আরও ' + toBn(rem) + ' টি পূর্ববর্তী ছবি দেখুন)';
+      } else {
+        moreBox.style.display = 'none';
+      }
+    }
+  };
+
+  window.loadMoreGalleryPhotos = function() {
+    visibleCount += GALLERY_PAGE_SIZE;
+    window.renderSpondonGallery();
+  };
+
+  window.setServerGalleryItems = function(serverArr) {
+    var localArr = getLocalGalleryCache();
+    var map = {};
+    var merged = [];
+    (serverArr || []).forEach(function(it) {
+      var k = (it.id || '') + '_' + (it.name || '') + '_' + (it.date || '');
+      map[k] = true;
+      merged.push(it);
+    });
+    // লোকাল ক্যাশে সদ্য পোস্ট করা কোনো ছবি যদি সার্ভার ক্যাশে এখনো না এসে থাকে, তবে সেটিও শুরুতে দেখাবে
+    localArr.forEach(function(loc) {
+      var k = (loc.id || '') + '_' + (loc.name || '') + '_' + (loc.date || '');
+      if (!map[k]) merged.unshift(loc);
+    });
+    allGalleryItems = merged;
+    saveLocalGalleryCache(merged);
+    window.renderSpondonGallery();
+  };
+
+  window.fetchGalleryDirect = function() {
+    fetch(S + '?action=getGallery&_t=' + Date.now())
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        if (d && d.status === 'Success' && Array.isArray(d.gallery)) {
+          window.setServerGalleryItems(d.gallery);
+        }
+      }).catch(function(){});
+  };
+
+  window.submitGalleryPhoto = function(ev) {
+    if (ev) ev.preventDefault();
+    var nameEl = document.getElementById('gal-name');
+    var distEl = document.getElementById('gal-district');
+    var bgEl = document.getElementById('gal-bg');
+    var dateEl = document.getElementById('gal-date');
+    var btn = document.getElementById('gal-submit-btn');
+    var btnTxt = document.getElementById('gal-submit-txt');
+    var msgBox = document.getElementById('gal-status-msg');
+
+    var name = nameEl ? nameEl.value.trim() : '';
+    var dist = distEl ? distEl.value.trim() : '';
+    var bg = bgEl ? bgEl.value.trim() : '';
+    var donDate = dateEl ? dateEl.value.trim() : '';
+
+    if (!name || !dist || !bg || !donDate) {
+      if (msgBox) { msgBox.style.display = 'block'; msgBox.style.color = '#dc2626'; msgBox.textContent = '⚠️ অনুগ্রহ করে নাম, জেলা, রক্তের গ্রুপ এবং রক্তদানের তারিখ পূরণ করুন।'; }
+      return false;
+    }
+    if (!compressedPhotoB64) {
+      if (msgBox) { msgBox.style.display = 'block'; msgBox.style.color = '#dc2626'; msgBox.textContent = '⚠️ অনুগ্রহ করে আপনার রক্তদানের একটি ছবি নির্বাচন করুন।'; }
+      return false;
+    }
+
+    if (btn) btn.disabled = true;
+    if (btnTxt) btnTxt.textContent = '⏳ গুগল ড্রাইভ ও গ্যালারিতে আপলোড হচ্ছে...';
+    if (msgBox) { msgBox.style.display = 'block'; msgBox.style.color = '#0f172a'; msgBox.textContent = '📡 আপনার ছবি স্পন্দন ফটো গ্যালারি ও গুগল ড্রাইভে সংরক্ষণ করা হচ্ছে...'; }
+
+    var fd = new URLSearchParams();
+    fd.append('action', 'addGalleryPhoto');
+    fd.append('name', name);
+    fd.append('district', dist);
+    fd.append('bg', bg);
+    fd.append('donationDate', donDate);
+    fd.append('mimeType', compressedMimeType);
+    fd.append('photoFile', compressedPhotoB64);
+
+    fetch(S, { method: 'POST', body: fd })
+      .then(function(r){ return r.json(); })
+      .then(function(res){
+        if (btn) btn.disabled = false;
+        if (btnTxt) btnTxt.textContent = 'গ্যালারিতে পোস্ট করুন';
+        if (res && res.status === 'Success') {
+          var newItem = res.item || {
+            id: Date.now(),
+            name: name,
+            district: dist,
+            bg: bg,
+            date: donDate,
+            image: compressedPhotoB64
+          };
+          // সাথে সাথে লোকাল ছবি হিসেবেও প্রদর্শন যাতে ১ সেকেন্ডও অপেক্ষা করতে না হয়
+          if (!newItem.image) newItem.image = compressedPhotoB64;
+          allGalleryItems.unshift(newItem);
+          saveLocalGalleryCache(allGalleryItems);
+          window.renderSpondonGallery();
+
+          if (msgBox) { msgBox.style.display = 'block'; msgBox.style.color = '#059669'; msgBox.textContent = res.message || '✅ সফলভাবে গ্যালারিতে যুক্ত হয়েছে!'; }
+          showToast('📸 আপনার ছবি স্পন্দন গ্যালারিতে যুক্ত হয়েছে!');
+          if (nameEl) nameEl.value = '';
+          compressedPhotoB64 = '';
+          var thumb = document.getElementById('gal-preview-thumb');
+          if (thumb) thumb.style.display = 'none';
+          var flbl = document.getElementById('gal-file-name');
+          if (flbl) flbl.textContent = 'একটি ছবি নির্বাচন করুন *';
+          var finp = document.getElementById('gal-file-inp');
+          if (finp) finp.value = '';
+          setTimeout(function(){
+            var f = document.getElementById('sbs-gallery-form');
+            if (f && f.classList.contains('open')) window.toggleGalleryUploadForm();
+            if (msgBox) msgBox.style.display = 'none';
+          }, 2200);
+        } else {
+          if (msgBox) { msgBox.style.display = 'block'; msgBox.style.color = '#dc2626'; msgBox.textContent = (res && res.message) ? res.message : '⚠️ আপলোড করতে সমস্যা হয়েছে। নতুন Code.gs ডিপ্লয় করা আছে কি না চেক করুন।'; }
+        }
+      })
+      .catch(function(){
+        if (btn) btn.disabled = false;
+        if (btnTxt) btnTxt.textContent = 'গ্যালারিতে পোস্ট করুন';
+        if (msgBox) { msgBox.style.display = 'block'; msgBox.style.color = '#dc2626'; msgBox.textContent = '⚠️ নেটওয়ার্ক ত্রুটি! অনুগ্রহ করে আবার চেষ্টা করুন।'; }
+      });
+    return false;
+  };
+
+  // পেজ লোডের শুরুতে লোকাল ক্যাশ থেকে গ্যালারি রেন্ডার এবং ব্যাকএন্ড থেকে সিঙ্ক
+  allGalleryItems = getLocalGalleryCache();
+  window.renderSpondonGallery();
+  setTimeout(window.fetchGalleryDirect, 900);
+})();
+
 </script>
 </body>
 </html>
