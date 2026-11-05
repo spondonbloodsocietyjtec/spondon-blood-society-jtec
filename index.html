@@ -2555,95 +2555,165 @@ function fail(e){
   });
 }
 
-/* ---------- PRECISE MULTI-SOURCE IP GEOLOCATION ENGINE (যখন GPS পারমিশন দেওয়া হয় না) ---------- */
-// কেন আগে বাগেরহাট এসেছিল? কারণ BigDataCloud অনেক সময় জিপিএস ছাড়া বাংলাদেশের ভৌগোলিক মধ্যবিন্দু (22.65, 89.78 = বাগেরহাট) রিটার্ন করে!
-// তাই BigDataCloud-এর ডিফল্ট মধ্যবিন্দু বাদ দিয়ে শুধুমাত্র প্রকৃত ISP রাউটার (ipwho.is, ipapi.co, geojs.io, freeipapi.com) থেকে
-// শহরের নাম ও নিখুঁত কোঅর্ডিনেট ভেরিফাই করে সঠিক জেলা (যেমন চট্টগ্রাম থাকলে চট্টগ্রামই) নির্ধারণ করা হচ্ছে:
+/* ---------- PRECISE MULTI-SOURCE IP GEOLOCATION ENGINE (যখন GPS ব্লক বা অফ থাকে — সেকেন্ডারি অপশন) ---------- */
+// মেইন ফোকাস সবসময় GPS লোকেশন। কিন্তু ইউজার যদি ব্রাউজারে লোকেশন পারমিশন Block করে দেন বা GPS কাজ না করে,
+// তবে সেকেন্ডারি অপশন হিসেবে সাথে সাথে IP অ্যাড্রেস ট্র্যাক করে তাঁর জেলা বের করবে এবং পপআপে "বন্ধ করে আনুমানিক জেলার নোটিশ দেখুন" বাটন দেখাবে!
 var IPS=[
-  ['https://ipwho.is/',function(j){
+  ['https://ipwho.is/',function(txt){
+    var j=JSON.parse(txt);
     if(!j||j.success===false||j.country_code!=='BD')return null;
     var cityDist=matchTextToDistrict(j.city||'');
     var regDist=matchTextToDistrict(j.region||'');
     var coordDist='';
     if(!isNaN(parseFloat(j.latitude))&&!isNaN(parseFloat(j.longitude))){
       var nr=nearest(parseFloat(j.latitude),parseFloat(j.longitude));
-      if(nr.km<=150)coordDist=nr.name;
+      if(nr.km<=160)coordDist=nr.name;
     }
     return cityDist||coordDist||regDist||'';
   }],
-  ['https://ipapi.co/json/',function(j){
+  ['https://ipapi.co/json/',function(txt){
+    var j=JSON.parse(txt);
     if(!j||j.country_code!=='BD')return null;
     var cityDist=matchTextToDistrict(j.city||'');
     var regDist=matchTextToDistrict(j.region||'');
     var coordDist='';
     if(!isNaN(parseFloat(j.latitude))&&!isNaN(parseFloat(j.longitude))){
       var nr=nearest(parseFloat(j.latitude),parseFloat(j.longitude));
-      if(nr.km<=150)coordDist=nr.name;
+      if(nr.km<=160)coordDist=nr.name;
     }
     return cityDist||coordDist||regDist||'';
   }],
-  ['https://freeipapi.com/api/json',function(j){
+  ['https://freeipapi.com/api/json',function(txt){
+    var j=JSON.parse(txt);
     if(!j||j.countryCode!=='BD')return null;
     var cityDist=matchTextToDistrict(j.cityName||'');
     var regDist=matchTextToDistrict(j.regionName||'');
     var coordDist='';
     if(!isNaN(parseFloat(j.latitude))&&!isNaN(parseFloat(j.longitude))){
       var nr=nearest(parseFloat(j.latitude),parseFloat(j.longitude));
-      if(nr.km<=150)coordDist=nr.name;
+      if(nr.km<=160)coordDist=nr.name;
     }
     return cityDist||coordDist||regDist||'';
   }],
-  ['https://get.geojs.io/v1/ip/geo.json',function(j){
+  ['https://get.geojs.io/v1/ip/geo.json',function(txt){
+    var j=JSON.parse(txt);
     if(!j||j.country_code!=='BD')return null;
     var cityDist=matchTextToDistrict((j.city||'')+' '+(j.region||''));
     var coordDist='';
     if(!isNaN(parseFloat(j.latitude))&&!isNaN(parseFloat(j.longitude))){
       var nr=nearest(parseFloat(j.latitude),parseFloat(j.longitude));
-      if(nr.km<=150)coordDist=nr.name;
+      if(nr.km<=160)coordDist=nr.name;
     }
     return cityDist||coordDist||'';
+  }],
+  ['https://api.db-ip.com/v2/free/self',function(txt){
+    var j=JSON.parse(txt);
+    if(!j||j.countryCode!=='BD')return null;
+    return matchTextToDistrict((j.city||'')+' '+(j.stateProv||''))||'';
+  }],
+  ['https://www.cloudflare.com/cdn-cgi/trace',function(txt){
+    if(!txt||txt.indexOf('loc=BD')===-1)return null;
+    var m=txt.match(/colo=([A-Z]{3})/);
+    if(m){
+      if(m[1]==='CGP')return 'Chattogram';
+      if(m[1]==='ZYL')return 'Sylhet';
+      if(m[1]==='JSR')return 'Jashore';
+      if(m[1]==='RJH')return 'Rajshahi';
+      if(m[1]==='SPD')return 'Rangpur';
+      if(m[1]==='BZL')return 'Barishal';
+      if(m[1]==='CXB')return "Cox's Bazar";
+      if(m[1]==='DAC')return 'Dhaka';
+    }
+    return '';
   }]
 ];
 
 function ipNote(){
-  return '<br><div style="margin-top:8px;padding:8px 10px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;color:#92400e;font-size:12px;">ℹ️ জিপিএস বন্ধ থাকায় আপনার ইন্টারনেট আইপি থেকে <b>'+ipDist+'</b> জেলা শনাক্ত হয়েছে। শতভাগ নিখুঁত লোকেশনের জন্য <b>ফোনের GPS অন করুন</b> অথবা নিচে জেলা নির্বাচন করুন।</div>';
+  if(!ipDist) {
+    return '<br><div style="margin-top:8px;padding:8px 10px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;color:#92400e;font-size:12px;">⏳ <b>সেকেন্ডারি অপশন (IP Tracking):</b> জিপিএস পারমিশন না পাওয়ায় আপনার ইন্টারনেট আইপি অ্যাড্রেস থেকে বর্তমান জেলা অনুমান করা হচ্ছে...</div>';
+  }
+  return '<br><div style="margin-top:8px;padding:8px 10px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;color:#92400e;font-size:12px;">ℹ️ <b>সেকেন্ডারি অপশন (IP Tracking):</b> জিপিএস বন্ধ/ব্লক থাকায় আপনার ইন্টারনেট আইপি অ্যাড্রেস থেকে আনুমানিক <b>'+ipDist+'</b> জেলা শনাক্ত হয়েছে। শতভাগ নিখুঁত লোকেশনের জন্য <b>ফোনের GPS অন করুন</b> অথবা উপরের <b>"বন্ধ করে আনুমানিক জেলার নোটিশ দেখুন"</b> বাটনে ক্লিক করুন।</div>';
 }
-function ipShow(){var p=$('pdm');if(p)p.innerHTML=lastMsg+ipNote();var c=$('pclose');if(c)c.style.display='block'}
+
+function ipShow(){
+  var p=$('pdm');
+  if(p) p.innerHTML=lastMsg+ipNote();
+  var c=$('pclose');
+  if(c) {
+    c.style.display='block';
+    c.textContent = ipDist
+      ? ('📍 বন্ধ করে আনুমানিক জেলা (' + ipDist + ')-এর নোটিশ দেখুন')
+      : '📍 বন্ধ করে আনুমানিক জেলার নোটিশ দেখুন';
+  }
+}
+
+function fetchWithTimeout(url, ms) {
+  return new Promise(function(resolve, reject){
+    var timer = setTimeout(function(){ reject(new Error('timeout')); }, ms || 2200);
+    fetch(url, {cache:'no-store'}).then(function(r){
+      clearTimeout(timer);
+      return r.text();
+    }).then(resolve).catch(function(err){
+      clearTimeout(timer);
+      reject(err);
+    });
+  });
+}
 
 function ipFallback(){
+  // জিপিএস ব্লক বা ব্যর্থ হওয়ার সাথে সাথেই সেকেন্ডারি অপশন বাটন (#pclose) দৃশ্যমান হবে!
+  ipShow();
   if(done||manual||ipBusy||ipDist)return;
   ipBusy=true;
   var votes={};
   var order=[];
   var completed=0;
+
+  function applyBestIpDistrict() {
+    if(done||manual||ipDist)return;
+    if(!order.length)return;
+    var best='',maxV=0;
+    var nonDhakaOrder=order.filter(function(d){return d!=='Dhaka'});
+    var pool=nonDhakaOrder.length>0?nonDhakaOrder:order;
+    pool.forEach(function(d){
+      if(votes[d]>maxV){maxV=votes[d];best=d}
+    });
+    var chosen=best||pool[0];
+    if(chosen){
+      ipDist=chosen;
+      ldN(chosen,true);
+      ipShow();
+    }
+  }
+
   IPS.forEach(function(item){
-    fetch(item[0],{cache:'no-store'}).then(function(r){return r.json()}).then(function(j){
-      var dName=item[1](j);
+    fetchWithTimeout(item[0], 2200).then(function(txt){
+      var dName='';
+      try{ dName=item[1](txt); }catch(e){}
       if(dName&&C[dName]){
         votes[dName]=(votes[dName]||0)+1;
         order.push(dName);
+        // প্রথম যে এপিআই দ্রুত জেলা রিটার্ন করবে, সাথে সাথেই তা বাটনে ও টিকারে দেখিয়ে দেবে (২-৩ সেকেন্ড অপেক্ষা করবে না)!
+        if(!ipDist) {
+          ipDist=dName;
+          ldN(dName,true);
+          ipShow();
+        } else if(dName!=='Dhaka' && ipDist==='Dhaka') {
+          // যদি পরবর্তীতে কোনো লোকাল সাবডিভিশন ঢাকার বাইরে সুনির্দিষ্ট জেলা পায়, তবে সাথে সাথে আপডেট করবে
+          ipDist=dName;
+          ldN(dName,true);
+          ipShow();
+        }
       }
     }).catch(function(){}).finally(function(){
       completed++;
       if(completed===IPS.length){
         ipBusy=false;
-        if(done||manual||!order.length)return;
-        // সংখ্যাগরিষ্ঠ ভোটে (Majority Consensus) অথবা আঞ্চলিক সুনির্দিষ্ট জেলা নির্বাচন:
-        var best='',maxV=0;
-        var nonDhakaOrder=order.filter(function(d){return d!=='Dhaka'});
-        var pool=nonDhakaOrder.length>0?nonDhakaOrder:order;
-        pool.forEach(function(d){
-          if(votes[d]>maxV){maxV=votes[d];best=d}
-        });
-        var chosen=best||pool[0];
-        ipDist=chosen;
-        ldN(chosen,true);
-        ipShow();
+        if(!ipDist) applyBestIpDistrict();
       }
     });
   });
 }
-
 /* ---------- auto-resume when the user comes back from Android settings / system dialog ---------- */
 function onBack(){
   if(done||busy||manual)return;
@@ -2673,7 +2743,14 @@ $('pok').addEventListener('click',function(ev){
   // ইউজার ক্লিক করার সাথে সাথে সরাসরি ব্রাউজার ও ডিভাইসের নেটিভ GPS রিকোয়েস্ট (সিনক্রোনাস ইউজার জেসচারের ভেতরে)
   ask();
 });
-$('pclose').addEventListener('click',function(){popHide()});
+$('pclose').addEventListener('click',function(){
+  popHide();
+  if(ipDist) {
+    ldN(ipDist, true);
+  } else {
+    ipFallback();
+  }
+});
 $('pskip').addEventListener('click',function(){manual=true;stopPoll();popHide();sman()});
 $('tdt').addEventListener('click',function(){clearSaved();ipDist='';done=false;manual=true;stopPoll();sman()});
 $('mdb').addEventListener('click',function(){var d=$('mds').value;if(!d)return;manual=true;ipDist='';stopPoll();$('tman').classList.remove('show');save(d);ldN(d,false)});
