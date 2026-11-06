@@ -7973,10 +7973,25 @@ function updateLb() {
   } catch(e){}
 
   function getLocalGalleryCache() {
-    try { return JSON.parse(localStorage.getItem('sbs_gallery_cache_v2') || '[]'); } catch(e){ return []; }
+    try {
+      var v2 = JSON.parse(localStorage.getItem('sbs_gallery_cache_v2') || '[]');
+      var v1 = JSON.parse(localStorage.getItem('sbs_gallery_cache_v1') || '[]');
+      var combined = (Array.isArray(v2) ? v2 : []).concat(Array.isArray(v1) ? v1 : []);
+      var seen = {}, out = [];
+      combined.forEach(function(x) {
+        if (!x || !x.name) return;
+        var k = String(x.name || '').trim() + '_' + String(x.bg || '').trim().toUpperCase() + '_' + String(x.date || '').substring(0, 10).trim();
+        if (!seen[k]) { seen[k] = true; out.push(x); }
+      });
+      return out;
+    } catch(e){ return []; }
   }
   function saveLocalGalleryCache(arr) {
-    try { localStorage.setItem('sbs_gallery_cache_v2', JSON.stringify((arr || []).slice(0, 200))); } catch(e){}
+    try {
+      var sliced = JSON.stringify((arr || []).slice(0, 200));
+      localStorage.setItem('sbs_gallery_cache_v2', sliced);
+      localStorage.setItem('sbs_gallery_cache_v1', sliced);
+    } catch(e){}
   }
 
   function getDeletedGalleryKeys() {
@@ -8391,6 +8406,40 @@ function updateLb() {
     fd.append('mimeType', compressedMimeType || 'image/jpeg');
     fd.append('photoFile', rawB);
 
+    function sendBridgeToSheetIfOldDeployment() {
+      var rfd = new FormData();
+      rfd.append('action', 'addFeedback');
+      rfd.append('name', name);
+      rfd.append('location', '__GAL__|' + dist + '|' + bg + '|' + donDate + '|' + clientId);
+      rfd.append('role', '__SPONDON_GALLERY__');
+      rfd.append('message', normalizeGalleryImageUrl(dataUri));
+      fetch(S, { method: 'POST', body: rfd })
+        .then(function(r){ return r.text(); })
+        .then(function(txt){
+          var rRes = null;
+          try { rRes = JSON.parse(txt); } catch(e){}
+          // ব্যাকএন্ডে মাইগ্রেশন ট্রিগার করার জন্য getGallery পিং করা
+          fetch(S + '?action=getGallery&_t=' + Date.now()).catch(function(){});
+          if (rRes && rRes.status === 'Success') {
+            var srvItem = rRes.item || {
+              id: (rRes.feedback && rRes.feedback.id) ? rRes.feedback.id : clientId,
+              name: name,
+              district: dist,
+              bg: bg,
+              date: donDate,
+              image: normalizeGalleryImageUrl(dataUri),
+              fileId: 'sheet_synced'
+            };
+            if (onComplete) onComplete(srvItem, rRes.message);
+          } else {
+            if (onComplete) onComplete(null, '');
+          }
+        })
+        .catch(function(){
+          if (onComplete) onComplete(null, '');
+        });
+    }
+
     function retryWithUrlEncoded() {
       var params = new URLSearchParams();
       params.append('action', 'addGalleryPhoto');
@@ -8418,11 +8467,11 @@ function updateLb() {
             srvItem.fileId = srvItem.fileId || 'drive_synced';
             if (onComplete) onComplete(srvItem, res.message);
           } else {
-            if (onComplete) onComplete(null, (res && res.message) ? res.message : '');
+            sendBridgeToSheetIfOldDeployment();
           }
         })
         .catch(function(){
-          if (onComplete) onComplete(null, '');
+          sendBridgeToSheetIfOldDeployment();
         });
     }
 
@@ -8506,45 +8555,106 @@ function updateLb() {
     return (c.f !== undefined && c.f !== null && String(c.v).indexOf('Date(') === 0) ? String(c.f).trim() : (c.v !== undefined && c.v !== null ? String(c.v).trim() : '');
   }
 
-  // সরাসরি গুগল শিটের ১৩ নম্বর শিট Gallery_DB থেকে রিয়েল-টাইম ছবি ও তথ্য রিড করা
+  // সরাসরি গুগল শিটের ১৩ নম্বর শিট Gallery_DB থেকে রিয়েল-টাইম ছবি ও তথ্য রিড করা (&headers=1 সহ, যাতে Chrome, Edge, Safari ও Brave সব ব্রাউজারে তাৎক্ষণিক সব ছবি দেখায়)
   function fetchGoogleSheetGalleryDirectGviz() {
-    var galUrl = 'https://docs.google.com/spreadsheets/d/' + GALLERY_SHEET_ID + '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(GALLERY_SHEET_NAME) + '&_t=' + Date.now();
-    fetch(galUrl)
-      .then(function(r){ return r.text(); })
-      .then(function(txt){
-        var obj = parseGvizJson(txt);
-        if (!obj || !obj.table || !Array.isArray(obj.table.rows)) return;
-        var items = [];
-        obj.table.rows.forEach(function(row){
-          var id = cellVal(row, 0);
-          var ts = cellVal(row, 1);
-          var nm = cellVal(row, 2);
-          var dst = cellVal(row, 3);
-          var bg = cellVal(row, 4);
-          var dt = cellVal(row, 5);
-          var img = cellVal(row, 6);
-          var fid = cellVal(row, 7);
-          var st = cellVal(row, 8) || 'Approved';
-          if (!nm || nm === 'Name' || id === 'ID' || st === 'Removed') return;
-          var cleanFid = fid;
-          var m = fid.match(/[-\w]{25,}/);
-          if (m) cleanFid = m[0];
-          items.push({
-            id: id,
-            timestamp: ts,
-            name: nm,
-            district: dst,
-            bg: bg,
-            date: dt.substring(0, 10),
-            image: normalizeGalleryImageUrl(img),
-            fileId: cleanFid || 'sheet_synced'
+    var galUrl = 'https://docs.google.com/spreadsheets/d/' + GALLERY_SHEET_ID + '/gviz/tq?tqx=out:json&headers=1&sheet=' + encodeURIComponent(GALLERY_SHEET_NAME) + '&_t=' + Date.now();
+    var fbTransitUrl = 'https://docs.google.com/spreadsheets/d/' + GALLERY_SHEET_ID + '/gviz/tq?tqx=out:json&headers=1&sheet=Feedback_DB&_t=' + Date.now();
+
+    Promise.all([
+      fetch(galUrl).then(function(r){ return r.text(); }).catch(function(){ return ''; }),
+      fetch(fbTransitUrl).then(function(r){ return r.text(); }).catch(function(){ return ''; })
+    ]).then(function(results) {
+      var items = [];
+      var galTxt = results[0] || '';
+      var fbTxt = results[1] || '';
+
+      var obj = parseGvizJson(galTxt);
+      if (obj && obj.table) {
+        if (Array.isArray(obj.table.rows) && obj.table.rows.length > 0) {
+          obj.table.rows.forEach(function(row){
+            var id = cellVal(row, 0);
+            var ts = cellVal(row, 1);
+            var nm = cellVal(row, 2);
+            var dst = cellVal(row, 3);
+            var bg = cellVal(row, 4);
+            var dt = cellVal(row, 5);
+            var img = cellVal(row, 6);
+            var fid = cellVal(row, 7);
+            var st = cellVal(row, 8) || 'Approved';
+            if (!nm || nm === 'Name' || id === 'ID' || st === 'Removed') return;
+            var cleanFid = extractDriveFileId(fid) || extractDriveFileId(img);
+            items.push({
+              id: id,
+              timestamp: ts,
+              name: nm,
+              district: dst,
+              bg: bg,
+              date: dt.substring(0, 10),
+              image: normalizeGalleryImageUrl(img),
+              fileId: cleanFid || 'sheet_synced'
+            });
           });
-        });
-        items.reverse();
-        if (items.length > 0) {
-          window.setServerGalleryItems(items);
+        } else if (Array.isArray(obj.table.cols) && obj.table.cols.length >= 7) {
+          // যদি সব কলাম টেক্সট হওয়ার কারণে gviz ২য় সারিকে হেডার লেবেলের সাথে মার্জ করে থাকে, তবে তা থেকেও ডাটা রিকভার করবে
+          var lblId = String((obj.table.cols[0] && obj.table.cols[0].label) || '').replace(/^ID\s*/i, '').trim();
+          var lblTs = String((obj.table.cols[1] && obj.table.cols[1].label) || '').replace(/^Timestamp\s*/i, '').trim();
+          var lblNm = String((obj.table.cols[2] && obj.table.cols[2].label) || '').replace(/^Name\s*/i, '').trim();
+          var lblDst = String((obj.table.cols[3] && obj.table.cols[3].label) || '').replace(/^District\s*/i, '').trim();
+          var lblBg = String((obj.table.cols[4] && obj.table.cols[4].label) || '').replace(/^Blood_Group\s*/i, '').trim();
+          var lblDt = String((obj.table.cols[5] && obj.table.cols[5].label) || '').replace(/^Donation_Date\s*/i, '').trim();
+          var lblImg = String((obj.table.cols[6] && obj.table.cols[6].label) || '').replace(/^Image_URL\s*/i, '').trim();
+          var lblFid = String((obj.table.cols[7] && obj.table.cols[7].label) || '').replace(/^Drive_File_ID\s*/i, '').trim();
+          if (lblNm && lblImg) {
+            var cFid = extractDriveFileId(lblFid) || extractDriveFileId(lblImg);
+            items.push({
+              id: lblId || Date.now().toString(),
+              timestamp: lblTs,
+              name: lblNm,
+              district: lblDst,
+              bg: lblBg,
+              date: lblDt.substring(0, 10),
+              image: normalizeGalleryImageUrl(lblImg),
+              fileId: cFid || 'sheet_synced'
+            });
+          }
         }
-      }).catch(function(){});
+      }
+      items.reverse();
+
+      // যদি কোনো ছবি ট্রানজিটে থাকে (১ মিনিটের অটো-ট্রিগারে Gallery_DB-তে ট্রান্সফার হওয়ার আগ মুহূর্ত পর্যন্ত), সেটিও সাথে সাথে দেখাবে
+      var fbObj = parseGvizJson(fbTxt);
+      var transitItems = [];
+      if (fbObj && fbObj.table && Array.isArray(fbObj.table.rows)) {
+        fbObj.table.rows.forEach(function(row){
+          var id = cellVal(row, 0);
+          var dt = cellVal(row, 1);
+          var nm = cellVal(row, 2);
+          var loc = cellVal(row, 3);
+          var rl = cellVal(row, 4);
+          var msg = cellVal(row, 5);
+          var st = cellVal(row, 6) || 'Approved';
+          if (st === 'Removed') return;
+          if (rl === '__SPONDON_GALLERY__' || loc.indexOf('__GAL__|') === 0) {
+            var parts = loc.split('|');
+            transitItems.push({
+              id: parts[4] || id,
+              name: nm,
+              district: parts[1] || '',
+              bg: parts[2] || '',
+              date: (parts[3] || dt || '').substring(0, 10),
+              image: normalizeGalleryImageUrl(msg),
+              fileId: 'sheet_synced'
+            });
+          }
+        });
+      }
+      transitItems.reverse();
+
+      var combined = transitItems.concat(items);
+      if (combined.length > 0) {
+        window.setServerGalleryItems(combined);
+      }
+    }).catch(function(){});
   }
 
   window.syncUnsyncedLocalGallery = function() {
