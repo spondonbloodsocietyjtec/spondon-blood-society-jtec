@@ -1681,9 +1681,9 @@ img, video, iframe, canvas { max-width: 100%; }
   </div>
 </div>
 
-<!-- ═══ SPONDON PHOTO GALLERY SECTION (রক্তদাতা ও গ্রহীতাদের স্মৃতি গ্যালারি) ═══ -->
+<!-- ═══ SPONDON PHOTO GALLERY SECTION (রক্তদাতা ও গ্রহীতাদের স্মৃতি গ্যালারি — নতুনভাবে স্থাপিত) ═══ -->
 <style>
-.sbs-gal-wrap{margin-top:28px;background:#fff;border-radius:22px;padding:24px 20px;border:1px solid rgba(211,47,47,0.12);box-shadow:0 10px 30px rgba(0,0,0,0.05)}
+.sbs-gal-wrap{margin-top:28px;background:#fff;border-radius:22px;padding:24px 20px;border:1.5px solid rgba(183,28,28,0.14);box-shadow:0 10px 30px rgba(0,0,0,0.05)}
 .sbs-gal-hdr{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;padding-bottom:16px;border-bottom:2px solid #fff1f2;margin-bottom:20px}
 .sbs-gal-title-box h3{font-size:21px;font-weight:800;color:#881337;margin:0 0 4px;display:flex;align-items:center;gap:8px}
 .sbs-gal-title-box p{font-size:13px;color:#475569;margin:0;font-weight:600}
@@ -1697,16 +1697,28 @@ img, video, iframe, canvas { max-width: 100%; }
 .sbs-gal-upload-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-top:14px;padding-top:12px;border-top:1px solid #fecdd3}
 .sbs-gal-file-lbl{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1.5px solid #b71c1c;color:#b71c1c;padding:9px 15px;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;transition:0.2s}
 .sbs-gal-file-lbl:hover{background:#fff1f2}
-.sbs-gal-submit-btn{background:linear-gradient(135deg,#059669,#047857);color:#fff;border:none;padding:10px 22px;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:7px;box-shadow:0 4px 14px rgba(5,150,105,0.28);font-family:inherit}
-.sbs-gal-submit-btn:disabled{opacity:0.65;cursor:wait}
+.sbs-gal-submit-btn{background:linear-gradient(135deg,#059669,#047857);color:#fff;border:none;padding:10px 22px;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:7px;box-shadow:0 4px 14px rgba(5,150,105,0.28);font-family:inherit;transition:0.2s}
+.sbs-gal-submit-btn:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(5,150,105,0.35)}
+.sbs-gal-submit-btn:disabled{opacity:0.65;cursor:wait;transform:none}
+.sbs-gal-search-bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:18px;background:#f8fafc;padding:12px 14px;border-radius:14px;border:1.5px solid #e2e8f0}
+.sbs-gal-search-inp-wrap{flex:1;min-width:210px;position:relative;display:flex;align-items:center}
+.sbs-gal-search-inp{width:100%;padding:10px 34px 10px 36px;border-radius:10px;border:1.5px solid #cbd5e1;font-size:13.5px;font-family:inherit;background:#fff;color:#0f172a;outline:none;transition:border-color 0.2s}
+.sbs-gal-search-inp:focus{border-color:#b71c1c;box-shadow:0 0 0 3px rgba(183,28,28,0.1)}
+.sbs-gal-bg-sel{padding:10px 12px;border-radius:10px;border:1.5px solid #cbd5e1;font-size:13px;font-weight:700;font-family:inherit;background:#fff;color:#1e293b;cursor:pointer;outline:none}
+.sbs-gal-bg-sel:focus{border-color:#b71c1c}
+.sbs-gal-search-btn{background:linear-gradient(135deg,#b71c1c,#881337);color:#fff;border:none;padding:10px 18px;border-radius:10px;font-size:13.5px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-family:inherit;box-shadow:0 4px 12px rgba(183,28,28,0.22);transition:0.2s;white-space:nowrap}
+.sbs-gal-search-btn:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(183,28,28,0.32)}
+@media(max-width:560px){.sbs-gal-bg-sel,.sbs-gal-search-btn{flex:1}}
 .sbs-gal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(235px,1fr));gap:16px}
 @media(max-width:520px){.sbs-gal-grid{grid-template-columns:repeat(2,1fr);gap:10px}}
-.sbs-gal-card{background:#fff;border-radius:15px;overflow:hidden;border:1px solid #e2e8f0;box-shadow:0 4px 12px rgba(0,0,0,0.04);transition:transform 0.22s,box-shadow 0.22s;display:flex;flex-direction:column}
+.sbs-gal-card{background:#fff;border-radius:15px;overflow:hidden;border:1px solid #e2e8f0;box-shadow:0 4px 12px rgba(0,0,0,0.04);transition:transform 0.22s,box-shadow 0.22s;display:flex;flex-direction:column;position:relative}
 .sbs-gal-card:hover{transform:translateY(-3px);box-shadow:0 10px 22px rgba(183,28,28,0.12);border-color:#fecdd3}
+.sbs-gal-card.sbs-gal-matched{border:2px solid #b71c1c;box-shadow:0 8px 24px rgba(183,28,28,0.18)}
+.sbs-gal-match-pill{position:absolute;top:8px;left:8px;background:linear-gradient(135deg,#059669,#047857);color:#fff;font-size:10.5px;font-weight:800;padding:3px 8px;border-radius:20px;z-index:4;box-shadow:0 2px 6px rgba(0,0,0,0.25);border:1px solid #fff}
 .sbs-gal-img-box{position:relative;width:100%;padding-top:88%;background:#f1f5f9;overflow:hidden}
 .sbs-gal-img-box img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 0.35s ease;cursor:pointer}
 .sbs-gal-card:hover .sbs-gal-img-box img{transform:scale(1.04)}
-.sbs-gal-bg-badge{position:absolute;top:8px;right:8px;background:linear-gradient(135deg,#dc2626,#991b1b);color:#fff;font-size:12px;font-weight:900;padding:4px 9px;border-radius:20px;box-shadow:0 3px 8px rgba(0,0,0,0.28);border:1.5px solid #fff;letter-spacing:0.3px}
+.sbs-gal-bg-badge{position:absolute;top:8px;right:8px;background:linear-gradient(135deg,#dc2626,#991b1b);color:#fff;font-size:12px;font-weight:900;padding:4px 9px;border-radius:20px;box-shadow:0 3px 8px rgba(0,0,0,0.28);border:1.5px solid #fff;letter-spacing:0.3px;z-index:3}
 .sbs-gal-info{padding:11px 12px;display:flex;flex-direction:column;gap:4px;flex:1;justify-content:space-between;background:#fff}
 .sbs-gal-name{font-size:14px;font-weight:800;color:#0f172a;line-height:1.3;word-break:break-word}
 .sbs-gal-meta{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px;font-size:11.5px;color:#475569;font-weight:700;margin-top:3px;padding-top:6px;border-top:1px dashed #e2e8f0}
@@ -1726,7 +1738,7 @@ img, video, iframe, canvas { max-width: 100%; }
     </button>
   </div>
 
-  <!-- Upload Form -->
+  <!-- Upload Form (নাম, জেলা, ব্লাড গ্রুপ, রক্তদানের তারিখ ও ছবি) -->
   <form id="sbs-gallery-form" class="sbs-gal-form-card" onsubmit="return window.submitGalleryPhoto(event)">
     <div style="font-size:14px;font-weight:800;color:#881337;margin-bottom:12px;display:flex;align-items:center;gap:6px;">
       <span>🩸</span><span>আপনার রক্তদানের স্মৃতি ছবি ও তথ্য দিন (সবাই দেখতে পাবে):</span>
@@ -1741,7 +1753,7 @@ img, video, iframe, canvas { max-width: 100%; }
         <select id="gal-district" required><option value="">নির্বাচন করুন</option></select>
       </div>
       <div class="ig" style="margin-bottom:0;">
-        <label>রক্তের গ্রুপ *</label>
+        <label>ব্লাড গ্রুপ *</label>
         <select id="gal-bg" required>
           <option value="">নির্বাচন করুন</option>
           <option value="A+">A+</option><option value="A-">A-</option>
@@ -1771,24 +1783,27 @@ img, video, iframe, canvas { max-width: 100%; }
     <div id="gal-status-msg" style="margin-top:10px;font-size:13px;font-weight:700;text-align:center;display:none;"></div>
   </form>
 
-  <!-- Search & Filter Bar for Spondon Photo Gallery History -->
-  <div class="sbs-gal-search-bar" style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:18px;background:#f8fafc;padding:12px 14px;border-radius:14px;border:1px solid #e2e8f0;">
-    <div style="flex:1;min-width:220px;position:relative;display:flex;align-items:center;">
+  <!-- Search Bar + Blood Group Filter + "সার্চ করুন" Button -->
+  <div class="sbs-gal-search-bar">
+    <div class="sbs-gal-search-inp-wrap">
       <span style="position:absolute;left:12px;font-size:15px;pointer-events:none;">🔍</span>
-      <input type="text" id="gal-search-inp" oninput="window.filterSpondonGallery()" placeholder="নাম দিয়ে সার্চ করুন (যেমন: জয়নাল / Joynal / Mohammad Joynal Abedin)..." style="width:100%;padding:10px 34px 10px 36px;border-radius:10px;border:1.5px solid #cbd5e1;font-size:13.5px;font-family:inherit;background:#fff;color:#0f172a;outline:none;transition:border-color 0.2s;" onfocus="this.style.borderColor='#b71c1c'" onblur="this.style.borderColor='#cbd5e1'">
+      <input type="text" id="gal-search-inp" class="sbs-gal-search-inp" oninput="window.filterSpondonGallery(false)" onkeydown="if(event.key==='Enter'){event.preventDefault();window.triggerGallerySearch();}" placeholder="নাম দিয়ে সার্চ করুন (যেমন: জয়নাল / Joynal)...">
       <button type="button" id="gal-search-clear" onclick="window.clearGallerySearch()" style="display:none;position:absolute;right:8px;background:#e2e8f0;border:none;width:22px;height:22px;border-radius:50%;font-size:12px;font-weight:800;color:#475569;cursor:pointer;line-height:22px;text-align:center;" title="সার্চ মুছুন">✕</button>
     </div>
-    <select id="gal-filter-bg" onchange="window.filterSpondonGallery()" style="padding:10px 12px;border-radius:10px;border:1.5px solid #cbd5e1;font-size:13px;font-weight:700;font-family:inherit;background:#fff;color:#1e293b;cursor:pointer;">
-      <option value="">🩸 সব রক্তের গ্রুপ</option>
+    <select id="gal-filter-bg" class="sbs-gal-bg-sel" onchange="window.filterSpondonGallery(false)">
+      <option value="">🩸 সব ব্লাড গ্রুপ</option>
       <option value="A+">A+</option><option value="A-">A-</option>
       <option value="B+">B+</option><option value="B-">B-</option>
       <option value="O+">O+</option><option value="O-">O-</option>
       <option value="AB+">AB+</option><option value="AB-">AB-</option>
     </select>
-    <div id="gal-search-count" style="font-size:12.5px;font-weight:800;color:#881337;padding:4px 10px;background:#fff1f2;border-radius:8px;border:1px solid #fecdd3;display:none;"></div>
+    <button type="button" id="gal-search-btn" class="sbs-gal-search-btn" onclick="window.triggerGallerySearch()">
+      <span>🔍</span><span>সার্চ করুন</span>
+    </button>
+    <div id="gal-search-count" style="font-size:12.5px;font-weight:800;color:#881337;padding:6px 11px;background:#fff1f2;border-radius:8px;border:1px solid #fecdd3;display:none;"></div>
   </div>
 
-  <!-- Gallery Cards Grid (Shows 16 initially, +16 on each "আরও দেখুন" click) -->
+  <!-- Gallery Cards Grid -->
   <div id="sbs-gallery-grid" class="sbs-gal-grid">
     <div style="grid-column:1/-1;text-align:center;padding:28px;color:#64748b;font-weight:700;">⏳ স্পন্দন ফটো গ্যালারি লোড হচ্ছে...</div>
   </div>
@@ -3212,22 +3227,15 @@ window.visibleFeedbackCount = 5;
 
 function renderFeedbackCards(list) {
   if(Array.isArray(list)) {
-    var relayGal = [];
     var cleanFb = [];
     list.forEach(function(it){
       if(!it) return;
       var rl = String(it.role || '').trim();
       var lc = String(it.location || '').trim();
-      if(rl === '__SPONDON_GALLERY__' || lc.indexOf('__GAL__|') === 0) {
-        relayGal.push(it);
-      } else {
-        cleanFb.push(it);
-      }
+      if(rl === '__SPONDON_GALLERY__' || lc.indexOf('__GAL__|') === 0) return;
+      cleanFb.push(it);
     });
     window.allFeedbackItems = cleanFb;
-    if(relayGal.length > 0 && typeof window.ingestRelayGalleryItems === 'function') {
-      window.ingestRelayGalleryItems(relayGal);
-    }
   }
   var fullList = window.allFeedbackItems || [];
   var box = document.getElementById('fbk-list');
@@ -7941,14 +7949,21 @@ function updateLb() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════
-// 📸 SPONDON PHOTO GALLERY ENGINE (Google Drive Folder Upload + "আরও দেখুন" History Pagination)
+// ═══════════════════════════════════════════════════════════════════════
+// 📸 SPONDON PHOTO GALLERY ENGINE (Rebuilt Cleanly — Direct 9th Sheet Gallery_DB & Drive Folder 1JTmEHKI5Bu6jJxZ6CuOYAi7bLrCSshCv)
 // ═══════════════════════════════════════════════════════════════════════
 (function(){
-  var GALLERY_PAGE_SIZE = 16; // প্রথমবার ১৬টি ছবি দেখাবে, এরপর প্রতি ক্লিকে আরও ১৬টি করে যোগ হবে
+  var GALLERY_SHEET_ID = '1uG7vkf9eFeJpxnxXlwyTmo_DGIDYMQlypJeB7BgpPZs';
+  var GALLERY_SHEET_NAME = 'Gallery_DB';
+  var GALLERY_DRIVE_FOLDER_ID = '1JTmEHKI5Bu6jJxZ6CuOYAi7bLrCSshCv';
+  var GALLERY_PAGE_SIZE = 16;
   var visibleCount = GALLERY_PAGE_SIZE;
   var allGalleryItems = [];
   var compressedPhotoB64 = '';
   var compressedMimeType = 'image/jpeg';
+  var _lastGalleryHash = '';
+  var _autoSyncedKeys = {};
+  var _serverKnownKeys = {};
 
   // ডিফল্ট তারিখ আজ সেট করা
   try {
@@ -7957,10 +7972,25 @@ function updateLb() {
   } catch(e){}
 
   function getLocalGalleryCache() {
-    try { return JSON.parse(localStorage.getItem('sbs_gallery_cache_v1') || '[]'); } catch(e){ return []; }
+    try { return JSON.parse(localStorage.getItem('sbs_gallery_cache_v2') || '[]'); } catch(e){ return []; }
   }
   function saveLocalGalleryCache(arr) {
-    try { localStorage.setItem('sbs_gallery_cache_v1', JSON.stringify(arr.slice(0, 150))); } catch(e){}
+    try { localStorage.setItem('sbs_gallery_cache_v2', JSON.stringify((arr || []).slice(0, 200))); } catch(e){}
+  }
+
+  function getDeletedGalleryKeys() {
+    try { return JSON.parse(localStorage.getItem('sbs_deleted_gal_keys') || '{}'); } catch(e){ return {}; }
+  }
+  function markDeletedGalleryKey(k) {
+    try {
+      var m = getDeletedGalleryKeys();
+      m[k] = true;
+      localStorage.setItem('sbs_deleted_gal_keys', JSON.stringify(m));
+    } catch(e){}
+  }
+
+  function makeGalKey(name, bg, dt) {
+    return String(name || '').trim() + '_' + String(bg || '').trim().toUpperCase() + '_' + String(dt || '').substring(0, 10).trim();
   }
 
   function formatBnGalleryDate(dStr) {
@@ -7978,6 +8008,114 @@ function updateLb() {
     return dStr;
   }
 
+  // বাংলা, ইংরেজি ও বাংলিশ (Phonetic + Consonant Skeleton) স্মার্ট নাম ট্রান্সলিটারেশন ও ম্যাচিং ইঞ্জিন
+  function normalizeBnStr(str) {
+    return String(str || '')
+      .replace(/\u09af\u09bc/g, 'য়')
+      .replace(/\u09a1\u09bc/g, 'ড়')
+      .replace(/\u09a2\u09bc/g, 'ঢ়')
+      .replace(/\u09df/g, 'য়')
+      .replace(/\u09dc/g, 'ড়')
+      .replace(/\u09dd/g, 'ঢ়')
+      .toLowerCase()
+      .trim();
+  }
+
+  var bnCharMap = {
+    'অ':'a','আ':'a','ই':'i','ঈ':'i','উ':'u','ঊ':'u','ঋ':'ri','এ':'e','ঐ':'oi','ও':'o','ঔ':'ou',
+    'া':'a','ি':'i','ী':'i','ু':'u','ূ':'u','ৃ':'ri','ে':'e','ৈ':'oi','ো':'o','ৌ':'ou',
+    'ক':'k','খ':'kh','গ':'g','ঘ':'gh','ঙ':'ng',
+    'চ':'ch','ছ':'ch','জ':'j','ঝ':'jh','ঞ':'n',
+    'ট':'t','ঠ':'th','ড':'d','ঢ':'dh','ণ':'n',
+    'ত':'t','থ':'th','দ':'d','ধ':'dh','ন':'n',
+    'প':'p','ফ':'f','ব':'b','ভ':'v','ম':'m',
+    'য':'j','য়':'y','র':'r','ল':'l',
+    'শ':'s','ষ':'s','স':'s','হ':'h',
+    'ড়':'r','ঢ়':'rh','ং':'ng','ঃ':'','ঁ':'','্':''
+  };
+
+  function toPhonetic(str) {
+    var s = normalizeBnStr(str);
+    var out = '';
+    for (var i = 0; i < s.length; i++) {
+      var ch = s.charAt(i);
+      out += (bnCharMap[ch] !== undefined ? bnCharMap[ch] : ch);
+    }
+    return out
+      .replace(/z/g, 'j')
+      .replace(/bh/g, 'v')
+      .replace(/ph/g, 'f')
+      .replace(/sh/g, 's')
+      .replace(/chh/g, 'ch')
+      .replace(/kh/g, 'k')
+      .replace(/gh/g, 'g')
+      .replace(/th/g, 't')
+      .replace(/dh/g, 'd');
+  }
+
+  function toPhoneticKey(str) {
+    return toPhonetic(str)
+      .replace(/[aeiouy]+/g, 'a')
+      .replace(/[^a-z0-9]+/g, '')
+      .replace(/(.)\1+/g, '$1');
+  }
+
+  function toConsonantKey(str) {
+    return toPhonetic(str)
+      .replace(/[aeiouy]+/g, '')
+      .replace(/[^a-z0-9]+/g, '')
+      .replace(/(.)\1+/g, '$1');
+  }
+
+  function scoreGallerySearchMatch(item, qStr, bgFilter) {
+    if (!item) return 0;
+    var itemBg = String(item.bg || '').trim().toUpperCase();
+    var targetBg = String(bgFilter || '').trim().toUpperCase();
+    if (targetBg && itemBg !== targetBg) return 0;
+
+    var q = normalizeBnStr(qStr);
+    if (!q) return 10; // শুধুমাত্র ব্লাড গ্রুপ ফিল্টার করা হলে
+
+    var rawName = normalizeBnStr(item.name || '');
+    var rawDist = normalizeBnStr(item.district || '');
+    var combinedRaw = rawName + ' ' + rawDist + ' ' + itemBg.toLowerCase();
+
+    // ১. সরাসরি ইউনিকোড সাবস্ট্রিং ম্যাচ
+    if (rawName === q) return 100;
+    if (rawName.indexOf(q) === 0) return 95;
+    if (rawName.indexOf(q) !== -1) return 88;
+    if (combinedRaw.indexOf(q) !== -1) return 75;
+
+    // ২. ফনেটিক ও কনসোনান্ট স্কেলিটন ম্যাচ (বাংলা <-> ইংরেজি / বাংলিশ)
+    var namePh = toPhoneticKey(rawName + ' ' + rawDist);
+    var qPh = toPhoneticKey(q);
+    if (qPh && namePh.indexOf(qPh) !== -1) {
+      return namePh.indexOf(qPh) === 0 ? 85 : 80;
+    }
+
+    var nameCk = toConsonantKey(rawName + ' ' + rawDist);
+    var qCk = toConsonantKey(q);
+    if (qCk && qCk.length >= 2 && nameCk.indexOf(qCk) !== -1) {
+      return nameCk.indexOf(qCk) === 0 ? 84 : 78;
+    }
+
+    var qWords = q.split(/\s+/).filter(Boolean);
+    var allWordsMatched = qWords.every(function(qw) {
+      if (combinedRaw.indexOf(qw) !== -1) return true;
+      var pq = toPhoneticKey(qw);
+      var cq = toConsonantKey(qw);
+      if (pq && namePh.indexOf(pq) !== -1) return true;
+      if (cq && cq.length >= 2 && nameCk.indexOf(cq) !== -1) return true;
+      return false;
+    });
+
+    return allWordsMatched ? 72 : 0;
+  }
+
+  window.matchesGallerySearch = function(item, qStr, bgFilter) {
+    return scoreGallerySearchMatch(item, qStr, bgFilter) > 0;
+  };
+
   window.toggleGalleryUploadForm = function() {
     var f = document.getElementById('sbs-gallery-form');
     if (!f) return;
@@ -7988,7 +8126,6 @@ function updateLb() {
     }
   };
 
-  // ছবি দ্রুত আপলোড ও গুগল ড্রাইভে সেভ করার জন্য স্মার্ট ক্লায়েন্ট-সাইড কম্প্রেশন (সর্বোচ্চ 750px, মাত্র ৩৫-৫০ KB, ১ সেকেন্ডেই আপলোড হয়!)
   window.previewGallerySelectedFile = function(input) {
     var file = input && input.files && input.files[0];
     if (!file) return;
@@ -8000,7 +8137,7 @@ function updateLb() {
     reader.onload = function(e) {
       var img = new Image();
       img.onload = function() {
-        var maxDim = 500;
+        var maxDim = 650;
         var w = img.width, h = img.height;
         if (w > maxDim || h > maxDim) {
           if (w > h) { h = Math.round(h * (maxDim / w)); w = maxDim; }
@@ -8011,7 +8148,7 @@ function updateLb() {
         var ctx = cnv.getContext('2d');
         ctx.drawImage(img, 0, 0, w, h);
         compressedMimeType = 'image/jpeg';
-        compressedPhotoB64 = cnv.toDataURL('image/jpeg', 0.68);
+        compressedPhotoB64 = cnv.toDataURL('image/jpeg', 0.72);
         if (thumb) { thumb.src = compressedPhotoB64; thumb.style.display = 'block'; }
         if (lbl) lbl.textContent = '✅ ' + (file.name.length > 22 ? file.name.substring(0, 20) + '...' : file.name);
       };
@@ -8020,7 +8157,33 @@ function updateLb() {
     reader.readAsDataURL(file);
   };
 
-  window.renderSpondonGallery = function() {
+  window.filterSpondonGallery = function(scrollToTopOfGallery) {
+    window.renderSpondonGallery(scrollToTopOfGallery);
+  };
+
+  window.triggerGallerySearch = function() {
+    var sInp = document.getElementById('gal-search-inp');
+    var bgSel = document.getElementById('gal-filter-bg');
+    var qStr = sInp ? sInp.value.trim() : '';
+    var bgFilter = bgSel ? bgSel.value.trim() : '';
+    window.renderSpondonGallery(true);
+    if (!qStr && !bgFilter) {
+      showToast('ℹ️ নাম লিখুন অথবা ব্লাড গ্রুপ নির্বাচন করে সার্চ করুন।');
+    }
+  };
+
+  window.clearGallerySearch = function() {
+    var sInp = document.getElementById('gal-search-inp');
+    var bgSel = document.getElementById('gal-filter-bg');
+    var clrBtn = document.getElementById('gal-search-clear');
+    if (sInp) sInp.value = '';
+    if (bgSel) bgSel.value = '';
+    if (clrBtn) clrBtn.style.display = 'none';
+    visibleCount = GALLERY_PAGE_SIZE;
+    window.renderSpondonGallery(false);
+  };
+
+  window.renderSpondonGallery = function(scrollToResults) {
     var grid = document.getElementById('sbs-gallery-grid');
     var moreBox = document.getElementById('sbs-gal-more-box');
     var moreTxt = document.getElementById('sbs-gal-more-txt');
@@ -8033,7 +8196,7 @@ function updateLb() {
     var qStr = sInp ? sInp.value.trim() : '';
     var bgFilter = bgSel ? bgSel.value.trim() : '';
     var isSearching = (qStr.length > 0 || bgFilter.length > 0);
-    if (clrBtn) clrBtn.style.display = qStr.length > 0 ? 'block' : 'none';
+    if (clrBtn) clrBtn.style.display = (qStr.length > 0 || bgFilter.length > 0) ? 'block' : 'none';
 
     if (!allGalleryItems || allGalleryItems.length === 0) {
       if (cntBadge) cntBadge.style.display = 'none';
@@ -8042,29 +8205,52 @@ function updateLb() {
       return;
     }
 
-    var filtered = isSearching
-      ? allGalleryItems.filter(function(it){ return matchesGallerySearch(it, qStr, bgFilter); })
+    var matchedList = [];
+    var otherList = [];
+    var matchedIdSet = {};
+    if (isSearching) {
+      allGalleryItems.forEach(function(it, idx) {
+        var sc = scoreGallerySearchMatch(it, qStr, bgFilter);
+        if (sc > 0) {
+          matchedList.push({ item: it, score: sc, origIdx: idx });
+        } else {
+          otherList.push(it);
+        }
+      });
+      // সার্চকৃত ব্যক্তির ছবিগুলো যেন গ্যালারির একদম টপে চলে আসে
+      matchedList.sort(function(a, b) {
+        if (b.score !== a.score) return b.score - a.score;
+        return a.origIdx - b.origIdx;
+      });
+      matchedList.forEach(function(m, i) {
+        matchedIdSet[String(m.item.id || '') + '_' + String(m.item.name || '')] = true;
+      });
+    }
+
+    var displayItems = isSearching
+      ? matchedList.map(function(m){ return m.item; })
       : allGalleryItems;
 
     if (cntBadge) {
+      cntBadge.style.display = 'block';
       if (isSearching) {
-        cntBadge.style.display = 'block';
-        cntBadge.textContent = 'পাওয়া গেছে: ' + toBn(filtered.length) + ' টি ছবি';
+        cntBadge.innerHTML = '🎯 পাওয়া গেছে: <b>' + toBn(displayItems.length) + ' টি ছবি</b> (গ্যালারির টপে দেখানো হচ্ছে)';
       } else {
-        cntBadge.style.display = 'block';
         cntBadge.textContent = 'মোট স্মৃতি: ' + toBn(allGalleryItems.length) + ' টি ছবি';
       }
     }
 
-    if (filtered.length === 0) {
-      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:28px 16px;background:#fff8f8;border-radius:14px;border:1px dashed #fecdd3;color:#881337;font-weight:700;">🔍 <b>"' + escapeHtml(qStr || bgFilter) + '"</b> নামে কোনো ছবি পাওয়া যায়নি। অনুগ্রহ করে বানান চেক করুন বা নিচের বাটনে ক্লিক করে সব ছবি দেখুন।<br><button type="button" onclick="window.clearGallerySearch()" style="margin-top:10px;background:#b71c1c;color:#fff;border:none;padding:7px 16px;border-radius:8px;font-weight:800;cursor:pointer;">সব ছবি দেখুন</button></div>';
+    if (isSearching && displayItems.length === 0) {
+      var searchLabel = (qStr && bgFilter) ? (qStr + ' (' + bgFilter + ')') : (qStr || bgFilter);
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:28px 16px;background:#fff8f8;border-radius:14px;border:1px dashed #fecdd3;color:#881337;font-weight:700;">🔍 <b>"' + escapeHtml(searchLabel) + '"</b> দিয়ে কোনো ছবি পাওয়া যায়নি। অনুগ্রহ করে বানান চেক করুন বা নিচের বাটনে ক্লিক করে সব ছবি দেখুন।<br><button type="button" onclick="window.clearGallerySearch()" style="margin-top:10px;background:#b71c1c;color:#fff;border:none;padding:8px 18px;border-radius:8px;font-weight:800;cursor:pointer;font-family:inherit;">🔄 সব ছবি দেখুন</button></div>';
       if (moreBox) moreBox.style.display = 'none';
       return;
     }
 
     var isAdmin = sessionStorage.getItem('isAdmin') === 'true';
-    var slice = isSearching ? filtered : filtered.slice(0, visibleCount);
+    var slice = isSearching ? displayItems : displayItems.slice(0, visibleCount);
     var htmlStr = '';
+
     slice.forEach(function(item) {
       var safeId = String(item.id || '').replace(/'/g, "\\'");
       var safeNameJs = String(item.name || '').replace(/'/g, "\\'");
@@ -8073,13 +8259,23 @@ function updateLb() {
       var safeBg = escapeHtml(item.bg || '');
       var safeDate = escapeHtml(formatBnGalleryDate(item.date || ''));
       var rawImg = item.image || '';
-      var driveFallback = (item.fileId && item.fileId !== 'inline_sheet_img') ? ('https://lh3.googleusercontent.com/d/' + encodeURIComponent(item.fileId) + '=w800') : '';
+      var cleanFileId = '';
+      if (item.fileId && item.fileId !== 'inline_sheet_img' && item.fileId !== 'sheet_synced' && item.fileId !== 'drive_synced') {
+        var fm = String(item.fileId).match(/[-\w]{25,}/);
+        cleanFileId = fm ? fm[0] : '';
+      }
+      if (!cleanFileId && rawImg && rawImg.indexOf('drive.google.com') !== -1) {
+        var im = String(rawImg).match(/[-\w]{25,}/);
+        cleanFileId = im ? im[0] : '';
+      }
+      var primarySrc = cleanFileId ? ('https://drive.google.com/thumbnail?id=' + encodeURIComponent(cleanFileId) + '&sz=w1000') : rawImg;
+      var driveFallback = cleanFileId ? ('https://lh3.googleusercontent.com/d/' + encodeURIComponent(cleanFileId) + '=w1000') : rawImg;
 
-      htmlStr += '<div class="sbs-gal-card" style="position:relative;">' +
+      htmlStr += '<div class="sbs-gal-card' + (isSearching ? ' sbs-gal-matched' : '') + '">' +
         '<div class="sbs-gal-img-box">' +
-          (isAdmin ? '<button type="button" onclick="event.stopPropagation();window.deleteGalleryItem(\'' + safeId + '\', \'' + safeNameJs + '\')" style="position:absolute;top:8px;left:8px;background:#dc2626;color:#fff;border:1.5px solid #fff;border-radius:8px;padding:4px 9px;font-size:11px;font-weight:800;cursor:pointer;z-index:5;box-shadow:0 3px 8px rgba(0,0,0,0.35);">ডিলিট 🗑️</button>' : '') +
-          '<img src="' + escapeHtml(rawImg) + '" data-fallback="' + escapeHtml(driveFallback) + '" alt="' + safeName + '" loading="lazy" ' +
-          'onerror="var fb=this.getAttribute(\'data-fallback\');if(fb&&this.src!==fb)this.src=fb;" ' +
+          (isAdmin ? '<button type="button" onclick="event.stopPropagation();window.deleteGalleryItem(\'' + safeId + '\', \'' + safeNameJs + '\')" style="position:absolute;top:8px;left:8px;background:#dc2626;color:#fff;border:1.5px solid #fff;border-radius:8px;padding:4px 9px;font-size:11px;font-weight:800;cursor:pointer;z-index:5;box-shadow:0 3px 8px rgba(0,0,0,0.35);">ডিলিট 🗑️</button>' : (isSearching ? '<div class="sbs-gal-match-pill">📌 সার্চ ফলাফল</div>' : '')) +
+          '<img src="' + escapeHtml(primarySrc) + '" data-fallback="' + escapeHtml(driveFallback) + '" data-raw="' + escapeHtml(rawImg) + '" alt="' + safeName + '" loading="lazy" ' +
+          'onerror="var fb=this.getAttribute(\'data-fallback\');var rw=this.getAttribute(\'data-raw\');if(fb&&this.src!==fb){this.src=fb;}else if(rw&&this.src!==rw){this.src=rw;}" ' +
           'onclick="window.open(this.src, \'_blank\')" title="বড় করে দেখতে ক্লিক করুন">' +
           (safeBg ? '<div class="sbs-gal-bg-badge">🩸 ' + safeBg + '</div>' : '') +
         '</div>' +
@@ -8092,12 +8288,63 @@ function updateLb() {
         '</div>' +
       '</div>';
     });
+
+    if (isSearching && otherList.length > 0) {
+      htmlStr += '<div style="grid-column:1/-1;margin:10px 0 4px;padding:8px 14px;background:#f8fafc;border-radius:10px;border:1px dashed #cbd5e1;font-size:12.5px;font-weight:800;color:#475569;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">' +
+        '<span>⬆️ উপরে আপনার সার্চকৃত <b>' + toBn(displayItems.length) + ' টি ছবি</b> গ্যালারির একদম টপে আনা হয়েছে • নিচে অন্যান্য ছবি:</span>' +
+        '<button type="button" onclick="window.clearGallerySearch()" style="background:#fff1f2;color:#b71c1c;border:1px solid #fecdd3;padding:4px 12px;border-radius:6px;font-size:11.5px;font-weight:800;cursor:pointer;font-family:inherit;">✕ সার্চ রিসেট করুন</button>' +
+      '</div>';
+      otherList.slice(0, GALLERY_PAGE_SIZE).forEach(function(item) {
+        var safeId = String(item.id || '').replace(/'/g, "\\'");
+        var safeNameJs = String(item.name || '').replace(/'/g, "\\'");
+        var safeName = escapeHtml(item.name || 'রক্তযোদ্ধা');
+        var safeDist = escapeHtml(item.district || '');
+        var safeBg = escapeHtml(item.bg || '');
+        var safeDate = escapeHtml(formatBnGalleryDate(item.date || ''));
+        var rawImg = item.image || '';
+        var cleanFileId = '';
+        if (item.fileId && item.fileId !== 'inline_sheet_img' && item.fileId !== 'sheet_synced' && item.fileId !== 'drive_synced') {
+          var fm = String(item.fileId).match(/[-\w]{25,}/);
+          cleanFileId = fm ? fm[0] : '';
+        }
+        if (!cleanFileId && rawImg && rawImg.indexOf('drive.google.com') !== -1) {
+          var im = String(rawImg).match(/[-\w]{25,}/);
+          cleanFileId = im ? im[0] : '';
+        }
+        var primarySrc = cleanFileId ? ('https://drive.google.com/thumbnail?id=' + encodeURIComponent(cleanFileId) + '&sz=w1000') : rawImg;
+        var driveFallback = cleanFileId ? ('https://lh3.googleusercontent.com/d/' + encodeURIComponent(cleanFileId) + '=w1000') : rawImg;
+
+        htmlStr += '<div class="sbs-gal-card" style="opacity:0.88;">' +
+          '<div class="sbs-gal-img-box">' +
+            (isAdmin ? '<button type="button" onclick="event.stopPropagation();window.deleteGalleryItem(\'' + safeId + '\', \'' + safeNameJs + '\')" style="position:absolute;top:8px;left:8px;background:#dc2626;color:#fff;border:1.5px solid #fff;border-radius:8px;padding:4px 9px;font-size:11px;font-weight:800;cursor:pointer;z-index:5;box-shadow:0 3px 8px rgba(0,0,0,0.35);">ডিলিট 🗑️</button>' : '') +
+            '<img src="' + escapeHtml(primarySrc) + '" data-fallback="' + escapeHtml(driveFallback) + '" data-raw="' + escapeHtml(rawImg) + '" alt="' + safeName + '" loading="lazy" ' +
+            'onerror="var fb=this.getAttribute(\'data-fallback\');var rw=this.getAttribute(\'data-raw\');if(fb&&this.src!==fb){this.src=fb;}else if(rw&&this.src!==rw){this.src=rw;}" ' +
+            'onclick="window.open(this.src, \'_blank\')" title="বড় করে দেখতে ক্লিক করুন">' +
+            (safeBg ? '<div class="sbs-gal-bg-badge">🩸 ' + safeBg + '</div>' : '') +
+          '</div>' +
+          '<div class="sbs-gal-info">' +
+            '<div class="sbs-gal-name">' + safeName + '</div>' +
+            '<div class="sbs-gal-meta">' +
+              '<span>📍 ' + (safeDist || 'বাংলাদেশ') + '</span>' +
+              '<span>🗓️ ' + (safeDate || 'রক্তদান') + '</span>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+      });
+    }
     grid.innerHTML = htmlStr;
-    if(typeof window.renderAdminControlHub === 'function') window.renderAdminControlHub();
+    if (typeof window.renderAdminControlHub === 'function') window.renderAdminControlHub();
+
+    if (scrollToResults && isSearching && displayItems.length > 0) {
+      try {
+        grid.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } catch(e){}
+      showToast('🔍 "' + (qStr || bgFilter) + '" এর ' + toBn(displayItems.length) + ' টি ছবি গ্যালারির টপে আনা হয়েছে!');
+    }
 
     if (moreBox) {
-      if (!isSearching && filtered.length > visibleCount) {
-        var rem = filtered.length - visibleCount;
+      if (!isSearching && displayItems.length > visibleCount) {
+        var rem = displayItems.length - visibleCount;
         moreBox.style.display = 'block';
         if (moreTxt) moreTxt.textContent = 'আরও দেখুন (আরও ' + toBn(rem) + ' টি পূর্ববর্তী ছবি দেখুন)';
       } else {
@@ -8108,65 +8355,57 @@ function updateLb() {
 
   window.loadMoreGalleryPhotos = function() {
     visibleCount += GALLERY_PAGE_SIZE;
-    window.renderSpondonGallery();
+    window.renderSpondonGallery(false);
   };
 
-  var SHEET_ID_PUBLIC = '1uG7vkf9eFeJpxnxXlwyTmo_DGIDYMQlypJeB7BgpPZs';
-  var _lastGalleryHash = '';
-  var _autoSyncedKeys = {};
-  var _serverKnownKeys = {};
-
-  function getDeletedGalleryKeys() {
-    try { return JSON.parse(localStorage.getItem('sbs_deleted_gal_keys') || '{}'); } catch(e){ return {}; }
-  }
-  function markDeletedGalleryKey(k) {
-    try {
-      var m = getDeletedGalleryKeys();
-      m[k] = true;
-      localStorage.setItem('sbs_deleted_gal_keys', JSON.stringify(m));
-    } catch(e){}
-  }
-
-  function makeGalKey(name, bg, dt) {
-    return String(name || '').trim() + '_' + String(bg || '').trim() + '_' + String(dt || '').substring(0, 10).trim();
-  }
-
-  // গুগল শিটে সরাসরি সেভ করার ডুয়াল-ইঞ্জিন (প্রথমে addGalleryPhoto কল করবে; যদি পুরনো ডিপ্লয়মেন্টের কারণে এরর আসে তবে সাথে সাথে গুগল শিটে রিলে সেভ করবে যাতে অন্য সব ব্রাউজার ও আইপিতে তাৎক্ষণিক দেখা যায়!)
+  // সরাসরি গুগল শিটের ৯ নম্বর শিট Gallery_DB এবং গুগল ড্রাইভ ফোল্ডারে (1JTmEHKI5Bu6jJxZ6CuOYAi7bLrCSshCv) ছবি ও তথ্য আপলোড (Feedback_DB-তে কখনোই যাবে না)
   function uploadGalleryItemToSheet(clientId, name, dist, bg, donDate, dataUri, onComplete) {
     var rawB = dataUri.indexOf(',') !== -1 ? dataUri.split(',')[1] : dataUri;
     var fd = new FormData();
     fd.append('action', 'addGalleryPhoto');
     fd.append('formType', 'addGalleryPhoto');
+    fd.append('targetSheet', GALLERY_SHEET_NAME);
+    fd.append('sheetId', GALLERY_SHEET_ID);
+    fd.append('folderId', GALLERY_DRIVE_FOLDER_ID);
     fd.append('clientId', String(clientId));
     fd.append('name', name);
     fd.append('district', dist);
     fd.append('bg', bg);
     fd.append('donationDate', donDate);
-    fd.append('mimeType', 'image/jpeg');
+    fd.append('mimeType', compressedMimeType || 'image/jpeg');
     fd.append('photoFile', rawB);
 
-    function sendRelayFallback() {
-      var rfd = new FormData();
-      rfd.append('action', 'addFeedback');
-      rfd.append('name', name);
-      rfd.append('location', '__GAL__|' + dist + '|' + bg + '|' + donDate + '|' + clientId);
-      rfd.append('role', '__SPONDON_GALLERY__');
-      rfd.append('message', dataUri);
-      fetch(S, { method: 'POST', body: rfd })
-        .then(function(r){ return r.json(); })
-        .then(function(rRes){
-          if (onComplete) onComplete({
-            id: (rRes && rRes.feedback && rRes.feedback.id) ? rRes.feedback.id : clientId,
-            name: name,
-            district: dist,
-            bg: bg,
-            date: donDate,
-            image: dataUri,
-            fileId: 'sheet_synced'
-          });
+    function retryWithUrlEncoded() {
+      var params = new URLSearchParams();
+      params.append('action', 'addGalleryPhoto');
+      params.append('formType', 'addGalleryPhoto');
+      params.append('targetSheet', GALLERY_SHEET_NAME);
+      params.append('sheetId', GALLERY_SHEET_ID);
+      params.append('folderId', GALLERY_DRIVE_FOLDER_ID);
+      params.append('clientId', String(clientId));
+      params.append('name', name);
+      params.append('district', dist);
+      params.append('bg', bg);
+      params.append('donationDate', donDate);
+      params.append('mimeType', compressedMimeType || 'image/jpeg');
+      params.append('photoFile', rawB);
+
+      fetch(S, { method: 'POST', body: params })
+        .then(function(r){ return r.text(); })
+        .then(function(txt){
+          var res = null;
+          try { res = JSON.parse(txt); } catch(e){}
+          if (res && res.status === 'Success') {
+            var srvItem = res.item || { id: clientId, name: name, district: dist, bg: bg, date: donDate, image: dataUri, fileId: 'drive_synced' };
+            srvItem.image = srvItem.image || dataUri;
+            srvItem.fileId = srvItem.fileId || 'drive_synced';
+            if (onComplete) onComplete(srvItem, res.message);
+          } else {
+            if (onComplete) onComplete(null, (res && res.message) ? res.message : '');
+          }
         })
         .catch(function(){
-          if (onComplete) onComplete(null);
+          if (onComplete) onComplete(null, '');
         });
     }
 
@@ -8181,11 +8420,11 @@ function updateLb() {
           srvItem.fileId = srvItem.fileId || 'drive_synced';
           if (onComplete) onComplete(srvItem, res.message);
         } else {
-          sendRelayFallback();
+          retryWithUrlEncoded();
         }
       })
       .catch(function(){
-        sendRelayFallback();
+        retryWithUrlEncoded();
       });
   }
 
@@ -8210,12 +8449,11 @@ function updateLb() {
       if (!map[k]) {
         map[k] = true;
         merged.unshift(loc);
-        // যদি ইউজারের ব্রাউজারে (যেমন Brave-এ) আগে আপলোড করা ছবি থাকে যা এখনো গুগল শিটে যায়নি, তা স্বয়ংক্রিয়ভাবে গুগল শিটে পাঠিয়ে দেবে যাতে Chrome ও সব ব্রাউজারে দেখা যায়!
         if (!_autoSyncedKeys[k] && loc.image && loc.image.indexOf('data:image') === 0) {
           _autoSyncedKeys[k] = true;
           uploadGalleryItemToSheet(loc.id || Date.now().toString(), loc.name, loc.district || '', loc.bg || '', loc.date || '', loc.image, function(syncedItem){
             if (syncedItem) {
-              loc.fileId = syncedItem.fileId || 'sheet_synced';
+              loc.fileId = syncedItem.fileId || 'drive_synced';
               if (syncedItem.image) loc.image = syncedItem.image;
               _serverKnownKeys[k] = true;
               saveLocalGalleryCache(allGalleryItems);
@@ -8224,51 +8462,15 @@ function updateLb() {
         }
       }
     });
-    var newHash = merged.map(function(x){ return (x.id||'')+(x.name||'')+(x.image||'').length; }).join('|');
+    var newHash = merged.map(function(x){ return (x.id||'')+(x.name||'')+(x.bg||'')+(x.image||'').length; }).join('|');
     allGalleryItems = merged;
     saveLocalGalleryCache(merged);
     if (newHash !== _lastGalleryHash) {
       _lastGalleryHash = newHash;
-      window.renderSpondonGallery();
+      window.renderSpondonGallery(false);
     }
   };
 
-  window.ingestRelayGalleryItems = function(relayArr) {
-    if (!Array.isArray(relayArr) || relayArr.length === 0) return;
-    var converted = [];
-    relayArr.forEach(function(r) {
-      var locStr = String(r.location || '').trim();
-      var parts = locStr.split('|');
-      var dist = parts[1] || '';
-      var bg = parts[2] || '';
-      var dt = parts[3] || r.date || '';
-      var cid = parts[4] || r.id || Date.now().toString();
-      var imgData = String(r.message || '').trim();
-      if (r.name && imgData) {
-        converted.push({
-          id: cid,
-          relayRowId: r.id,
-          name: r.name,
-          district: dist,
-          bg: bg,
-          date: dt,
-          image: imgData,
-          fileId: 'sheet_synced'
-        });
-      }
-    });
-    if (converted.length > 0) {
-      var combined = converted.concat(allGalleryItems || []);
-      var uniq = [], seen = {};
-      combined.forEach(function(it){
-        var k = makeGalKey(it.name, it.bg, it.date);
-        if (!seen[k]) { seen[k] = true; uniq.push(it); }
-      });
-      window.setServerGalleryItems(uniq);
-    }
-  };
-
-  // সরাসরি পাবলিক গুগল শিট (Gallery_DB এবং Feedback_DB) থেকে রিয়েল-টাইম ছবি রিডার — যেকোনো ব্রাউজার (Chrome, Brave, Safari) ও যেকোনো IP থেকে তাৎক্ষণিক সব ছবি দেখাবে!
   function parseGvizJson(txt) {
     try {
       var start = txt.indexOf('{');
@@ -8286,8 +8488,9 @@ function updateLb() {
     return (c.f !== undefined && c.f !== null && String(c.v).indexOf('Date(') === 0) ? String(c.f).trim() : (c.v !== undefined && c.v !== null ? String(c.v).trim() : '');
   }
 
+  // সরাসরি গুগল শিটের ৯ নম্বর শিট Gallery_DB থেকে রিয়েল-টাইম ছবি ও তথ্য রিড করা
   function fetchGoogleSheetGalleryDirectGviz() {
-    var galUrl = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID_PUBLIC + '/gviz/tq?tqx=out:json&sheet=Gallery_DB&_t=' + Date.now();
+    var galUrl = 'https://docs.google.com/spreadsheets/d/' + GALLERY_SHEET_ID + '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(GALLERY_SHEET_NAME) + '&_t=' + Date.now();
     fetch(galUrl)
       .then(function(r){ return r.text(); })
       .then(function(txt){
@@ -8321,33 +8524,7 @@ function updateLb() {
         });
         items.reverse();
         if (items.length > 0) {
-          window.setServerGalleryItems(items.concat(allGalleryItems || []));
-        }
-      }).catch(function(){});
-
-    var fbUrl = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID_PUBLIC + '/gviz/tq?tqx=out:json&sheet=Feedback_DB&_t=' + Date.now();
-    fetch(fbUrl)
-      .then(function(r){ return r.text(); })
-      .then(function(txt){
-        var obj = parseGvizJson(txt);
-        if (!obj || !obj.table || !Array.isArray(obj.table.rows)) return;
-        var relays = [];
-        obj.table.rows.forEach(function(row){
-          var id = cellVal(row, 0);
-          var dt = cellVal(row, 1);
-          var nm = cellVal(row, 2);
-          var loc = cellVal(row, 3);
-          var rl = cellVal(row, 4);
-          var msg = cellVal(row, 5);
-          var st = cellVal(row, 6) || 'Approved';
-          if (st === 'Removed') return;
-          if (rl === '__SPONDON_GALLERY__' || loc.indexOf('__GAL__|') === 0) {
-            relays.push({ id: id, date: dt, name: nm, location: loc, role: rl, message: msg });
-          }
-        });
-        relays.reverse();
-        if (relays.length > 0) {
-          window.ingestRelayGalleryItems(relays);
+          window.setServerGalleryItems(items);
         }
       }).catch(function(){});
   }
@@ -8361,7 +8538,7 @@ function updateLb() {
         _autoSyncedKeys[k] = true;
         uploadGalleryItemToSheet(loc.id || Date.now().toString(), loc.name, loc.district || '', loc.bg || '', loc.date || '', loc.image, function(syncedItem){
           if (syncedItem) {
-            loc.fileId = syncedItem.fileId || 'sheet_synced';
+            loc.fileId = syncedItem.fileId || 'drive_synced';
             if (syncedItem.image) loc.image = syncedItem.image;
             _serverKnownKeys[k] = true;
             saveLocalGalleryCache(allGalleryItems);
@@ -8403,7 +8580,7 @@ function updateLb() {
       });
       saveLocalGalleryCache(allGalleryItems);
       _lastGalleryHash = '';
-      window.renderSpondonGallery();
+      window.renderSpondonGallery(false);
       if (typeof window.renderAdminControlHub === 'function') window.renderAdminControlHub();
     } catch(e){}
 
@@ -8426,15 +8603,6 @@ function updateLb() {
       .catch(function(){
         fetch(S + '?action=deleteGalleryPhoto&email=' + encodeURIComponent(admEmail) + '&pin=' + encodeURIComponent(admPin) + '&rowId=' + encodeURIComponent(id) + '&name=' + encodeURIComponent(targetName)).catch(function(){});
       });
-    // যদি রিলে রো হিসেবেও থাকে তবে সেটিও মুছে দেবে
-    var rfd = new FormData();
-    rfd.append('action', 'deleteFeedback');
-    rfd.append('formType', 'deleteFeedback');
-    rfd.append('email', admEmail);
-    rfd.append('pin', admPin);
-    rfd.append('rowId', id);
-    rfd.append('name', targetName);
-    fetch(S, { method: 'POST', body: rfd }).catch(function(){});
   };
 
   window.activeAdminControlTab = 'gallery';
@@ -8559,7 +8727,7 @@ function updateLb() {
     var donDate = dateEl ? dateEl.value.trim() : '';
 
     if (!name || !dist || !bg || !donDate) {
-      if (msgBox) { msgBox.style.display = 'block'; msgBox.style.color = '#dc2626'; msgBox.textContent = '⚠️ অনুগ্রহ করে নাম, জেলা, রক্তের গ্রুপ এবং রক্তদানের তারিখ পূরণ করুন।'; }
+      if (msgBox) { msgBox.style.display = 'block'; msgBox.style.color = '#dc2626'; msgBox.textContent = '⚠️ অনুগ্রহ করে নাম, জেলা, ব্লাড গ্রুপ এবং রক্তদানের তারিখ পূরণ করুন।'; }
       return false;
     }
     if (!compressedPhotoB64) {
@@ -8568,12 +8736,11 @@ function updateLb() {
     }
 
     var savedPhotoCopy = compressedPhotoB64;
-    var rawBase64Only = savedPhotoCopy.indexOf(',') !== -1 ? savedPhotoCopy.split(',')[1] : savedPhotoCopy;
     var clientId = Date.now().toString();
 
     if (btn) btn.disabled = true;
-    if (btnTxt) btnTxt.textContent = '⏳ গুগল শিটে আপলোড হচ্ছে...';
-    if (msgBox) { msgBox.style.display = 'block'; msgBox.style.color = '#0f172a'; msgBox.textContent = '📡 আপনার ছবি ও তথ্য স্পন্দন ডাটাবেস (Gallery_DB) ও গুগল ড্রাইভে সংরক্ষণ করা হচ্ছে...'; }
+    if (btnTxt) btnTxt.textContent = '⏳ গ্যালারি ও গুগল শিটে আপলোড হচ্ছে...';
+    if (msgBox) { msgBox.style.display = 'block'; msgBox.style.color = '#0f172a'; msgBox.textContent = '📡 আপনার ছবি গুগল ড্রাইভে এবং তথ্য ৯ নম্বর শিট Gallery_DB-তে সংরক্ষণ করা হচ্ছে...'; }
 
     function finalizeGalleryAdd(itemObj, customMsg) {
       if (btn) btn.disabled = false;
@@ -8585,11 +8752,16 @@ function updateLb() {
       allGalleryItems.unshift(itemObj);
       saveLocalGalleryCache(allGalleryItems);
       _lastGalleryHash = '';
-      window.renderSpondonGallery();
+      // নতুন পোস্ট করার সাথে সাথে সার্চ ক্লিয়ার করে গ্যালারির একদম টপে দেখাবে
+      var sInp = document.getElementById('gal-search-inp');
+      var bgSel = document.getElementById('gal-filter-bg');
+      if (sInp) sInp.value = '';
+      if (bgSel) bgSel.value = '';
+      window.renderSpondonGallery(false);
       if (typeof window.renderAdminControlHub === 'function') window.renderAdminControlHub();
 
-      if (msgBox) { msgBox.style.display = 'block'; msgBox.style.color = '#059669'; msgBox.textContent = customMsg || '✅ অভিনন্দন! আপনার রক্তদানের স্মৃতি ছবি ও তথ্য গুগল শিটের Gallery_DB এবং ওয়েবসাইটে সফলভাবে যুক্ত হয়েছে!'; }
-      showToast('📸 আপনার ছবি গ্যালারি ও গুগল শিটে যুক্ত হয়েছে!');
+      if (msgBox) { msgBox.style.display = 'block'; msgBox.style.color = '#059669'; msgBox.textContent = customMsg || '✅ অভিনন্দন! আপনার রক্তদানের স্মৃতি ছবি গুগল ড্রাইভে এবং তথ্য গুগল শিটের Gallery_DB-তে সফলভাবে সংরক্ষিত হয়েছে!'; }
+      showToast('📸 আপনার ছবি গ্যালারি ও Gallery_DB শিটে যুক্ত হয়েছে!');
       if (nameEl) nameEl.value = '';
       compressedPhotoB64 = '';
       var thumb = document.getElementById('gal-preview-thumb');
@@ -8602,7 +8774,7 @@ function updateLb() {
         var f = document.getElementById('sbs-gallery-form');
         if (f && f.classList.contains('open')) window.toggleGalleryUploadForm();
         if (msgBox) msgBox.style.display = 'none';
-      }, 2000);
+      }, 2200);
     }
 
     var k = makeGalKey(name, bg, donDate);
@@ -8610,7 +8782,7 @@ function updateLb() {
     uploadGalleryItemToSheet(clientId, name, dist, bg, donDate, savedPhotoCopy, function(srvItem, msgTxt){
       if (srvItem) {
         _serverKnownKeys[k] = true;
-        finalizeGalleryAdd(srvItem, msgTxt || '✅ অভিনন্দন! আপনার রক্তদানের স্মৃতি ছবি ও তথ্য গুগল শিটে এবং পাবলিক ফটো গ্যালারিতে সফলভাবে যুক্ত হয়েছে!');
+        finalizeGalleryAdd(srvItem, msgTxt || '✅ অভিনন্দন! আপনার রক্তদানের স্মৃতি ছবি গুগল ড্রাইভে এবং তথ্য গুগল শিটের Gallery_DB-তে সফলভাবে সংরক্ষিত হয়েছে!');
       } else {
         finalizeGalleryAdd({
           id: clientId,
@@ -8619,15 +8791,15 @@ function updateLb() {
           bg: bg,
           date: donDate,
           image: savedPhotoCopy
-        }, '✅ অভিনন্দন! আপনার রক্তদানের স্মৃতি ছবি স্পন্দন ফটো গ্যালারিতে যুক্ত হয়েছে!');
+        }, '✅ আপনার রক্তদানের স্মৃতি ছবি স্পন্দন ফটো গ্যালারিতে যুক্ত হয়েছে!');
       }
     });
     return false;
   };
-  // পেজ লোডের শুরুতে লোকাল ক্যাশ থেকে গ্যালারি রেন্ডার এবং ব্যাকএন্ড থেকে সিঙ্ক
+
   allGalleryItems = getLocalGalleryCache();
-  window.renderSpondonGallery();
-  setTimeout(window.fetchGalleryDirect, 900);
+  window.renderSpondonGallery(false);
+  setTimeout(window.fetchGalleryDirect, 700);
 })();
 
 </script>
