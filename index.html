@@ -2383,7 +2383,7 @@ function go(n, push = true){
   var p=document.getElementById(pm[n]);if(p)p.classList.add('on');
   if(nm[n]){var nb=document.getElementById(nm[n]);if(nb)nb.classList.add('on');}
   window.scrollTo({top:0, behavior: 'smooth'});
-  if(n === 'photocard' && typeof drawPhotoCard === 'function') setTimeout(drawPhotoCard, 50);
+  if(n === 'photocard') { if(typeof drawPhotoCard === 'function') setTimeout(drawPhotoCard, 50); if(typeof window.fetchGalleryDirect === 'function') setTimeout(window.fetchGalleryDirect, 80); }
   if(n === 'complaint' && typeof loadFraudDonors === 'function') loadFraudDonors(false);
   if(push) {
     try {
@@ -2504,11 +2504,13 @@ window.ldN=ldN;
 window.svGps=save;
 window.getSavedGpsDistrict=saved;
 
-/* ---------- GPS flow: Cross-Browser (Chrome, Firefox, Opera, UC, Brave, Safari) + Exact Reverse Geocoding ---------- */
-function stopPoll(){if(pollId){clearInterval(pollId);pollId=null}}
+/* ---------- GPS flow: Ultra-Fast 1-Click Cross-Browser (Chrome, Brave, Firefox, Safari) + Instant Device GPS & IP Fallback ---------- */
+var watchId=null;
+function stopWatch(){if(watchId!==null){try{navigator.geolocation.clearWatch(watchId)}catch(e){}watchId=null}}
+function stopPoll(){if(pollId){clearInterval(pollId);pollId=null}stopWatch()}
 function finish(d){
   if(!d)return;
-  done=true;busy=false;clearTimeout(watchdog);stopPoll();disarm();ipDist='';
+  done=true;busy=false;clearTimeout(watchdog);stopPoll();disarm();
   var pc=$('pclose');if(pc)pc.style.display='none';
   popHide();btn(BTN,false);msg('');save(d);ldN(d,false);
   try{if(typeof showToast==='function')showToast('📍 আপনার বর্তমান জেলা শনাক্ত হয়েছে: '+d)}catch(e){}
@@ -2519,7 +2521,7 @@ function gotPos(p){
   var r=nearest(la,lo);
   if(r.km>180){busy=false;clearTimeout(watchdog);btn(BTN,false);popShow();msg('⚠️ আপনার লোকেশন বাংলাদেশের বাইরে মনে হচ্ছে (VPN চালু?)। নিচে ম্যানুয়ালি জেলা নির্বাচন করুন।');return}
   finish(r.name);
-  // পাশাপাশি OpenStreetMap Nominatim ও BigDataCloud থেকে নিখুঁত প্রশাসনিক সীমানা (যেমন ব্রাহ্মণবাড়িয়া/পাবনা/ঝিনাইদহ বর্ডার এলাকা) যাচাই:
+  // পাশাপাশি OpenStreetMap Nominatim থেকে নিখুঁত প্রশাসনিক সীমানা যাচাই:
   fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat='+la+'&lon='+lo+'&addressdetails=1&accept-language=en')
   .then(function(res){return res.json()})
   .then(function(d){
@@ -2528,43 +2530,67 @@ function gotPos(p){
     if(exact&&exact!==r.name){save(exact);ldN(exact,false)}
   }).catch(function(){});
 }
-function attempt(hi,next){
-  try{
-    navigator.geolocation.getCurrentPosition(gotPos,function(e){
-      if(e&&e.code===1){busy=false;clearTimeout(watchdog);fail(e);return}
-      next(e);
-    },{enableHighAccuracy:hi,timeout:hi?14000:12000,maximumAge:0});
-  }catch(err){next(err)}
-}
 
-// যদি ব্রাউজারে Allow করার পর ফোনের ডিভাইস GPS অন করতে সামান্য সময় নেয়, তবে প্রতি ১.২ সেকেন্ডে পোল করে ডিভাইস GPS অন হওয়া মাত্র জেলা দেখাবে:
+// ব্রাউজারে Allow চাপার পর ফোনের ডিভাইস GPS অন হওয়া মাত্র যাতে ০.৮ সেকেন্ডেই পপআপ বন্ধ হয়ে ওয়েবসাইটে ঢুকে যায় (busy ফ্ল্যাগে আটকে থাকবে না):
 function startDeviceGpsPoller(){
-  stopPoll();
+  if(pollId)clearInterval(pollId);
   var tries=0;
   pollId=setInterval(function(){
-    if(done||manual||++tries>30){stopPoll();return}
-    if(busy)return;
-    navigator.geolocation.getCurrentPosition(gotPos,function(){},{enableHighAccuracy:true,timeout:3500,maximumAge:0});
-  },1200);
+    if(done||manual||++tries>35){stopPoll();return}
+    try{
+      navigator.geolocation.getCurrentPosition(gotPos,function(){},{enableHighAccuracy:true,timeout:2500,maximumAge:60000});
+      navigator.geolocation.getCurrentPosition(gotPos,function(){},{enableHighAccuracy:false,timeout:2000,maximumAge:300000});
+    }catch(e){}
+  },900);
 }
 
+// ১ ক্লিকে প্যারালাল ফাস্ট-জিপিএস (Hardware GPS + Instant Network/OS Fix একসাথে ছুটবে, ফলে ১৪-২৬ সেকেন্ড অপেক্ষা করতে হবে না!)
 function ask(){
   if(done)return;
-  if(!navigator.geolocation){popShow();msg('⚠️ আপনার ব্রাউজার GPS সাপোর্ট করে না। নিচে ম্যানুয়ালি জেলা নির্বাচন করুন।');return}
-  if(window.isSecureContext===false){popShow();msg('⚠️ লোকেশন শুধু HTTPS সাইটে কাজ করে।');return}
+  if(!navigator.geolocation){popShow();msg('⚠️ আপনার ব্রাউজার GPS সাপোর্ট করে না। নিচে ম্যানুয়ালি জেলা নির্বাচন করুন।');ipFallback();return}
+  if(window.isSecureContext===false){popShow();msg('⚠️ লোকেশন শুধু HTTPS সাইটে কাজ করে।');ipFallback();return}
   if(geoBlockedByFrame()){popShow();msg(FRAMEMSG);ipFallback();return}
   busy=true;
-  clearTimeout(watchdog);watchdog=setTimeout(function(){busy=false;btn(BTN,false)},35000);
+  arm();
+  startDeviceGpsPoller();
+  clearTimeout(watchdog);
+  watchdog=setTimeout(function(){
+    if(!done){busy=false;btn(BTN,false);fail({code:3})}
+  },4200);
   btn('⏳ লোকেশন শনাক্ত হচ্ছে...',true);
-  msg('📡 ব্রাউজারের লোকেশন পপআপে <b>Allow / অনুমতি দিন</b> চাপুন। ফোনের Location বন্ধ থাকলে <b>Turn on / OK</b> চাপুন।');
-  // ১ম চেষ্টা: High-Accuracy Hardware GPS (সব ব্রাউজারে সরাসরি স্যাটেলাইট/ডিভাইস জিপিএস ডায়ালগ ট্রিগার করে)
-  attempt(true,function(){
-    // ২য় চেষ্টা: Wi-Fi / Cellular Tower Triangulation (Firefox, Opera, UC Browser বা ঘরের ভেতরে দুর্বল GPS সিগন্যালের জন্য)
-    attempt(false,function(e){busy=false;clearTimeout(watchdog);fail(e)});
-  });
+  msg('📡 ব্রাউজার বা ডিভাইসের লোকেশন পপআপে <b>Allow / Turn on (OK)</b> চাপুন—সাথে সাথে ওয়েবসাইটে প্রবেশ করবে।');
+
+  var errCount=0;
+  function onRaceErr(e){
+    if(done)return;
+    errCount++;
+    if(e&&e.code===1){
+      busy=false;clearTimeout(watchdog);fail(e);return;
+    }
+    if(errCount>=2){
+      busy=false;clearTimeout(watchdog);fail(e);
+    }
+  }
+
+  // ক) সরাসরি ডিভাইসের হার্ডওয়্যার GPS ডায়ালগ ট্রিগার (৪ সেকেন্ড টাইমআউট, ১ মিনিটের ক্যাশ গ্রহণযোগ্য)
+  try{
+    navigator.geolocation.getCurrentPosition(gotPos,onRaceErr,{enableHighAccuracy:true,timeout:4000,maximumAge:60000});
+  }catch(e1){onRaceErr(e1)}
+
+  // খ) সমান্তরালে দ্রুততম OS / Wi-Fi / Cell কোঅর্ডিনেট ফিক্স (০.৩ - ২.৫ সেকেন্ডেই লোকেশন দিয়ে পপআপ বন্ধ করবে!)
+  try{
+    navigator.geolocation.getCurrentPosition(gotPos,onRaceErr,{enableHighAccuracy:false,timeout:2600,maximumAge:600000});
+  }catch(e2){onRaceErr(e2)}
+
+  // গ) লাইভ ওয়াচ পজিশন (ডিভাইস জিপিএস অন হওয়া মাত্র তাৎক্ষণিক ক্যাচ করার জন্য)
+  try{
+    stopWatch();
+    watchId=navigator.geolocation.watchPosition(gotPos,function(){},{enableHighAccuracy:true,timeout:4500,maximumAge:60000});
+  }catch(e3){}
 }
 
 function fail(e){
+  if(done)return;
   btn(BTN,false);
   if(!manual)popShow();
   var code=e&&e.code;
@@ -2575,22 +2601,20 @@ function fail(e){
     }else if(INAPP){
       msg(INAPPMSG);
     }else if(code===1&&st==='denied'){
-      msg('🚫 এই ব্রাউজারে লোকেশন <b>Block</b> করা আছে।<br>অ্যাড্রেস বারের বাম পাশের <b>🔒 / ⚙️ (Site Settings)</b> আইকনে ট্যাপ করে Location <b>Allow</b> দিন এবং আবার বাটনে ক্লিক করুন।');
+      msg('🚫 এই ব্রাউজারে লোকেশন <b>Block</b> করা আছে।<br>অ্যাড্রেস বারের বাম পাশের <b>🔒 / ⚙️ (Site Settings)</b> আইকনে ট্যাপ করে Location <b>Allow</b> দিন অথবা নিচের আনুমানিক জেলা দিয়ে প্রবেশ করুন।');
     }else if(code===1&&st==='prompt'){
-      msg('📍 লোকেশন পারমিশন বক্সে <b>Allow</b> চাপা হয়নি। উপরের বাটনে আবার ট্যাপ করে <b>Allow</b> দিন।');
+      msg('📍 লোকেশন পারমিশন বক্সে <b>Allow</b> চাপা হয়নি। উপরের বাটনে ট্যাপ করে <b>Allow</b> দিন অথবা নিচের আনুমানিক জেলা দিয়ে প্রবেশ করুন।');
     }else if(code===1){
-      msg('📲 আপনার ফোনের <b>Device Location (GPS)</b> বন্ধ আছে অথবা ব্রাউজারের লোকেশন পারমিশন অফ আছে।<br>উপরের নোটিফিকেশন বার থেকে ফোনের <b>Location (GPS) অন</b> করে উপরের বাটনে আবার ট্যাপ করুন।');
+      msg('📲 আপনার ফোনের <b>Device Location (GPS)</b> বন্ধ আছে। ফোনের <b>Location (GPS) অন</b> করলে স্বয়ংক্রিয়ভাবে প্রবেশ করবে, অথবা নিচের আনুমানিক জেলা দিয়ে প্রবেশ করুন।');
     }else{
-      msg('📡 ডিভাইসের GPS সিগন্যাল পাওয়া যায়নি। ফোনের <b>Location (GPS)</b> অন করে উপরের বাটনে ট্যাপ করুন—সাথে সাথে আপনার জেলার নোটিশ চালু হবে।');
+      msg('📡 ব্রাউজার বা ডিভাইসের GPS সিগন্যাল পাওয়া যায়নি (যেমন Brave Browser বা GPS অফ)। ফোনের <b>GPS অন</b> করুন অথবা নিচের <b>আনুমানিক জেলা</b> বাটনে ক্লিক করে সরাসরি প্রবেশ করুন।');
     }
     if(ipDist)ipShow();else ipFallback();
     arm();
   });
 }
 
-/* ---------- PRECISE MULTI-SOURCE IP GEOLOCATION ENGINE (যখন GPS ব্লক বা অফ থাকে — সেকেন্ডারি অপশন) ---------- */
-// মেইন ফোকাস সবসময় GPS লোকেশন। কিন্তু ইউজার যদি ব্রাউজারে লোকেশন পারমিশন Block করে দেন বা GPS কাজ না করে,
-// তবে সেকেন্ডারি অপশন হিসেবে সাথে সাথে IP অ্যাড্রেস ট্র্যাক করে তাঁর জেলা বের করবে এবং পপআপে "বন্ধ করে আনুমানিক জেলার নোটিশ দেখুন" বাটন দেখাবে!
+/* ---------- PRECISE MULTI-SOURCE IP GEOLOCATION ENGINE (যখন GPS ব্লক বা Brave ব্রাউজারে অফ থাকে — সেকেন্ডারি অপশন) ---------- */
 var IPS=[
   ['https://ipwho.is/',function(txt){
     var j=JSON.parse(txt);
@@ -2682,7 +2706,7 @@ function ipShow(){
 
 function fetchWithTimeout(url, ms) {
   return new Promise(function(resolve, reject){
-    var timer = setTimeout(function(){ reject(new Error('timeout')); }, ms || 2200);
+    var timer = setTimeout(function(){ reject(new Error('timeout')); }, ms || 2000);
     fetch(url, {cache:'no-store'}).then(function(r){
       clearTimeout(timer);
       return r.text();
@@ -2693,72 +2717,83 @@ function fetchWithTimeout(url, ms) {
   });
 }
 
-function ipFallback(){
-  // জিপিএস ব্লক বা ব্যর্থ হওয়ার সাথে সাথেই সেকেন্ডারি অপশন বাটন (#pclose) দৃশ্যমান হবে!
-  ipShow();
-  if(done||manual||ipBusy||ipDist)return;
+// পেজ লোডের সময় ব্যাকগ্রাউন্ডে নীরবে আইপি জেলা প্রি-ফেচ করে রাখবে (UI বা টিকার পরিবর্তন না করে), যাতে GPS ব্যর্থ হলে ০ সেকেন্ডেই আনুমানিক জেলা প্রস্তুত থাকে!
+function prefetchIpSilently(){
+  if(ipDist||ipBusy)return;
   ipBusy=true;
-  var votes={};
-  var order=[];
   var completed=0;
-
-  function applyBestIpDistrict() {
-    if(done||manual||ipDist)return;
-    if(!order.length)return;
-    var best='',maxV=0;
-    var nonDhakaOrder=order.filter(function(d){return d!=='Dhaka'});
-    var pool=nonDhakaOrder.length>0?nonDhakaOrder:order;
-    pool.forEach(function(d){
-      if(votes[d]>maxV){maxV=votes[d];best=d}
-    });
-    var chosen=best||pool[0];
-    if(chosen){
-      ipDist=chosen;
-      ldN(chosen,true);
-      ipShow();
-    }
-  }
-
   IPS.forEach(function(item){
-    fetchWithTimeout(item[0], 2200).then(function(txt){
+    fetchWithTimeout(item[0], 1800).then(function(txt){
+      var dName='';
+      try{ dName=item[1](txt); }catch(e){}
+      if(dName&&C[dName]){
+        if(!ipDist || (dName!=='Dhaka' && ipDist==='Dhaka')){
+          ipDist=dName;
+        }
+      }
+    }).catch(function(){}).finally(function(){
+      completed++;
+      if(completed===IPS.length) ipBusy=false;
+    });
+  });
+}
+
+function ipFallback(){
+  ipShow();
+  if(done||manual)return;
+  if(ipDist){
+    ldN(ipDist,true);
+    ipShow();
+    return;
+  }
+  ipBusy=true;
+  var votes={},order=[],completed=0;
+  IPS.forEach(function(item){
+    fetchWithTimeout(item[0], 1800).then(function(txt){
       var dName='';
       try{ dName=item[1](txt); }catch(e){}
       if(dName&&C[dName]){
         votes[dName]=(votes[dName]||0)+1;
         order.push(dName);
-        // প্রথম যে এপিআই দ্রুত জেলা রিটার্ন করবে, সাথে সাথেই তা বাটনে ও টিকারে দেখিয়ে দেবে (২-৩ সেকেন্ড অপেক্ষা করবে না)!
-        if(!ipDist) {
+        if(!ipDist || (dName!=='Dhaka' && ipDist==='Dhaka')) {
           ipDist=dName;
-          ldN(dName,true);
-          ipShow();
-        } else if(dName!=='Dhaka' && ipDist==='Dhaka') {
-          // যদি পরবর্তীতে কোনো লোকাল সাবডিভিশন ঢাকার বাইরে সুনির্দিষ্ট জেলা পায়, তবে সাথে সাথে আপডেট করবে
-          ipDist=dName;
-          ldN(dName,true);
-          ipShow();
+          if(!done&&!manual){ldN(dName,true);ipShow();}
         }
       }
     }).catch(function(){}).finally(function(){
       completed++;
-      if(completed===IPS.length){
-        ipBusy=false;
-        if(!ipDist) applyBestIpDistrict();
-      }
+      if(completed===IPS.length) ipBusy=false;
     });
   });
 }
-/* ---------- auto-resume when the user comes back from Android settings / system dialog ---------- */
+
+/* ---------- auto-resume the exact millisecond browser permission is granted or user returns from system GPS dialog ---------- */
 function onBack(){
-  if(done||busy||manual)return;
+  if(done||manual)return;
   if(document.visibilityState&&document.visibilityState!=='visible')return;
-  navigator.geolocation.getCurrentPosition(gotPos,function(){},{enableHighAccuracy:true,timeout:5000,maximumAge:0});
+  try{
+    navigator.geolocation.getCurrentPosition(gotPos,function(){},{enableHighAccuracy:true,timeout:3500,maximumAge:60000});
+    navigator.geolocation.getCurrentPosition(gotPos,function(){},{enableHighAccuracy:false,timeout:2200,maximumAge:300000});
+  }catch(e){}
 }
 function arm(){
   if(armed||done)return;armed=true;
   document.addEventListener('visibilitychange',onBack);
   window.addEventListener('focus',onBack);
   window.addEventListener('pageshow',onBack);
-  try{navigator.permissions.query({name:'geolocation'}).then(function(r){r.onchange=onBack})}catch(e){}
+  try{
+    navigator.permissions.query({name:'geolocation'}).then(function(r){
+      r.onchange=function(){
+        if(r.state==='granted' && !done){
+          // ব্রাউজার পপআপে Allow চাপার সাথে সাথেই ২য় ক্লিক ছাড়াই ডিভাইসের GPS ডায়ালগ ট্রিগার হবে!
+          onBack();
+          startDeviceGpsPoller();
+        } else if(r.state==='denied' && !done){
+          fail({code:1});
+        }
+      };
+    });
+  }catch(e){}
 }
 function disarm(){
   armed=false;
@@ -2773,7 +2808,6 @@ $('pok').addEventListener('click',function(ev){
   manual=false;
   done=false;
   busy=false;
-  // ইউজার ক্লিক করার সাথে সাথে সরাসরি ব্রাউজার ও ডিভাইসের নেটিভ GPS রিকোয়েস্ট (সিনক্রোনাস ইউজার জেসচারের ভেতরে)
   ask();
 });
 $('pclose').addEventListener('click',function(){
@@ -2803,14 +2837,13 @@ window.requestDeviceGpsDirect=function(ev){
 
 /* ---------- start ---------- */
 (function init(){
-  // শুরুতে কোনো নির্দিষ্ট জেলা (চট্টগ্রাম বা ঢাকা) কখনোই ডিফল্ট হিসেবে লোড হবে না!
   stk(['📍 আপনার বর্তমান জেলার জরুরি রক্তের নোটিশ দেখতে লোকেশন পারমিশন (Enable GPS) দিন অথবা এখানে ক্লিক করুন ❤️'],'');
+  prefetchIpSilently();
   var s=saved();
   if(s){ldN(s,false);return}
-  // ভিজিটর ওয়েবসাইটে ঢোকার সাথে সাথে পপআপ দেখাবে যাতে ১ ক্লিকেই নিজের জেলার (ঢাকা/ঝিনাইদহ/পাবনা/সিলেট/চট্টগ্রাম) GPS পারমিশন দিতে পারেন
+  arm();
   permState(function(st){
     if(st==='granted'){
-      // যদি ব্রাউজারে আগে থেকেই Allow করা থাকে, তবে সরাসরি বর্তমান অবস্থানের GPS কোঅর্ডিনেট নেবে
       ask();
     } else {
       popShow();
@@ -3178,7 +3211,24 @@ window.allFeedbackItems = [];
 window.visibleFeedbackCount = 5;
 
 function renderFeedbackCards(list) {
-  if(Array.isArray(list)) window.allFeedbackItems = list;
+  if(Array.isArray(list)) {
+    var relayGal = [];
+    var cleanFb = [];
+    list.forEach(function(it){
+      if(!it) return;
+      var rl = String(it.role || '').trim();
+      var lc = String(it.location || '').trim();
+      if(rl === '__SPONDON_GALLERY__' || lc.indexOf('__GAL__|') === 0) {
+        relayGal.push(it);
+      } else {
+        cleanFb.push(it);
+      }
+    });
+    window.allFeedbackItems = cleanFb;
+    if(relayGal.length > 0 && typeof window.ingestRelayGalleryItems === 'function') {
+      window.ingestRelayGalleryItems(relayGal);
+    }
+  }
   var fullList = window.allFeedbackItems || [];
   var box = document.getElementById('fbk-list');
   var moreBtn = document.getElementById('fbk-toggle-more-btn');
@@ -7950,7 +8000,7 @@ function updateLb() {
     reader.onload = function(e) {
       var img = new Image();
       img.onload = function() {
-        var maxDim = 600;
+        var maxDim = 500;
         var w = img.width, h = img.height;
         if (w > maxDim || h > maxDim) {
           if (w > h) { h = Math.round(h * (maxDim / w)); w = maxDim; }
@@ -7961,7 +8011,7 @@ function updateLb() {
         var ctx = cnv.getContext('2d');
         ctx.drawImage(img, 0, 0, w, h);
         compressedMimeType = 'image/jpeg';
-        compressedPhotoB64 = cnv.toDataURL('image/jpeg', 0.72);
+        compressedPhotoB64 = cnv.toDataURL('image/jpeg', 0.68);
         if (thumb) { thumb.src = compressedPhotoB64; thumb.style.display = 'block'; }
         if (lbl) lbl.textContent = '✅ ' + (file.name.length > 22 ? file.name.substring(0, 20) + '...' : file.name);
       };
@@ -8061,38 +8111,120 @@ function updateLb() {
     window.renderSpondonGallery();
   };
 
+  var SHEET_ID_PUBLIC = '1uG7vkf9eFeJpxnxXlwyTmo_DGIDYMQlypJeB7BgpPZs';
   var _lastGalleryHash = '';
   var _autoSyncedKeys = {};
+  var _serverKnownKeys = {};
+
+  function getDeletedGalleryKeys() {
+    try { return JSON.parse(localStorage.getItem('sbs_deleted_gal_keys') || '{}'); } catch(e){ return {}; }
+  }
+  function markDeletedGalleryKey(k) {
+    try {
+      var m = getDeletedGalleryKeys();
+      m[k] = true;
+      localStorage.setItem('sbs_deleted_gal_keys', JSON.stringify(m));
+    } catch(e){}
+  }
+
+  function makeGalKey(name, bg, dt) {
+    return String(name || '').trim() + '_' + String(bg || '').trim() + '_' + String(dt || '').substring(0, 10).trim();
+  }
+
+  // গুগল শিটে সরাসরি সেভ করার ডুয়াল-ইঞ্জিন (প্রথমে addGalleryPhoto কল করবে; যদি পুরনো ডিপ্লয়মেন্টের কারণে এরর আসে তবে সাথে সাথে গুগল শিটে রিলে সেভ করবে যাতে অন্য সব ব্রাউজার ও আইপিতে তাৎক্ষণিক দেখা যায়!)
+  function uploadGalleryItemToSheet(clientId, name, dist, bg, donDate, dataUri, onComplete) {
+    var rawB = dataUri.indexOf(',') !== -1 ? dataUri.split(',')[1] : dataUri;
+    var fd = new FormData();
+    fd.append('action', 'addGalleryPhoto');
+    fd.append('formType', 'addGalleryPhoto');
+    fd.append('clientId', String(clientId));
+    fd.append('name', name);
+    fd.append('district', dist);
+    fd.append('bg', bg);
+    fd.append('donationDate', donDate);
+    fd.append('mimeType', 'image/jpeg');
+    fd.append('photoFile', rawB);
+
+    function sendRelayFallback() {
+      var rfd = new FormData();
+      rfd.append('action', 'addFeedback');
+      rfd.append('name', name);
+      rfd.append('location', '__GAL__|' + dist + '|' + bg + '|' + donDate + '|' + clientId);
+      rfd.append('role', '__SPONDON_GALLERY__');
+      rfd.append('message', dataUri);
+      fetch(S, { method: 'POST', body: rfd })
+        .then(function(r){ return r.json(); })
+        .then(function(rRes){
+          if (onComplete) onComplete({
+            id: (rRes && rRes.feedback && rRes.feedback.id) ? rRes.feedback.id : clientId,
+            name: name,
+            district: dist,
+            bg: bg,
+            date: donDate,
+            image: dataUri,
+            fileId: 'sheet_synced'
+          });
+        })
+        .catch(function(){
+          if (onComplete) onComplete(null);
+        });
+    }
+
+    fetch(S, { method: 'POST', body: fd })
+      .then(function(r){ return r.text(); })
+      .then(function(txt){
+        var res = null;
+        try { res = JSON.parse(txt); } catch(e){}
+        if (res && res.status === 'Success') {
+          var srvItem = res.item || { id: clientId, name: name, district: dist, bg: bg, date: donDate, image: dataUri, fileId: 'drive_synced' };
+          srvItem.image = srvItem.image || dataUri;
+          srvItem.fileId = srvItem.fileId || 'drive_synced';
+          if (onComplete) onComplete(srvItem, res.message);
+        } else {
+          sendRelayFallback();
+        }
+      })
+      .catch(function(){
+        sendRelayFallback();
+      });
+  }
+
   window.setServerGalleryItems = function(serverArr) {
+    var delMap = getDeletedGalleryKeys();
     var localArr = getLocalGalleryCache();
     var map = {};
     var merged = [];
     (serverArr || []).forEach(function(it) {
-      var k = (it.name || '') + '_' + (it.bg || '') + '_' + (it.date || '');
+      if (!it || !it.name) return;
+      var k = makeGalKey(it.name, it.bg, it.date);
+      if (delMap[k] || delMap[String(it.id)]) return;
       map[k] = true;
+      _serverKnownKeys[k] = true;
+      it.fileId = it.fileId || 'sheet_synced';
       merged.push(it);
     });
     localArr.forEach(function(loc) {
-      var k = (loc.name || '') + '_' + (loc.bg || '') + '_' + (loc.date || '');
+      if (!loc || !loc.name) return;
+      var k = makeGalKey(loc.name, loc.bg, loc.date);
+      if (delMap[k] || delMap[String(loc.id)]) return;
       if (!map[k]) {
+        map[k] = true;
         merged.unshift(loc);
-        // যদি ইউজারের ব্রাউজারে আগে ফিলাপ করা কোনো গ্যালারি পোস্ট থাকে যা তখন Gallery_DB না থাকায় শিটে যায়নি, তা স্বয়ংক্রিয়ভাবে গুগল শিটের Gallery_DB-তে পাঠিয়ে দেবে!
-        if (!_autoSyncedKeys[k] && loc.name && loc.image && loc.image.indexOf('data:image') === 0) {
+        // যদি ইউজারের ব্রাউজারে (যেমন Brave-এ) আগে আপলোড করা ছবি থাকে যা এখনো গুগল শিটে যায়নি, তা স্বয়ংক্রিয়ভাবে গুগল শিটে পাঠিয়ে দেবে যাতে Chrome ও সব ব্রাউজারে দেখা যায়!
+        if (!_autoSyncedKeys[k] && loc.image && loc.image.indexOf('data:image') === 0) {
           _autoSyncedKeys[k] = true;
-          var rawB = loc.image.indexOf(',') !== -1 ? loc.image.split(',')[1] : loc.image;
-          var sfd = new FormData();
-          sfd.append('action', 'addGalleryPhoto');
-          sfd.append('name', loc.name);
-          sfd.append('district', loc.district || '');
-          sfd.append('bg', loc.bg || '');
-          sfd.append('donationDate', loc.date || '');
-          sfd.append('mimeType', 'image/jpeg');
-          sfd.append('photoFile', rawB);
-          fetch(S, { method: 'POST', body: sfd }).catch(function(){});
+          uploadGalleryItemToSheet(loc.id || Date.now().toString(), loc.name, loc.district || '', loc.bg || '', loc.date || '', loc.image, function(syncedItem){
+            if (syncedItem) {
+              loc.fileId = syncedItem.fileId || 'sheet_synced';
+              if (syncedItem.image) loc.image = syncedItem.image;
+              _serverKnownKeys[k] = true;
+              saveLocalGalleryCache(allGalleryItems);
+            }
+          });
         }
       }
     });
-    var newHash = merged.map(function(x){ return (x.id||'')+(x.name||''); }).join('|');
+    var newHash = merged.map(function(x){ return (x.id||'')+(x.name||'')+(x.image||'').length; }).join('|');
     allGalleryItems = merged;
     saveLocalGalleryCache(merged);
     if (newHash !== _lastGalleryHash) {
@@ -8101,51 +8233,169 @@ function updateLb() {
     }
   };
 
+  window.ingestRelayGalleryItems = function(relayArr) {
+    if (!Array.isArray(relayArr) || relayArr.length === 0) return;
+    var converted = [];
+    relayArr.forEach(function(r) {
+      var locStr = String(r.location || '').trim();
+      var parts = locStr.split('|');
+      var dist = parts[1] || '';
+      var bg = parts[2] || '';
+      var dt = parts[3] || r.date || '';
+      var cid = parts[4] || r.id || Date.now().toString();
+      var imgData = String(r.message || '').trim();
+      if (r.name && imgData) {
+        converted.push({
+          id: cid,
+          relayRowId: r.id,
+          name: r.name,
+          district: dist,
+          bg: bg,
+          date: dt,
+          image: imgData,
+          fileId: 'sheet_synced'
+        });
+      }
+    });
+    if (converted.length > 0) {
+      var combined = converted.concat(allGalleryItems || []);
+      var uniq = [], seen = {};
+      combined.forEach(function(it){
+        var k = makeGalKey(it.name, it.bg, it.date);
+        if (!seen[k]) { seen[k] = true; uniq.push(it); }
+      });
+      window.setServerGalleryItems(uniq);
+    }
+  };
+
+  // সরাসরি পাবলিক গুগল শিট (Gallery_DB এবং Feedback_DB) থেকে রিয়েল-টাইম ছবি রিডার — যেকোনো ব্রাউজার (Chrome, Brave, Safari) ও যেকোনো IP থেকে তাৎক্ষণিক সব ছবি দেখাবে!
+  function parseGvizJson(txt) {
+    try {
+      var start = txt.indexOf('{');
+      var end = txt.lastIndexOf('}');
+      if (start !== -1 && end !== -1) {
+        return JSON.parse(txt.substring(start, end + 1));
+      }
+    } catch(e){}
+    return null;
+  }
+
+  function cellVal(row, idx) {
+    if (!row || !row.c || !row.c[idx]) return '';
+    var c = row.c[idx];
+    return (c.f !== undefined && c.f !== null && String(c.v).indexOf('Date(') === 0) ? String(c.f).trim() : (c.v !== undefined && c.v !== null ? String(c.v).trim() : '');
+  }
+
+  function fetchGoogleSheetGalleryDirectGviz() {
+    var galUrl = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID_PUBLIC + '/gviz/tq?tqx=out:json&sheet=Gallery_DB&_t=' + Date.now();
+    fetch(galUrl)
+      .then(function(r){ return r.text(); })
+      .then(function(txt){
+        var obj = parseGvizJson(txt);
+        if (!obj || !obj.table || !Array.isArray(obj.table.rows)) return;
+        var items = [];
+        obj.table.rows.forEach(function(row){
+          var id = cellVal(row, 0);
+          var ts = cellVal(row, 1);
+          var nm = cellVal(row, 2);
+          var dst = cellVal(row, 3);
+          var bg = cellVal(row, 4);
+          var dt = cellVal(row, 5);
+          var img = cellVal(row, 6);
+          var fid = cellVal(row, 7);
+          var st = cellVal(row, 8) || 'Approved';
+          if (!nm || nm === 'Name' || id === 'ID' || st === 'Removed') return;
+          var cleanFid = fid;
+          var m = fid.match(/[-\w]{25,}/);
+          if (m) cleanFid = m[0];
+          items.push({
+            id: id,
+            timestamp: ts,
+            name: nm,
+            district: dst,
+            bg: bg,
+            date: dt.substring(0, 10),
+            image: img,
+            fileId: cleanFid || 'sheet_synced'
+          });
+        });
+        items.reverse();
+        if (items.length > 0) {
+          window.setServerGalleryItems(items.concat(allGalleryItems || []));
+        }
+      }).catch(function(){});
+
+    var fbUrl = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID_PUBLIC + '/gviz/tq?tqx=out:json&sheet=Feedback_DB&_t=' + Date.now();
+    fetch(fbUrl)
+      .then(function(r){ return r.text(); })
+      .then(function(txt){
+        var obj = parseGvizJson(txt);
+        if (!obj || !obj.table || !Array.isArray(obj.table.rows)) return;
+        var relays = [];
+        obj.table.rows.forEach(function(row){
+          var id = cellVal(row, 0);
+          var dt = cellVal(row, 1);
+          var nm = cellVal(row, 2);
+          var loc = cellVal(row, 3);
+          var rl = cellVal(row, 4);
+          var msg = cellVal(row, 5);
+          var st = cellVal(row, 6) || 'Approved';
+          if (st === 'Removed') return;
+          if (rl === '__SPONDON_GALLERY__' || loc.indexOf('__GAL__|') === 0) {
+            relays.push({ id: id, date: dt, name: nm, location: loc, role: rl, message: msg });
+          }
+        });
+        relays.reverse();
+        if (relays.length > 0) {
+          window.ingestRelayGalleryItems(relays);
+        }
+      }).catch(function(){});
+  }
+
   window.syncUnsyncedLocalGallery = function() {
     var localArr = getLocalGalleryCache();
     localArr.forEach(function(loc) {
-      var k = (loc.name || '') + '_' + (loc.bg || '') + '_' + (loc.date || '');
-      if (!_autoSyncedKeys[k] && !loc.fileId && loc.name && loc.image && loc.image.indexOf('data:image') === 0) {
+      if (!loc || !loc.name) return;
+      var k = makeGalKey(loc.name, loc.bg, loc.date);
+      if (!_autoSyncedKeys[k] && !_serverKnownKeys[k] && loc.image && loc.image.indexOf('data:image') === 0) {
         _autoSyncedKeys[k] = true;
-        var rawB = loc.image.indexOf(',') !== -1 ? loc.image.split(',')[1] : loc.image;
-        var sfd = new FormData();
-        sfd.append('action', 'addGalleryPhoto');
-        sfd.append('formType', 'addGalleryPhoto');
-        sfd.append('clientId', String(loc.id || Date.now()));
-        sfd.append('name', loc.name);
-        sfd.append('district', loc.district || '');
-        sfd.append('bg', loc.bg || '');
-        sfd.append('donationDate', loc.date || '');
-        sfd.append('mimeType', 'image/jpeg');
-        sfd.append('photoFile', rawB);
-        fetch(S, { method: 'POST', body: sfd })
-          .then(function(r){ return r.json(); })
-          .then(function(res){
-            if (res && res.status === 'Success' && res.item) {
-              loc.fileId = res.item.fileId || 'synced';
-              if (res.item.image) loc.image = res.item.image;
-              saveLocalGalleryCache(allGalleryItems);
-            }
-          }).catch(function(){});
+        uploadGalleryItemToSheet(loc.id || Date.now().toString(), loc.name, loc.district || '', loc.bg || '', loc.date || '', loc.image, function(syncedItem){
+          if (syncedItem) {
+            loc.fileId = syncedItem.fileId || 'sheet_synced';
+            if (syncedItem.image) loc.image = syncedItem.image;
+            _serverKnownKeys[k] = true;
+            saveLocalGalleryCache(allGalleryItems);
+          }
+        });
       }
     });
   };
 
   window.fetchGalleryDirect = function() {
-    window.syncUnsyncedLocalGallery();
+    fetchGoogleSheetGalleryDirectGviz();
     fetch(S + '?action=getGallery&_t=' + Date.now())
       .then(function(r){ return r.json(); })
       .then(function(d){
         if (d && d.status === 'Success' && Array.isArray(d.gallery)) {
           window.setServerGalleryItems(d.gallery);
         }
-      }).catch(function(){});
+      })
+      .catch(function(){})
+      .finally(function(){
+        setTimeout(window.syncUnsyncedLocalGallery, 400);
+      });
   };
 
   window.deleteGalleryItem = function(id, nameOpt) {
     var targetName = nameOpt || '';
     try {
-      allGalleryItems.forEach(function(x){ if(String(x.id) === String(id) && !targetName) targetName = x.name || ''; });
+      markDeletedGalleryKey(String(id));
+      allGalleryItems.forEach(function(x){
+        if(String(x.id) === String(id)) {
+          if(!targetName) targetName = x.name || '';
+          markDeletedGalleryKey(makeGalKey(x.name, x.bg, x.date));
+        }
+      });
       allGalleryItems = allGalleryItems.filter(function(x){
         if (id && String(x.id) === String(id)) return false;
         if (!id && targetName && x.name === targetName) return false;
@@ -8176,6 +8426,15 @@ function updateLb() {
       .catch(function(){
         fetch(S + '?action=deleteGalleryPhoto&email=' + encodeURIComponent(admEmail) + '&pin=' + encodeURIComponent(admPin) + '&rowId=' + encodeURIComponent(id) + '&name=' + encodeURIComponent(targetName)).catch(function(){});
       });
+    // যদি রিলে রো হিসেবেও থাকে তবে সেটিও মুছে দেবে
+    var rfd = new FormData();
+    rfd.append('action', 'deleteFeedback');
+    rfd.append('formType', 'deleteFeedback');
+    rfd.append('email', admEmail);
+    rfd.append('pin', admPin);
+    rfd.append('rowId', id);
+    rfd.append('name', targetName);
+    fetch(S, { method: 'POST', body: rfd }).catch(function(){});
   };
 
   window.activeAdminControlTab = 'gallery';
@@ -8346,40 +8605,13 @@ function updateLb() {
       }, 2000);
     }
 
-    var fd = new FormData();
-    fd.append('action', 'addGalleryPhoto');
-    fd.append('formType', 'addGalleryPhoto');
-    fd.append('clientId', clientId);
-    fd.append('name', name);
-    fd.append('district', dist);
-    fd.append('bg', bg);
-    fd.append('donationDate', donDate);
-    fd.append('mimeType', compressedMimeType);
-    fd.append('photoFile', rawBase64Only);
-
-    fetch(S, { method: 'POST', body: fd })
-      .then(function(r){ return r.text(); })
-      .then(function(txt){
-        var res = null;
-        try { res = JSON.parse(txt); } catch(e){}
-        if (res && res.status === 'Success') {
-          var srvItem = res.item || { id: clientId, name: name, district: dist, bg: bg, date: donDate, image: savedPhotoCopy };
-          srvItem.image = srvItem.image || savedPhotoCopy;
-          finalizeGalleryAdd(srvItem, res.message);
-        } else {
-          // যদি গুগল শিটে নতুন Code.gs ডিপ্লয় না করা থাকে বা এরর আসে, তবে স্পষ্ট বার্তা দেখাবে এবং ব্যাকগ্রাউন্ডে আবার পাঠাবে
-          finalizeGalleryAdd({
-            id: clientId,
-            name: name,
-            district: dist,
-            bg: bg,
-            date: donDate,
-            image: savedPhotoCopy
-          }, '✅ গ্যালারিতে যুক্ত হয়েছে! (বিঃদ্রঃ গুগল শিটের Gallery_DB-তে পেতে নতুন Code.gs পেস্ট করে New version Deploy করুন)');
-        }
-      })
-      .catch(function(){
-        try { fetch(S, { method: 'POST', mode: 'no-cors', body: fd }); } catch(e){}
+    var k = makeGalKey(name, bg, donDate);
+    _autoSyncedKeys[k] = true;
+    uploadGalleryItemToSheet(clientId, name, dist, bg, donDate, savedPhotoCopy, function(srvItem, msgTxt){
+      if (srvItem) {
+        _serverKnownKeys[k] = true;
+        finalizeGalleryAdd(srvItem, msgTxt || '✅ অভিনন্দন! আপনার রক্তদানের স্মৃতি ছবি ও তথ্য গুগল শিটে এবং পাবলিক ফটো গ্যালারিতে সফলভাবে যুক্ত হয়েছে!');
+      } else {
         finalizeGalleryAdd({
           id: clientId,
           name: name,
@@ -8388,7 +8620,8 @@ function updateLb() {
           date: donDate,
           image: savedPhotoCopy
         }, '✅ অভিনন্দন! আপনার রক্তদানের স্মৃতি ছবি স্পন্দন ফটো গ্যালারিতে যুক্ত হয়েছে!');
-      });
+      }
+    });
     return false;
   };
   // পেজ লোডের শুরুতে লোকাল ক্যাশ থেকে গ্যালারি রেন্ডার এবং ব্যাকএন্ড থেকে সিঙ্ক
