@@ -7994,6 +7994,35 @@ function updateLb() {
     return String(name || '').trim() + '_' + String(bg || '').trim().toUpperCase() + '_' + String(dt || '').substring(0, 10).trim();
   }
 
+  // যেকোনো ব্রাউজারে ছবি ১০০% নিখুঁতভাবে দেখানোর জন্য ইমেজ লিংক ও Base64 স্যানিটাইজার (স্পেস হয়ে যাওয়া '+' চিহ্ন অটো-ফিক্স ও গুগল ড্রাইভ মাল্টি-ফলব্যাক)
+  function normalizeGalleryImageUrl(rawImg) {
+    if (!rawImg) return '';
+    var s = String(rawImg).trim();
+    if (s.indexOf('data:image') === 0) {
+      var commaIdx = s.indexOf(',');
+      if (commaIdx !== -1) {
+        var header = s.substring(0, commaIdx + 1);
+        var body = s.substring(commaIdx + 1).replace(/ /g, '+').replace(/[\r\n\t]+/g, '');
+        while (body.length % 4 !== 0) body += '=';
+        return header + body;
+      }
+    }
+    return s;
+  }
+
+  function extractDriveFileId(str) {
+    if (!str) return '';
+    var s = String(str).trim();
+    if (s === 'inline_sheet_img' || s === 'sheet_synced' || s === 'drive_synced' || s.indexOf('data:image') === 0) return '';
+    var m1 = s.match(/[?&]id=([-\w]{25,})/);
+    if (m1) return m1[1];
+    var m2 = s.match(/\/d\/([-\w]{25,})/);
+    if (m2) return m2[1];
+    var m3 = s.match(/^([-\w]{25,})$/);
+    if (m3) return m3[1];
+    return '';
+  }
+
   function formatBnGalleryDate(dStr) {
     if (!dStr) return '';
     try {
@@ -8259,18 +8288,11 @@ function updateLb() {
       var safeDist = escapeHtml(item.district || '');
       var safeBg = escapeHtml(item.bg || '');
       var safeDate = escapeHtml(formatBnGalleryDate(item.date || ''));
-      var rawImg = item.image || '';
-      var cleanFileId = '';
-      if (item.fileId && item.fileId !== 'inline_sheet_img' && item.fileId !== 'sheet_synced' && item.fileId !== 'drive_synced') {
-        var fm = String(item.fileId).match(/[-\w]{25,}/);
-        cleanFileId = fm ? fm[0] : '';
-      }
-      if (!cleanFileId && rawImg && rawImg.indexOf('drive.google.com') !== -1) {
-        var im = String(rawImg).match(/[-\w]{25,}/);
-        cleanFileId = im ? im[0] : '';
-      }
+      var rawImg = normalizeGalleryImageUrl(item.image || '');
+      var cleanFileId = extractDriveFileId(item.fileId) || extractDriveFileId(rawImg);
       var primarySrc = cleanFileId ? ('https://drive.google.com/thumbnail?id=' + encodeURIComponent(cleanFileId) + '&sz=w1000') : rawImg;
       var driveFallback = cleanFileId ? ('https://lh3.googleusercontent.com/d/' + encodeURIComponent(cleanFileId) + '=w1000') : rawImg;
+      var ucFallback = cleanFileId ? ('https://drive.google.com/uc?export=view&id=' + encodeURIComponent(cleanFileId)) : rawImg;
 
       htmlStr += '<div class="sbs-gal-card' + (isSearching ? ' sbs-gal-matched' : '') + '">' +
         '<div class="sbs-gal-img-box">' +
@@ -8302,16 +8324,8 @@ function updateLb() {
         var safeDist = escapeHtml(item.district || '');
         var safeBg = escapeHtml(item.bg || '');
         var safeDate = escapeHtml(formatBnGalleryDate(item.date || ''));
-        var rawImg = item.image || '';
-        var cleanFileId = '';
-        if (item.fileId && item.fileId !== 'inline_sheet_img' && item.fileId !== 'sheet_synced' && item.fileId !== 'drive_synced') {
-          var fm = String(item.fileId).match(/[-\w]{25,}/);
-          cleanFileId = fm ? fm[0] : '';
-        }
-        if (!cleanFileId && rawImg && rawImg.indexOf('drive.google.com') !== -1) {
-          var im = String(rawImg).match(/[-\w]{25,}/);
-          cleanFileId = im ? im[0] : '';
-        }
+        var rawImg = normalizeGalleryImageUrl(item.image || '');
+        var cleanFileId = extractDriveFileId(item.fileId) || extractDriveFileId(rawImg);
         var primarySrc = cleanFileId ? ('https://drive.google.com/thumbnail?id=' + encodeURIComponent(cleanFileId) + '&sz=w1000') : rawImg;
         var driveFallback = cleanFileId ? ('https://lh3.googleusercontent.com/d/' + encodeURIComponent(cleanFileId) + '=w1000') : rawImg;
 
@@ -8442,6 +8456,7 @@ function updateLb() {
       if (delMap[k] || delMap[String(it.id)]) return;
       map[k] = true;
       _serverKnownKeys[k] = true;
+      it.image = normalizeGalleryImageUrl(it.image || '');
       it.fileId = it.fileId || 'sheet_synced';
       merged.push(it);
     });
@@ -8521,7 +8536,7 @@ function updateLb() {
             district: dst,
             bg: bg,
             date: dt.substring(0, 10),
-            image: img,
+            image: normalizeGalleryImageUrl(img),
             fileId: cleanFid || 'sheet_synced'
           });
         });
