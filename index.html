@@ -7950,11 +7950,12 @@ function updateLb() {
 
 // ═══════════════════════════════════════════════════════════════════════
 // ═══════════════════════════════════════════════════════════════════════
-// 📸 SPONDON PHOTO GALLERY ENGINE (Rebuilt Cleanly — Direct 9th Sheet Gallery_DB & Drive Folder 1JTmEHKI5Bu6jJxZ6CuOYAi7bLrCSshCv)
+// 📸 SPONDON PHOTO GALLERY ENGINE (Rebuilt Cleanly — Direct 13th Sheet Gallery_DB & Drive Folder 1JTmEHKI5Bu6jJxZ6CuOYAi7bLrCSshCv)
 // ═══════════════════════════════════════════════════════════════════════
 (function(){
   var GALLERY_SHEET_ID = '1uG7vkf9eFeJpxnxXlwyTmo_DGIDYMQlypJeB7BgpPZs';
   var GALLERY_SHEET_NAME = 'Gallery_DB';
+  var GALLERY_SHEET_NUMBER = 13; // মেইন শিটের ১৩ নম্বর শিট (Gallery_DB)
   var GALLERY_DRIVE_FOLDER_ID = '1JTmEHKI5Bu6jJxZ6CuOYAi7bLrCSshCv';
   var GALLERY_PAGE_SIZE = 16;
   var visibleCount = GALLERY_PAGE_SIZE;
@@ -8358,13 +8359,14 @@ function updateLb() {
     window.renderSpondonGallery(false);
   };
 
-  // সরাসরি গুগল শিটের ৯ নম্বর শিট Gallery_DB এবং গুগল ড্রাইভ ফোল্ডারে (1JTmEHKI5Bu6jJxZ6CuOYAi7bLrCSshCv) ছবি ও তথ্য আপলোড (Feedback_DB-তে কখনোই যাবে না)
+  // সরাসরি গুগল শিটের ১৩ নম্বর শিট Gallery_DB এবং গুগল ড্রাইভ ফোল্ডারে (1JTmEHKI5Bu6jJxZ6CuOYAi7bLrCSshCv) ছবি ও তথ্য আপলোড (Feedback_DB-তে কখনোই যাবে না)
   function uploadGalleryItemToSheet(clientId, name, dist, bg, donDate, dataUri, onComplete) {
     var rawB = dataUri.indexOf(',') !== -1 ? dataUri.split(',')[1] : dataUri;
     var fd = new FormData();
     fd.append('action', 'addGalleryPhoto');
     fd.append('formType', 'addGalleryPhoto');
     fd.append('targetSheet', GALLERY_SHEET_NAME);
+    fd.append('sheetNumber', String(GALLERY_SHEET_NUMBER));
     fd.append('sheetId', GALLERY_SHEET_ID);
     fd.append('folderId', GALLERY_DRIVE_FOLDER_ID);
     fd.append('clientId', String(clientId));
@@ -8380,6 +8382,7 @@ function updateLb() {
       params.append('action', 'addGalleryPhoto');
       params.append('formType', 'addGalleryPhoto');
       params.append('targetSheet', GALLERY_SHEET_NAME);
+      params.append('sheetNumber', String(GALLERY_SHEET_NUMBER));
       params.append('sheetId', GALLERY_SHEET_ID);
       params.append('folderId', GALLERY_DRIVE_FOLDER_ID);
       params.append('clientId', String(clientId));
@@ -8488,7 +8491,7 @@ function updateLb() {
     return (c.f !== undefined && c.f !== null && String(c.v).indexOf('Date(') === 0) ? String(c.f).trim() : (c.v !== undefined && c.v !== null ? String(c.v).trim() : '');
   }
 
-  // সরাসরি গুগল শিটের ৯ নম্বর শিট Gallery_DB থেকে রিয়েল-টাইম ছবি ও তথ্য রিড করা
+  // সরাসরি গুগল শিটের ১৩ নম্বর শিট Gallery_DB থেকে রিয়েল-টাইম ছবি ও তথ্য রিড করা
   function fetchGoogleSheetGalleryDirectGviz() {
     var galUrl = 'https://docs.google.com/spreadsheets/d/' + GALLERY_SHEET_ID + '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(GALLERY_SHEET_NAME) + '&_t=' + Date.now();
     fetch(galUrl)
@@ -8740,7 +8743,7 @@ function updateLb() {
 
     if (btn) btn.disabled = true;
     if (btnTxt) btnTxt.textContent = '⏳ গ্যালারি ও গুগল শিটে আপলোড হচ্ছে...';
-    if (msgBox) { msgBox.style.display = 'block'; msgBox.style.color = '#0f172a'; msgBox.textContent = '📡 আপনার ছবি গুগল ড্রাইভে এবং তথ্য ৯ নম্বর শিট Gallery_DB-তে সংরক্ষণ করা হচ্ছে...'; }
+    if (msgBox) { msgBox.style.display = 'block'; msgBox.style.color = '#0f172a'; msgBox.textContent = '📡 আপনার ছবি গুগল ড্রাইভে এবং তথ্য ১৩ নম্বর শিট Gallery_DB-তে সংরক্ষণ করা হচ্ছে...'; }
 
     function finalizeGalleryAdd(itemObj, customMsg) {
       if (btn) btn.disabled = false;
@@ -8760,7 +8763,7 @@ function updateLb() {
       window.renderSpondonGallery(false);
       if (typeof window.renderAdminControlHub === 'function') window.renderAdminControlHub();
 
-      if (msgBox) { msgBox.style.display = 'block'; msgBox.style.color = '#059669'; msgBox.textContent = customMsg || '✅ অভিনন্দন! আপনার রক্তদানের স্মৃতি ছবি গুগল ড্রাইভে এবং তথ্য গুগল শিটের Gallery_DB-তে সফলভাবে সংরক্ষিত হয়েছে!'; }
+      if (msgBox) { msgBox.style.display = 'block'; msgBox.style.color = '#059669'; msgBox.textContent = customMsg || '✅ অভিনন্দন! আপনার রক্তদানের স্মৃতি ছবি গুগল ড্রাইভে এবং তথ্য গুগল শিটের ১৩ নম্বর শিট Gallery_DB-তে সফলভাবে সংরক্ষিত হয়েছে!'; }
       showToast('📸 আপনার ছবি গ্যালারি ও Gallery_DB শিটে যুক্ত হয়েছে!');
       if (nameEl) nameEl.value = '';
       compressedPhotoB64 = '';
@@ -8782,7 +8785,7 @@ function updateLb() {
     uploadGalleryItemToSheet(clientId, name, dist, bg, donDate, savedPhotoCopy, function(srvItem, msgTxt){
       if (srvItem) {
         _serverKnownKeys[k] = true;
-        finalizeGalleryAdd(srvItem, msgTxt || '✅ অভিনন্দন! আপনার রক্তদানের স্মৃতি ছবি গুগল ড্রাইভে এবং তথ্য গুগল শিটের Gallery_DB-তে সফলভাবে সংরক্ষিত হয়েছে!');
+        finalizeGalleryAdd(srvItem, msgTxt || '✅ অভিনন্দন! আপনার রক্তদানের স্মৃতি ছবি গুগল ড্রাইভে এবং তথ্য গুগল শিটের ১৩ নম্বর শিট Gallery_DB-তে সফলভাবে সংরক্ষিত হয়েছে!');
       } else {
         finalizeGalleryAdd({
           id: clientId,
