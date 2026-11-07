@@ -3044,8 +3044,11 @@ function fetchStats(forceNow) {
     if (d.aiStats && typeof window.updateAdminAiStatsUI === 'function') {
       window.updateAdminAiStatsUI(d.aiStats);
     }
-    if (Array.isArray(d.gallery) && typeof window.setServerGalleryItems === 'function') {
+    if (Array.isArray(d.gallery) && typeof window.setServerGalleryItems === 'function' && !d.cached && !window._gvizLiveGalleryActive) {
       window.setServerGalleryItems(d.gallery);
+    }
+    if (typeof window.fetchGalleryDirect === 'function') {
+      window.fetchGalleryDirect();
     }
     if (Array.isArray(d.feedbacks) && typeof renderFeedbackCards === 'function') {
       var merged = d.feedbacks;
@@ -3429,20 +3432,31 @@ window.deleteFeedbackItem = function(id, nameOpt) {
   } catch(e){}
   var admEmail = sessionStorage.getItem('adminEmail') || 'spondon@gmail.com';
   var admPin = sessionStorage.getItem('adminPin') || '1234';
-  var fd = new FormData();
-  fd.append('action', 'deleteFeedback');
-  fd.append('formType', 'deleteFeedback');
-  fd.append('email', admEmail);
-  fd.append('pin', admPin);
-  fd.append('rowId', id);
-  fd.append('name', targetName);
+  var delFbUrl = S + '?action=deleteFeedback&email=' + encodeURIComponent(admEmail) + '&pin=' + encodeURIComponent(admPin) + '&rowId=' + encodeURIComponent(id) + '&name=' + encodeURIComponent(targetName) + '&_t=' + Date.now();
+  var params = new URLSearchParams();
+  params.append('action', 'deleteFeedback');
+  params.append('formType', 'deleteFeedback');
+  params.append('email', admEmail);
+  params.append('pin', admPin);
+  params.append('rowId', id);
+  params.append('name', targetName);
   showToast('🗑️ ফিডব্যাক মুছে ফেলা হচ্ছে...');
-  fetch(S, {method:'POST', body: fd}).then(function(r){return r.json();}).then(function(res){
-    showToast('✅ ফিডব্যাক গুগল শিট ও ওয়েবসাইট থেকে মুছে ফেলা হয়েছে!');
-    if(typeof window.renderAdminControlHub === 'function') window.renderAdminControlHub();
-  }).catch(function(){
-    fetch(S + '?action=deleteFeedback&email=' + encodeURIComponent(admEmail) + '&pin=' + encodeURIComponent(admPin) + '&rowId=' + encodeURIComponent(id) + '&name=' + encodeURIComponent(targetName)).catch(function(){});
-  });
+  fetch(delFbUrl, { cache: 'no-store' })
+    .then(function(r){ return r.json(); })
+    .then(function(res){
+      if (!res || res.status !== 'Success') {
+        return fetch(S, { method: 'POST', body: params }).then(function(r2){ return r2.json(); });
+      }
+      return res;
+    })
+    .then(function(){
+      showToast('✅ ফিডব্যাক গুগল শিট ও সব ব্রাউজার থেকে স্থায়ীভাবে মুছে ফেলা হয়েছে!');
+      if(typeof window.renderAdminControlHub === 'function') window.renderAdminControlHub();
+      setTimeout(function(){ fetchStats(true); }, 800);
+    })
+    .catch(function(){
+      fetch(S, { method: 'POST', body: params }).catch(function(){});
+    });
 };
 
 document.getElementById('fbk-toggle-more-btn').addEventListener('click', function(){
@@ -4698,20 +4712,31 @@ window.deleteFraudItem = function(id, phoneOpt) {
   } catch(e){}
   var admEmail = sessionStorage.getItem('adminEmail') || 'spondon@gmail.com';
   var admPin = sessionStorage.getItem('adminPin') || '1234';
-  var fd = new FormData();
-  fd.append('action', 'deleteFraudReport');
-  fd.append('formType', 'deleteFraudReport');
-  fd.append('email', admEmail);
-  fd.append('pin', admPin);
-  fd.append('rowId', id);
-  fd.append('phone', targetPhone);
+  var delFrUrl = S + '?action=deleteFraudReport&email=' + encodeURIComponent(admEmail) + '&pin=' + encodeURIComponent(admPin) + '&rowId=' + encodeURIComponent(id) + '&phone=' + encodeURIComponent(targetPhone) + '&_t=' + Date.now();
+  var params = new URLSearchParams();
+  params.append('action', 'deleteFraudReport');
+  params.append('formType', 'deleteFraudReport');
+  params.append('email', admEmail);
+  params.append('pin', admPin);
+  params.append('rowId', id);
+  params.append('phone', targetPhone);
   showToast('🗑️ অভিযোগ মুছে ফেলা হচ্ছে...');
-  fetch(S, {method:'POST', body: fd}).then(r=>r.json()).then(res=>{
-    showToast('✅ অভিযোগ গুগল শিট ও ওয়েবসাইট থেকে মুছে ফেলা হয়েছে!');
-    if(typeof window.renderAdminControlHub === 'function') window.renderAdminControlHub();
-  }).catch(function(){
-    fetch(S + '?action=deleteFraudReport&email=' + encodeURIComponent(admEmail) + '&pin=' + encodeURIComponent(admPin) + '&rowId=' + encodeURIComponent(id) + '&phone=' + encodeURIComponent(targetPhone)).catch(function(){});
-  });
+  fetch(delFrUrl, { cache: 'no-store' })
+    .then(function(r){ return r.json(); })
+    .then(function(res){
+      if (!res || res.status !== 'Success') {
+        return fetch(S, { method: 'POST', body: params }).then(function(r2){ return r2.json(); });
+      }
+      return res;
+    })
+    .then(function(){
+      showToast('✅ অভিযোগ গুগল শিট ও সব ব্রাউজার থেকে স্থায়ীভাবে মুছে ফেলা হয়েছে!');
+      if(typeof window.renderAdminControlHub === 'function') window.renderAdminControlHub();
+      setTimeout(function(){ fetchStats(true); }, 800);
+    })
+    .catch(function(){
+      fetch(S, { method: 'POST', body: params }).catch(function(){});
+    });
 };
 
 
@@ -8068,41 +8093,50 @@ function updateLb() {
     if (gd && !gd.value) gd.value = new Date().toISOString().split('T')[0];
   } catch(e){}
 
+  // 🚫 ব্রাউজারের পুরনো localStorage ক্যাশ থেকে যাতে ডিলিট করা ছবি কখনোই ফিরে না আসে (যেমন Brave বা অন্য ব্রাউজারে রিফ্রেশ দিলে)
+  // এবং নতুন সাবমিট করা ছবি যাতে পুরনো ডিলিট-লিস্টের কারণে লুকিয়ে না যায়, তাই পুরনো সব লোকাল গ্যালারি ক্যাশ সম্পূর্ণ পরিষ্কার করা হচ্ছে:
+  try {
+    localStorage.removeItem('sbs_gallery_cache_v1');
+    localStorage.removeItem('sbs_gallery_cache_v2');
+    localStorage.removeItem('sbs_deleted_gal_keys');
+  } catch(e){}
+
+  // শুধুমাত্র বর্তমান সেশনে এইমাত্র ডিলিট করা আইটেম (২০ সেকেন্ডের জন্য) এবং এইমাত্র আপলোড করা পেন্ডিং আইটেম (৪৫ সেকেন্ডের জন্য) মেমোরিতে ট্র্যাক করা হবে:
+  var _recentlyDeletedMap = {};
+  var _pendingUploadedItems = [];
+
   function getLocalGalleryCache() {
-    try {
-      var v2 = JSON.parse(localStorage.getItem('sbs_gallery_cache_v2') || '[]');
-      var v1 = JSON.parse(localStorage.getItem('sbs_gallery_cache_v1') || '[]');
-      var combined = (Array.isArray(v2) ? v2 : []).concat(Array.isArray(v1) ? v1 : []);
-      var seen = {}, out = [];
-      combined.forEach(function(x) {
-        if (!x || !x.name) return;
-        var k = String(x.name || '').trim() + '_' + String(x.bg || '').trim().toUpperCase() + '_' + String(x.date || '').substring(0, 10).trim();
-        if (!seen[k]) { seen[k] = true; out.push(x); }
-      });
-      return out;
-    } catch(e){ return []; }
+    return [];
   }
   function saveLocalGalleryCache(arr) {
     try {
-      var sliced = JSON.stringify((arr || []).slice(0, 200));
-      localStorage.setItem('sbs_gallery_cache_v2', sliced);
-      localStorage.setItem('sbs_gallery_cache_v1', sliced);
+      localStorage.removeItem('sbs_gallery_cache_v1');
+      localStorage.removeItem('sbs_gallery_cache_v2');
     } catch(e){}
   }
 
-  function getDeletedGalleryKeys() {
-    try { return JSON.parse(localStorage.getItem('sbs_deleted_gal_keys') || '{}'); } catch(e){ return {}; }
+  function isRecentlyDeletedItem(id, name, bg, dt) {
+    var now = Date.now();
+    var idKey = id ? ('id:' + String(id).trim()) : '';
+    var nmKey = name ? ('nm:' + String(name).trim().toLowerCase() + '|' + String(bg || '').trim().toUpperCase() + '|' + String(dt || '').substring(0, 10)) : '';
+    if (idKey && _recentlyDeletedMap[idKey] && (now - _recentlyDeletedMap[idKey] < 20000)) return true;
+    if (nmKey && _recentlyDeletedMap[nmKey] && (now - _recentlyDeletedMap[nmKey] < 20000)) return true;
+    return false;
   }
-  function markDeletedGalleryKey(k) {
-    try {
-      var m = getDeletedGalleryKeys();
-      m[k] = true;
-      localStorage.setItem('sbs_deleted_gal_keys', JSON.stringify(m));
-    } catch(e){}
+
+  function markRecentlyDeletedItem(id, name, bg, dt) {
+    var now = Date.now();
+    if (id) _recentlyDeletedMap['id:' + String(id).trim()] = now;
+    if (name) _recentlyDeletedMap['nm:' + String(name).trim().toLowerCase() + '|' + String(bg || '').trim().toUpperCase() + '|' + String(dt || '').substring(0, 10)] = now;
+  }
+
+  function unmarkRecentlyDeletedItem(id, name, bg, dt) {
+    if (id) delete _recentlyDeletedMap['id:' + String(id).trim()];
+    if (name) delete _recentlyDeletedMap['nm:' + String(name).trim().toLowerCase() + '|' + String(bg || '').trim().toUpperCase() + '|' + String(dt || '').substring(0, 10)];
   }
 
   function makeGalKey(name, bg, dt) {
-    return String(name || '').trim() + '_' + String(bg || '').trim().toUpperCase() + '_' + String(dt || '').substring(0, 10).trim();
+    return String(name || '').trim().toLowerCase() + '_' + String(bg || '').trim().toUpperCase() + '_' + String(dt || '').substring(0, 10).trim();
   }
 
   // যেকোনো ব্রাউজারে ছবি ১০০% নিখুঁতভাবে দেখানোর জন্য ইমেজ লিংক ও Base64 স্যানিটাইজার (স্পেস হয়ে যাওয়া '+' চিহ্ন অটো-ফিক্স ও গুগল ড্রাইভ মাল্টি-ফলব্যাক)
@@ -8484,38 +8518,39 @@ function updateLb() {
     window.renderSpondonGallery(false);
   };
 
-  // সরাসরি গুগল শিটের ১৩ নম্বর শিট Gallery_DB এবং গুগল ড্রাইভ ফোল্ডারে (1JTmEHKI5Bu6jJxZ6CuOYAi7bLrCSshCv) ছবি ও তথ্য আপলোড (Feedback_DB-তে কখনোই যাবে না)
+  // সরাসরি গুগল শিটের ১৩ নম্বর শিট Gallery_DB এবং গুগল ড্রাইভ ফোল্ডারে (1JTmEHKI5Bu6jJxZ6CuOYAi7bLrCSshCv) ছবি ও তথ্য আপলোড
+  // (প্রথম চেষ্টাতেই URLSearchParams পাঠানো হয় যাতে Google Apps Script doPost ১০০% নির্ভুলভাবে সাথে সাথে গ্রহণ করে)
   function uploadGalleryItemToSheet(clientId, name, dist, bg, donDate, dataUri, onComplete) {
     var rawB = dataUri.indexOf(',') !== -1 ? dataUri.split(',')[1] : dataUri;
-    var fd = new FormData();
-    fd.append('action', 'addGalleryPhoto');
-    fd.append('formType', 'addGalleryPhoto');
-    fd.append('targetSheet', GALLERY_SHEET_NAME);
-    fd.append('sheetNumber', String(GALLERY_SHEET_NUMBER));
-    fd.append('sheetId', GALLERY_SHEET_ID);
-    fd.append('folderId', GALLERY_DRIVE_FOLDER_ID);
-    fd.append('clientId', String(clientId));
-    fd.append('name', name);
-    fd.append('district', dist);
-    fd.append('bg', bg);
-    fd.append('donationDate', donDate);
-    fd.append('mimeType', compressedMimeType || 'image/jpeg');
-    fd.append('photoFile', rawB);
+
+    var params = new URLSearchParams();
+    params.append('action', 'addGalleryPhoto');
+    params.append('formType', 'addGalleryPhoto');
+    params.append('targetSheet', GALLERY_SHEET_NAME);
+    params.append('sheetNumber', String(GALLERY_SHEET_NUMBER));
+    params.append('sheetId', GALLERY_SHEET_ID);
+    params.append('folderId', GALLERY_DRIVE_FOLDER_ID);
+    params.append('clientId', String(clientId));
+    params.append('name', name);
+    params.append('district', dist);
+    params.append('bg', bg);
+    params.append('donationDate', donDate);
+    params.append('mimeType', compressedMimeType || 'image/jpeg');
+    params.append('photoFile', rawB);
 
     function sendBridgeToSheetIfOldDeployment() {
-      var rfd = new FormData();
-      rfd.append('action', 'addFeedback');
-      rfd.append('name', name);
-      rfd.append('location', '__GAL__|' + dist + '|' + bg + '|' + donDate + '|' + clientId);
-      rfd.append('role', '__SPONDON_GALLERY__');
-      rfd.append('message', normalizeGalleryImageUrl(dataUri));
-      fetch(S, { method: 'POST', body: rfd })
+      var rParams = new URLSearchParams();
+      rParams.append('action', 'addFeedback');
+      rParams.append('name', name);
+      rParams.append('location', '__GAL__|' + dist + '|' + bg + '|' + donDate + '|' + clientId);
+      rParams.append('role', '__SPONDON_GALLERY__');
+      rParams.append('message', normalizeGalleryImageUrl(dataUri));
+      fetch(S, { method: 'POST', body: rParams })
         .then(function(r){ return r.text(); })
         .then(function(txt){
           var rRes = null;
           try { rRes = JSON.parse(txt); } catch(e){}
-          // ব্যাকএন্ডে মাইগ্রেশন ট্রিগার করার জন্য getGallery পিং করা
-          fetch(S + '?action=getGallery&_t=' + Date.now()).catch(function(){});
+          fetch(S + '?action=getGallery&_t=' + Date.now(), { cache: 'no-store' }).catch(function(){});
           if (rRes && rRes.status === 'Success') {
             var srvItem = rRes.item || {
               id: (rRes.feedback && rRes.feedback.id) ? rRes.feedback.id : clientId,
@@ -8536,42 +8571,7 @@ function updateLb() {
         });
     }
 
-    function retryWithUrlEncoded() {
-      var params = new URLSearchParams();
-      params.append('action', 'addGalleryPhoto');
-      params.append('formType', 'addGalleryPhoto');
-      params.append('targetSheet', GALLERY_SHEET_NAME);
-      params.append('sheetNumber', String(GALLERY_SHEET_NUMBER));
-      params.append('sheetId', GALLERY_SHEET_ID);
-      params.append('folderId', GALLERY_DRIVE_FOLDER_ID);
-      params.append('clientId', String(clientId));
-      params.append('name', name);
-      params.append('district', dist);
-      params.append('bg', bg);
-      params.append('donationDate', donDate);
-      params.append('mimeType', compressedMimeType || 'image/jpeg');
-      params.append('photoFile', rawB);
-
-      fetch(S, { method: 'POST', body: params })
-        .then(function(r){ return r.text(); })
-        .then(function(txt){
-          var res = null;
-          try { res = JSON.parse(txt); } catch(e){}
-          if (res && res.status === 'Success') {
-            var srvItem = res.item || { id: clientId, name: name, district: dist, bg: bg, date: donDate, image: dataUri, fileId: 'drive_synced' };
-            srvItem.image = srvItem.image || dataUri;
-            srvItem.fileId = srvItem.fileId || 'drive_synced';
-            if (onComplete) onComplete(srvItem, res.message);
-          } else {
-            sendBridgeToSheetIfOldDeployment();
-          }
-        })
-        .catch(function(){
-          sendBridgeToSheetIfOldDeployment();
-        });
-    }
-
-    fetch(S, { method: 'POST', body: fd })
+    fetch(S, { method: 'POST', body: params })
       .then(function(r){ return r.text(); })
       .then(function(txt){
         var res = null;
@@ -8582,49 +8582,57 @@ function updateLb() {
           srvItem.fileId = srvItem.fileId || 'drive_synced';
           if (onComplete) onComplete(srvItem, res.message);
         } else {
-          retryWithUrlEncoded();
+          sendBridgeToSheetIfOldDeployment();
         }
       })
       .catch(function(){
-        retryWithUrlEncoded();
+        sendBridgeToSheetIfOldDeployment();
       });
   }
 
   // গুগল শিট (Gallery_DB) হলো ১০০% মূল ডাটাবেজ (Single Source of Truth):
-  // শিট থেকে বা অ্যাডমিন প্যানেল থেকে কোনো ছবি ডিলিট করা হলে তা সব ব্রাউজার (Brave, Chrome, Edge) ও মোবাইল থেকে সাথে সাথে মুছে যাবে!
+  // শিট থেকে বা যেকোনো ব্রাউজারে অ্যাডমিন লগইন করে কোনো ছবি ডিলিট বা অ্যাড করলে তা সাথে সাথে সব ব্রাউজার (Chrome, Brave, Edge, Safari) ও মোবাইলে সিঙ্ক হবে!
   window.setServerGalleryItems = function(serverArr) {
-    var delMap = getDeletedGalleryKeys();
-    var localArr = getLocalGalleryCache();
     var map = {};
+    var idMap = {};
     var merged = [];
     var nowMs = Date.now();
 
     (serverArr || []).forEach(function(it) {
       if (!it || !it.name) return;
+      var cleanDate = formatIsoDateFromAny(it.date || '');
+      it.date = cleanDate;
+      if (isRecentlyDeletedItem(it.id, it.name, it.bg, it.date)) return;
       var k = makeGalKey(it.name, it.bg, it.date);
-      if (delMap[k] || delMap[String(it.id)]) return;
-      map[k] = true;
+      var idStr = String(it.id || '').trim();
+      if (idStr && idMap[idStr]) return;
+      if (map[k] && idStr && map[k].id === idStr) return;
+      if (idStr) idMap[idStr] = true;
+      map[k] = it;
       _serverKnownKeys[k] = true;
       it.image = normalizeGalleryImageUrl(it.image || '');
       it.fileId = it.fileId || 'sheet_synced';
       merged.push(it);
     });
 
-    // শুধুমাত্র এইমাত্র (গত ১৫ সেকেন্ডের মধ্যে) ফর্ম সাবমিট করা পেন্ডিং আইটেমটি ইন-ফ্লাইট অবস্থায় থাকবে; পুরনো বা ডিলিট হওয়া কোনো লোকাল ক্যাশ কখনোই ফিরে আসবে না!
-    localArr.forEach(function(loc) {
-      if (!loc || !loc.name) return;
+    // এইমাত্র সাবমিট করা পেন্ডিং আইটেম (৪৫ সেকেন্ডের মধ্যে) যদি গুগল ড্রাইভে আপলোড হওয়ার ট্রানজিটে থাকে, তবে তা স্ক্রিনে ধরে রাখবে:
+    _pendingUploadedItems = (_pendingUploadedItems || []).filter(function(p) {
+      if (!p || !p.name) return false;
+      if (isRecentlyDeletedItem(p.id, p.name, p.bg, p.date)) return false;
+      return p._pendingUploadTs && ((nowMs - p._pendingUploadTs) < 45000);
+    });
+    _pendingUploadedItems.forEach(function(loc) {
       var k = makeGalKey(loc.name, loc.bg, loc.date);
-      if (delMap[k] || delMap[String(loc.id)]) return;
-      var isJustSubmitted = loc._pendingUploadTs && ((nowMs - loc._pendingUploadTs) < 15000);
-      if (!map[k] && isJustSubmitted) {
-        map[k] = true;
+      var idStr = String(loc.id || '').trim();
+      if (!map[k] && (!idStr || !idMap[idStr])) {
+        map[k] = loc;
+        if (idStr) idMap[idStr] = true;
         merged.unshift(loc);
       }
     });
 
-    var newHash = 'len:' + merged.length + '|' + merged.map(function(x){ return (x.id||'')+(x.name||'')+(x.bg||'')+(x.image||'').length; }).join('|');
+    var newHash = 'len:' + merged.length + '|' + merged.map(function(x){ return (x.id||'')+'_'+(x.name||'')+'_'+(x.bg||'')+'_'+(x.date||'')+'_'+(x.fileId||''); }).join('|');
     allGalleryItems = merged;
-    saveLocalGalleryCache(merged);
     if (newHash !== _lastGalleryHash) {
       _lastGalleryHash = newHash;
       window.renderSpondonGallery(false);
@@ -8642,148 +8650,223 @@ function updateLb() {
     return null;
   }
 
+  function formatIsoDateFromAny(val) {
+    if (!val) return '';
+    var s = String(val).trim();
+    // Handle gviz Date(2026,10,2) where month is 0-indexed (10 -> 11)
+    var dm = s.match(/^Date\(\s*(\d{4})\s*,\s*(\d{1,2})\s*,\s*(\d{1,2})/i);
+    if (dm) {
+      var yr = dm[1];
+      var mo = String(parseInt(dm[2], 10) + 1).padStart(2, '0');
+      var dy = String(parseInt(dm[3], 10)).padStart(2, '0');
+      return yr + '-' + mo + '-' + dy;
+    }
+    // Handle YYYY-MM-DD
+    var iso = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+    if (iso) {
+      return iso[1] + '-' + String(iso[2]).padStart(2, '0') + '-' + String(iso[3]).padStart(2, '0');
+    }
+    // Handle M/D/YYYY or D/M/YYYY
+    var sl = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+    if (sl) {
+      var p1 = parseInt(sl[1], 10), p2 = parseInt(sl[2], 10), yr2 = sl[3];
+      var m2 = p1 > 12 ? p2 : p1;
+      var d2 = p1 > 12 ? p1 : p2;
+      return yr2 + '-' + String(m2).padStart(2, '0') + '-' + String(d2).padStart(2, '0');
+    }
+    return s.substring(0, 10);
+  }
+
   function cellVal(row, idx) {
     if (!row || !row.c || !row.c[idx]) return '';
     var c = row.c[idx];
-    return (c.f !== undefined && c.f !== null && String(c.v).indexOf('Date(') === 0) ? String(c.f).trim() : (c.v !== undefined && c.v !== null ? String(c.v).trim() : '');
+    if (c.v !== undefined && c.v !== null && String(c.v).indexOf('Date(') === 0) {
+      return formatIsoDateFromAny(String(c.v));
+    }
+    if (c.v !== undefined && c.v !== null) {
+      var sv = String(c.v).trim();
+      if (/^\d+\.0$/.test(sv)) sv = sv.replace(/\.0$/, '');
+      return sv;
+    }
+    if (c.f !== undefined && c.f !== null) return String(c.f).trim();
+    return '';
   }
 
-  // সরাসরি গুগল শিটের ১৩ নম্বর শিট Gallery_DB থেকে রিয়েল-টাইম ছবি ও তথ্য রিড করা (&headers=1 সহ, যাতে Chrome, Edge, Safari ও Brave সব ব্রাউজারে তাৎক্ষণিক সব ছবি দেখায়)
-  function fetchGoogleSheetGalleryDirectGviz() {
-    var galUrl = 'https://docs.google.com/spreadsheets/d/' + GALLERY_SHEET_ID + '/gviz/tq?tqx=out:json&headers=1&sheet=' + encodeURIComponent(GALLERY_SHEET_NAME) + '&_t=' + Date.now();
-    var fbTransitUrl = 'https://docs.google.com/spreadsheets/d/' + GALLERY_SHEET_ID + '/gviz/tq?tqx=out:json&headers=1&sheet=Feedback_DB&_t=' + Date.now();
+  // 🛠️ ০-রো, ১-রো (যেমন: MD Nayem Mollah যেখানে ID সংখ্যা কিন্তু Name টেক্সট) এবং মাল্টি-রো সব অবস্থার জন্য ১০০% নির্ভুল gviz টেবিল পার্সার:
+  function parseGvizGalleryTable(obj) {
+    var items = [];
+    if (!obj || !obj.table) return items;
+    var rows = Array.isArray(obj.table.rows) ? obj.table.rows : [];
+    var cols = Array.isArray(obj.table.cols) ? obj.table.cols : [];
 
-    Promise.all([
-      fetch(galUrl).then(function(r){ return r.text(); }).catch(function(){ return ''; }),
-      fetch(fbTransitUrl).then(function(r){ return r.text(); }).catch(function(){ return ''; })
-    ]).then(function(results) {
-      var items = [];
-      var galTxt = results[0] || '';
-      var fbTxt = results[1] || '';
+    // ধাপ ১: যদি gviz ১ম ডাটা রো-এর টেক্সট কলামগুলোকে cols[].label-এর সাথে মার্জ করে থাকে (যা ১টি রো থাকলে কিংবা সব টেক্সট কলাম থাকলে ঘটে):
+    if (cols.length >= 7) {
+      var lblId = String((cols[0] && cols[0].label) || '').replace(/^ID\s*/i, '').trim();
+      var lblTs = String((cols[1] && cols[1].label) || '').replace(/^Timestamp\s*/i, '').trim();
+      var lblNm = String((cols[2] && cols[2].label) || '').replace(/^Name\s*/i, '').trim();
+      var lblDst = String((cols[3] && cols[3].label) || '').replace(/^District\s*/i, '').trim();
+      var lblBg = String((cols[4] && cols[4].label) || '').replace(/^Blood_Group\s*/i, '').trim();
+      var lblDt = String((cols[5] && cols[5].label) || '').replace(/^Donation_Date\s*/i, '').trim();
+      var lblImg = String((cols[6] && cols[6].label) || '').replace(/^Image_URL\s*/i, '').trim();
+      var lblFid = String((cols[7] && cols[7].label) || '').replace(/^Drive_File_ID\s*/i, '').trim();
+      var lblSt = String((cols[8] && cols[8].label) || '').replace(/^Status\s*/i, '').trim() || 'Approved';
 
-      var obj = parseGvizJson(galTxt);
-      if (obj && obj.table) {
-        if (Array.isArray(obj.table.rows) && obj.table.rows.length > 0) {
-          obj.table.rows.forEach(function(row){
-            var id = cellVal(row, 0);
-            var ts = cellVal(row, 1);
-            var nm = cellVal(row, 2);
-            var dst = cellVal(row, 3);
-            var bg = cellVal(row, 4);
-            var dt = cellVal(row, 5);
-            var img = cellVal(row, 6);
-            var fid = cellVal(row, 7);
-            var st = cellVal(row, 8) || 'Approved';
-            if (!nm || nm === 'Name' || id === 'ID' || st === 'Removed') return;
-            var cleanFid = extractDriveFileId(fid) || extractDriveFileId(img);
-            items.push({
-              id: id,
-              timestamp: ts,
-              name: nm,
-              district: dst,
-              bg: bg,
-              date: dt.substring(0, 10),
-              image: normalizeGalleryImageUrl(img),
-              fileId: cleanFid || 'sheet_synced'
-            });
-          });
-        } else if (Array.isArray(obj.table.cols) && obj.table.cols.length >= 7) {
-          // যদি সব কলাম টেক্সট হওয়ার কারণে gviz ২য় সারিকে হেডার লেবেলের সাথে মার্জ করে থাকে, তবে তা থেকেও ডাটা রিকভার করবে
-          var lblId = String((obj.table.cols[0] && obj.table.cols[0].label) || '').replace(/^ID\s*/i, '').trim();
-          var lblTs = String((obj.table.cols[1] && obj.table.cols[1].label) || '').replace(/^Timestamp\s*/i, '').trim();
-          var lblNm = String((obj.table.cols[2] && obj.table.cols[2].label) || '').replace(/^Name\s*/i, '').trim();
-          var lblDst = String((obj.table.cols[3] && obj.table.cols[3].label) || '').replace(/^District\s*/i, '').trim();
-          var lblBg = String((obj.table.cols[4] && obj.table.cols[4].label) || '').replace(/^Blood_Group\s*/i, '').trim();
-          var lblDt = String((obj.table.cols[5] && obj.table.cols[5].label) || '').replace(/^Donation_Date\s*/i, '').trim();
-          var lblImg = String((obj.table.cols[6] && obj.table.cols[6].label) || '').replace(/^Image_URL\s*/i, '').trim();
-          var lblFid = String((obj.table.cols[7] && obj.table.cols[7].label) || '').replace(/^Drive_File_ID\s*/i, '').trim();
-          if (lblNm && lblImg) {
-            var cFid = extractDriveFileId(lblFid) || extractDriveFileId(lblImg);
-            items.push({
-              id: lblId || Date.now().toString(),
-              timestamp: lblTs,
-              name: lblNm,
-              district: lblDst,
-              bg: lblBg,
-              date: lblDt.substring(0, 10),
-              image: normalizeGalleryImageUrl(lblImg),
-              fileId: cFid || 'sheet_synced'
-            });
-          }
-        }
+      // যদি সংখ্যা/তারিখ কলামগুলো (ID, Timestamp, Donation_Date) rows[0]-তে থেকে থাকে এবং টেক্সট কলামগুলো (Name, Image_URL) cols-এ মার্জ হয়ে থাকে:
+      if (rows.length > 0 && !cellVal(rows[0], 2)) {
+        if (!lblId) lblId = cellVal(rows[0], 0);
+        if (!lblTs) lblTs = cellVal(rows[0], 1);
+        if (!lblDt) lblDt = cellVal(rows[0], 5);
       }
-      items.reverse();
 
-      // যদি কোনো ছবি ট্রানজিটে থাকে (১ মিনিটের অটো-ট্রিগারে Gallery_DB-তে ট্রান্সফার হওয়ার আগ মুহূর্ত পর্যন্ত), সেটিও সাথে সাথে দেখাবে
-      var fbObj = parseGvizJson(fbTxt);
-      var transitItems = [];
-      if (fbObj && fbObj.table && Array.isArray(fbObj.table.rows)) {
-        fbObj.table.rows.forEach(function(row){
-          var id = cellVal(row, 0);
-          var dt = cellVal(row, 1);
-          var nm = cellVal(row, 2);
-          var loc = cellVal(row, 3);
-          var rl = cellVal(row, 4);
-          var msg = cellVal(row, 5);
-          var st = cellVal(row, 6) || 'Approved';
-          if (st === 'Removed') return;
-          if (rl === '__SPONDON_GALLERY__' || loc.indexOf('__GAL__|') === 0) {
-            var parts = loc.split('|');
-            transitItems.push({
-              id: parts[4] || id,
-              name: nm,
-              district: parts[1] || '',
-              bg: parts[2] || '',
-              date: (parts[3] || dt || '').substring(0, 10),
-              image: normalizeGalleryImageUrl(msg),
-              fileId: 'sheet_synced'
-            });
-          }
+      if (lblNm && lblNm.toLowerCase() !== 'name' && (lblImg || lblFid) && lblSt !== 'Removed') {
+        var cFid = extractDriveFileId(lblFid) || extractDriveFileId(lblImg);
+        var resolvedImg = normalizeGalleryImageUrl(lblImg) || (cFid ? ('https://drive.google.com/thumbnail?id=' + cFid + '&sz=w1000') : '');
+        items.push({
+          id: lblId || Date.now().toString(),
+          timestamp: lblTs,
+          name: lblNm,
+          district: lblDst,
+          bg: lblBg,
+          date: formatIsoDateFromAny(lblDt),
+          image: resolvedImg,
+          fileId: cFid || 'sheet_synced'
         });
       }
-      transitItems.reverse();
+    }
 
-      var combined = transitItems.concat(items);
-      if (obj && obj.table) {
-        window.setServerGalleryItems(combined);
-      } else if (combined.length > 0) {
-        window.setServerGalleryItems(combined);
-      }
-    }).catch(function(){});
+    // ধাপ ২: সাধারণ rows[] লুপ (একাধিক রো থাকলে কিংবা সব কলাম rows[]-এ থাকলে):
+    if (rows.length > 0) {
+      rows.forEach(function(row) {
+        var id = cellVal(row, 0);
+        var ts = cellVal(row, 1);
+        var nm = cellVal(row, 2);
+        var dst = cellVal(row, 3);
+        var bg = cellVal(row, 4);
+        var dt = formatIsoDateFromAny(cellVal(row, 5));
+        var img = cellVal(row, 6);
+        var fid = cellVal(row, 7);
+        var st = cellVal(row, 8) || 'Approved';
+        if (!nm || nm.toLowerCase() === 'name' || id.toLowerCase() === 'id' || st === 'Removed') return;
+        var cleanFid = extractDriveFileId(fid) || extractDriveFileId(img);
+        var resolvedImg = normalizeGalleryImageUrl(img) || (cleanFid ? ('https://drive.google.com/thumbnail?id=' + cleanFid + '&sz=w1000') : '');
+        items.push({
+          id: id || Date.now().toString(),
+          timestamp: ts,
+          name: nm,
+          district: dst,
+          bg: bg,
+          date: dt,
+          image: resolvedImg,
+          fileId: cleanFid || 'sheet_synced'
+        });
+      });
+    }
+
+    return items;
   }
 
-  window.syncUnsyncedLocalGallery = function() {
-    // গুগল শিট থেকে ডিলিট করা ছবি যাতে লোকাল ক্যাশ থেকে পুনরায় শিটে আপলোড না হয়, তাই অটো-রিআপলোড বন্ধ রাখা হলো
-  };
+  // 🌐 যেকোনো ব্রাউজারে (Brave Shields, Chrome, Edge, Safari, Mobile) ১০০% CORS-মুক্ত লাইভ গুগল শিট রিডার (JSONP <script> + Fetch):
+  function loadGvizJsonpOrFetch(sheetName, cb) {
+    var done = false;
+    var cbName = '_sbsGvizCb_' + sheetName.replace(/[^a-zA-Z0-9]/g, '') + '_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
+    var scriptEl = null;
+    var timer = setTimeout(function() {
+      cleanup();
+      if (!done) { done = true; cb(null); }
+    }, 3500);
+
+    function cleanup() {
+      clearTimeout(timer);
+      try { delete window[cbName]; } catch(e){ window[cbName] = undefined; }
+      if (scriptEl && scriptEl.parentNode) scriptEl.parentNode.removeChild(scriptEl);
+    }
+
+    window[cbName] = function(data) {
+      if (done) return;
+      done = true;
+      cleanup();
+      cb(data);
+    };
+
+    try {
+      scriptEl = document.createElement('script');
+      scriptEl.async = true;
+      scriptEl.src = 'https://docs.google.com/spreadsheets/d/' + GALLERY_SHEET_ID + '/gviz/tq?tqx=out:json;responseHandler:' + cbName + '&headers=1&sheet=' + encodeURIComponent(sheetName) + '&_t=' + Date.now();
+      scriptEl.onerror = function() {
+        if (done) return;
+        // Fallback to credential-less fetch if script tag blocked
+        var fUrl = 'https://docs.google.com/spreadsheets/d/' + GALLERY_SHEET_ID + '/gviz/tq?tqx=out:json&headers=1&sheet=' + encodeURIComponent(sheetName) + '&_t=' + Date.now();
+        fetch(fUrl, { credentials: 'omit', cache: 'no-store' })
+          .then(function(r){ return r.text(); })
+          .then(function(txt){
+            if (!done) {
+              done = true;
+              cleanup();
+              cb(parseGvizJson(txt));
+            }
+          })
+          .catch(function(){
+            if (!done) {
+              done = true;
+              cleanup();
+              cb(null);
+            }
+          });
+      };
+      (document.head || document.body || document.documentElement).appendChild(scriptEl);
+    } catch(ex) {
+      cleanup();
+      if (!done) { done = true; cb(null); }
+    }
+  }
+
+  // সরাসরি গুগল শিটের ১৩ নম্বর শিট Gallery_DB থেকে রিয়েল-টাইম ছবি ও তথ্য রিড করা
+  function fetchGoogleSheetGalleryDirectGviz() {
+    loadGvizJsonpOrFetch(GALLERY_SHEET_NAME, function(galObj) {
+      if (!galObj || !galObj.table) return;
+      window._gvizLiveGalleryActive = true;
+      var items = parseGvizGalleryTable(galObj);
+      items.reverse();
+      window.setServerGalleryItems(items);
+    });
+  }
+
+  window.syncUnsyncedLocalGallery = function() {};
 
   window.fetchGalleryDirect = function() {
     fetchGoogleSheetGalleryDirectGviz();
-    fetch(S + '?action=getGallery&_t=' + Date.now())
+    fetch(S + '?action=getGallery&_t=' + Date.now(), { cache: 'no-store' })
       .then(function(r){ return r.json(); })
       .then(function(d){
         if (d && d.status === 'Success' && Array.isArray(d.gallery)) {
-          window.setServerGalleryItems(d.gallery);
+          if (!window._gvizLiveGalleryActive || d.gallery.length > 0 || allGalleryItems.length === 0) {
+            window.setServerGalleryItems(d.gallery);
+          }
         }
       })
-      .catch(function(){})
-      .finally(function(){
-        setTimeout(window.syncUnsyncedLocalGallery, 400);
-      });
+      .catch(function(){});
   };
 
   window.deleteGalleryItem = function(id, nameOpt) {
     var targetName = nameOpt || '';
+    var targetBg = '', targetDate = '';
     try {
-      markDeletedGalleryKey(String(id));
       allGalleryItems.forEach(function(x){
-        if(String(x.id) === String(id)) {
+        if((id && String(x.id) === String(id)) || (targetName && String(x.name).toLowerCase() === String(targetName).toLowerCase())) {
           if(!targetName) targetName = x.name || '';
-          markDeletedGalleryKey(makeGalKey(x.name, x.bg, x.date));
+          targetBg = x.bg || '';
+          targetDate = x.date || '';
         }
+      });
+      markRecentlyDeletedItem(id, targetName, targetBg, targetDate);
+      _pendingUploadedItems = (_pendingUploadedItems || []).filter(function(x){
+        if (id && String(x.id) === String(id)) return false;
+        if (targetName && String(x.name || '').toLowerCase() === String(targetName).toLowerCase()) return false;
+        return true;
       });
       allGalleryItems = allGalleryItems.filter(function(x){
         if (id && String(x.id) === String(id)) return false;
-        if (!id && targetName && x.name === targetName) return false;
+        if (targetName && String(x.name || '').toLowerCase() === String(targetName).toLowerCase()) return false;
         return true;
       });
       saveLocalGalleryCache(allGalleryItems);
@@ -8794,30 +8877,33 @@ function updateLb() {
 
     var admEmail = sessionStorage.getItem('adminEmail') || 'spondon@gmail.com';
     var admPin = sessionStorage.getItem('adminPin') || '1234';
-    var fd = new FormData();
-    fd.append('action', 'deleteGalleryPhoto');
-    fd.append('formType', 'deleteGalleryPhoto');
-    fd.append('email', admEmail);
-    fd.append('pin', admPin);
-    fd.append('rowId', id);
-    fd.append('name', targetName);
-    showToast('🗑️ গ্যালারি পোস্ট মুছে ফেলা হচ্ছে...');
-    var delUrl = S + '?action=deleteGalleryPhoto&email=' + encodeURIComponent(admEmail) + '&pin=' + encodeURIComponent(admPin) + '&rowId=' + encodeURIComponent(id) + '&name=' + encodeURIComponent(targetName) + '&_t=' + Date.now();
-    fetch(S, { method: 'POST', body: fd })
+    var delUrl = S + '?action=deleteGalleryPhoto&email=' + encodeURIComponent(admEmail) + '&pin=' + encodeURIComponent(admPin) + '&rowId=' + encodeURIComponent(id || '') + '&name=' + encodeURIComponent(targetName || '') + '&_t=' + Date.now();
+    var params = new URLSearchParams();
+    params.append('action', 'deleteGalleryPhoto');
+    params.append('formType', 'deleteGalleryPhoto');
+    params.append('email', admEmail);
+    params.append('pin', admPin);
+    params.append('rowId', id || '');
+    params.append('name', targetName || '');
+
+    showToast('🗑️ গ্যালারি পোস্ট গুগল শিট থেকে মুছে ফেলা হচ্ছে...');
+    fetch(delUrl, { cache: 'no-store' })
       .then(function(r){ return r.json(); })
       .then(function(res){
         if (!res || res.status !== 'Success') {
-          return fetch(delUrl).then(function(r2){ return r2.json(); });
+          return fetch(S, { method: 'POST', body: params }).then(function(r2){ return r2.json(); });
         }
         return res;
       })
       .then(function(){
         showToast('✅ গ্যালারি পোস্ট গুগল শিট (Gallery_DB) ও সব ব্রাউজার থেকে স্থায়ীভাবে মুছে ফেলা হয়েছে!');
         if (typeof window.renderAdminControlHub === 'function') window.renderAdminControlHub();
-        setTimeout(window.fetchGalleryDirect, 1200);
+        setTimeout(window.fetchGalleryDirect, 900);
       })
       .catch(function(){
-        fetch(delUrl).catch(function(){});
+        fetch(S, { method: 'POST', body: params }).finally(function(){
+          setTimeout(window.fetchGalleryDirect, 1200);
+        });
       });
   };
 
@@ -8869,11 +8955,13 @@ function updateLb() {
       } else {
         var gh = '';
         galArr.forEach(function(it){
-          var sid = String(it.id || '').replace(/'/g, "\\'");
-          var sname = String(it.name || '').replace(/'/g, "\\'");
+          var sid = String(it.id || '').replace(/'/g, "\'");
+          var sname = String(it.name || '').replace(/'/g, "\'");
+          var cleanFileId = extractDriveFileId(it.fileId) || extractDriveFileId(it.image || '');
+          var thumbSrc = cleanFileId ? ('https://drive.google.com/thumbnail?id=' + encodeURIComponent(cleanFileId) + '&sz=w400') : (it.image || '');
           gh += '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;background:#f8fafc;border:1px solid #e2e8f0;padding:8px 12px;border-radius:10px;">' +
             '<div style="display:flex;align-items:center;gap:10px;min-width:0;">' +
-              '<img src="' + escapeHtml(it.image || '') + '" style="width:40px;height:40px;border-radius:8px;object-fit:cover;border:1px solid #cbd5e1;flex-shrink:0;" onerror="this.style.display=\'none\'">' +
+              '<img src="' + escapeHtml(thumbSrc) + '" style="width:40px;height:40px;border-radius:8px;object-fit:cover;border:1px solid #cbd5e1;flex-shrink:0;" onerror="this.style.display=\'none\'">' +
               '<div style="min-width:0;">' +
                 '<div style="font-size:13px;font-weight:800;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + escapeHtml(it.name || 'রক্তযোদ্ধা') + ' <span style="color:#b71c1c;">(' + escapeHtml(it.bg || '') + ')</span></div>' +
                 '<div style="font-size:11.5px;color:#475569;font-weight:600;">📍 ' + escapeHtml(it.district || '') + ' • 🗓️ ' + escapeHtml(it.date || '') + '</div>' +
@@ -8892,12 +8980,12 @@ function updateLb() {
       } else {
         var fh = '';
         fbkArr.forEach(function(it){
-          var sid = String(it.id || '').replace(/'/g, "\\'");
-          var sname = String(it.name || '').replace(/'/g, "\\'");
+          var sid = String(it.id || '').replace(/'/g, "\'");
+          var sname = String(it.name || '').replace(/'/g, "\'");
           fh += '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;background:#f8fafc;border:1px solid #e2e8f0;padding:8px 12px;border-radius:10px;">' +
             '<div style="min-width:0;flex:1;">' +
-              '<div style="font-size:13px;font-weight:800;color:#0f172a;">' + escapeHtml(it.name || '') + ' <span style="font-size:11px;color:#64748b;font-weight:600;">(' + escapeHtml(it.location || '') + ' • ' + escapeHtml(it.date || '') + ')</span></div>' +
-              '<div style="font-size:12px;color:#334155;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + escapeHtml(it.message || '') + '</div>' +
+              '<div style="font-size:13px;font-weight:800;color:#0f172a;">' + escapeHtml(it.name || '') + ' <span style="font-size:11px;color:#64748b;font-weight:600;">(' + escapeHtml(it.location || '') + ')</span></div>' +
+              '<div style="font-size:11.5px;color:#475569;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + escapeHtml(it.message || '') + '</div>' +
             '</div>' +
             '<button type="button" onclick="window.deleteFeedbackItem(\'' + sid + '\', \'' + sname + '\')" style="background:#dc2626;color:#fff;border:none;padding:6px 12px;border-radius:8px;font-size:11.5px;font-weight:800;cursor:pointer;flex-shrink:0;">ডিলিট 🗑️</button>' +
           '</div>';
@@ -8908,16 +8996,16 @@ function updateLb() {
 
     if (frdListEl) {
       if (frdArr.length === 0) {
-        frdListEl.innerHTML = '<div style="text-align:center;padding:14px;color:#64748b;font-size:12.5px;font-weight:700;">অভিযোগ বক্সে কোনো রিপোর্ট নেই।</div>';
+        frdListEl.innerHTML = '<div style="text-align:center;padding:14px;color:#64748b;font-size:12.5px;font-weight:700;">প্রতারক তালিকায় কোনো অভিযোগ নেই।</div>';
       } else {
         var frh = '';
         frdArr.forEach(function(it){
-          var sid = String(it.id || '').replace(/'/g, "\\'");
-          var sphone = String(it.phone || '').replace(/'/g, "\\'");
+          var sid = String(it.id || '').replace(/'/g, "\'");
+          var sphone = String(it.phone || '').replace(/'/g, "\'");
           frh += '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;background:#f8fafc;border:1px solid #e2e8f0;padding:8px 12px;border-radius:10px;">' +
             '<div style="min-width:0;flex:1;">' +
-              '<div style="font-size:13px;font-weight:800;color:#b71c1c;">🚫 ' + escapeHtml(it.phone || '') + ' — ' + escapeHtml(it.accusedName || '') + '</div>' +
-              '<div style="font-size:12px;color:#334155;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">কারণ: ' + escapeHtml(it.reason || '') + ' (' + escapeHtml(it.details || '') + ')</div>' +
+              '<div style="font-size:13px;font-weight:800;color:#0f172a;">' + escapeHtml(it.accusedName || 'অজ্ঞাত') + ' — <span style="color:#dc2626;">📞 ' + escapeHtml(it.phone || '') + '</span></div>' +
+              '<div style="font-size:11.5px;color:#475569;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">কারণ: ' + escapeHtml(it.reason || '') + ' (' + escapeHtml(it.details || '') + ')</div>' +
             '</div>' +
             '<button type="button" onclick="window.deleteFraudItem(\'' + sid + '\', \'' + sphone + '\')" style="background:#dc2626;color:#fff;border:none;padding:6px 12px;border-radius:8px;font-size:11.5px;font-weight:800;cursor:pointer;flex-shrink:0;">ডিলিট 🗑️</button>' +
           '</div>';
@@ -8954,26 +9042,52 @@ function updateLb() {
     var savedPhotoCopy = compressedPhotoB64;
     var clientId = Date.now().toString();
 
+    // যদি আগে কখনো একই নাম/তারিখের ছবি ডিলিট করা হয়ে থাকে, সেই ডিলিট ফ্ল্যাগ সাথে সাথে তুলে নেওয়া হচ্ছে:
+    unmarkRecentlyDeletedItem(clientId, name, bg, donDate);
+
+    // ⚡ তাৎক্ষণিক অপটিমিস্টিক রেন্ডার (০.০১ সেকেন্ডে ওয়েবসাইটে সাথে সাথে ছবি ও তথ্য প্রদর্শন):
+    var optimisticItem = {
+      id: clientId,
+      name: name,
+      district: dist,
+      bg: bg,
+      date: donDate,
+      image: savedPhotoCopy,
+      fileId: 'uploading_now',
+      _pendingUploadTs: Date.now()
+    };
+    _pendingUploadedItems.unshift(optimisticItem);
+    allGalleryItems = allGalleryItems.filter(function(x){
+      return !((String(x.name).toLowerCase() === name.toLowerCase()) && (x.date === donDate) && (x.bg === bg));
+    });
+    allGalleryItems.unshift(optimisticItem);
+    _lastGalleryHash = '';
+    var sInp = document.getElementById('gal-search-inp');
+    var bgSel = document.getElementById('gal-filter-bg');
+    if (sInp) sInp.value = '';
+    if (bgSel) bgSel.value = '';
+    window.renderSpondonGallery(false);
+    if (typeof window.renderAdminControlHub === 'function') window.renderAdminControlHub();
+
     if (btn) btn.disabled = true;
-    if (btnTxt) btnTxt.textContent = '⏳ গ্যালারি ও গুগল শিটে আপলোড হচ্ছে...';
-    if (msgBox) { msgBox.style.display = 'block'; msgBox.style.color = '#0f172a'; msgBox.textContent = '📡 আপনার ছবি গুগল ড্রাইভে এবং তথ্য ১৩ নম্বর শিট Gallery_DB-তে সংরক্ষণ করা হচ্ছে...'; }
+    if (btnTxt) btnTxt.textContent = '⏳ গুগল শিটে সংরক্ষণ হচ্ছে...';
+    if (msgBox) { msgBox.style.display = 'block'; msgBox.style.color = '#0f172a'; msgBox.textContent = '📡 আপনার ছবি ওয়েবসাইটে যুক্ত হয়েছে এবং গুগল শিটের Gallery_DB-তে সিঙ্ক হচ্ছে...'; }
 
     function finalizeGalleryAdd(itemObj, customMsg) {
       if (btn) btn.disabled = false;
       if (btnTxt) btnTxt.textContent = 'গ্যালারিতে পোস্ট করুন';
       if (!itemObj.image) itemObj.image = savedPhotoCopy;
       itemObj._pendingUploadTs = Date.now();
+      _pendingUploadedItems = _pendingUploadedItems.filter(function(x){
+        return String(x.id) !== String(clientId) && !((String(x.name).toLowerCase() === String(itemObj.name).toLowerCase()) && (x.date === itemObj.date));
+      });
+      _pendingUploadedItems.unshift(itemObj);
+
       allGalleryItems = allGalleryItems.filter(function(x){
-        return !((x.name === itemObj.name) && (x.date === itemObj.date) && (x.bg === itemObj.bg));
+        return String(x.id) !== String(clientId) && !((String(x.name).toLowerCase() === String(itemObj.name).toLowerCase()) && (x.date === itemObj.date) && (x.bg === itemObj.bg));
       });
       allGalleryItems.unshift(itemObj);
-      saveLocalGalleryCache(allGalleryItems);
       _lastGalleryHash = '';
-      // নতুন পোস্ট করার সাথে সাথে সার্চ ক্লিয়ার করে গ্যালারির একদম টপে দেখাবে
-      var sInp = document.getElementById('gal-search-inp');
-      var bgSel = document.getElementById('gal-filter-bg');
-      if (sInp) sInp.value = '';
-      if (bgSel) bgSel.value = '';
       window.renderSpondonGallery(false);
       if (typeof window.renderAdminControlHub === 'function') window.renderAdminControlHub();
 
@@ -8991,7 +9105,8 @@ function updateLb() {
         var f = document.getElementById('sbs-gallery-form');
         if (f && f.classList.contains('open')) window.toggleGalleryUploadForm();
         if (msgBox) msgBox.style.display = 'none';
-      }, 2200);
+      }, 2000);
+      setTimeout(window.fetchGalleryDirect, 1500);
     }
 
     var k = makeGalKey(name, bg, donDate);
@@ -9001,30 +9116,25 @@ function updateLb() {
         _serverKnownKeys[k] = true;
         finalizeGalleryAdd(srvItem, msgTxt || '✅ অভিনন্দন! আপনার রক্তদানের স্মৃতি ছবি গুগল ড্রাইভে এবং তথ্য গুগল শিটের ১৩ নম্বর শিট Gallery_DB-তে সফলভাবে সংরক্ষিত হয়েছে!');
       } else {
-        finalizeGalleryAdd({
-          id: clientId,
-          name: name,
-          district: dist,
-          bg: bg,
-          date: donDate,
-          image: savedPhotoCopy
-        }, '✅ আপনার রক্তদানের স্মৃতি ছবি স্পন্দন ফটো গ্যালারিতে যুক্ত হয়েছে!');
+        finalizeGalleryAdd(optimisticItem, '✅ আপনার রক্তদানের স্মৃতি ছবি স্পন্দন ফটো গ্যালারিতে যুক্ত হয়েছে!');
       }
     });
     return false;
   };
 
-  allGalleryItems = getLocalGalleryCache();
-  window.renderSpondonGallery(false);
-  setTimeout(window.fetchGalleryDirect, 400);
+  // পেজ লোড হওয়ার সাথে সাথে গুগল শিটের Gallery_DB থেকে সরাসরি লাইভ ডাটা নিয়ে আসবে (পুরনো localStorage ক্যাশ কখনোই দেখাবে না):
+  window.fetchGalleryDirect();
+  setTimeout(window.fetchGalleryDirect, 1200);
   window.addEventListener('focus', function(){ window.fetchGalleryDirect(); });
+  document.addEventListener('visibilitychange', function(){
+    if (!document.hidden) window.fetchGalleryDirect();
+  });
+  // প্রতি ৬ সেকেন্ড অন্তর গুগল শিটের সাথে অটো-সিঙ্ক করবে যাতে যেকোনো ব্রাউজার বা শিট থেকে ডিলিট/অ্যাড হলে সব ডিভাইসে সাথে সাথে সিঙ্ক হয়:
   setInterval(function(){
-    var pcPage = document.getElementById('p-photocard');
-    var admPanel = document.getElementById('admin-panel');
-    if ((pcPage && pcPage.classList.contains('on')) || (admPanel && admPanel.style.display === 'block')) {
+    if (!document.hidden) {
       window.fetchGalleryDirect();
     }
-  }, 10000);
+  }, 6000);
 })();
 
 </script>
