@@ -2350,16 +2350,81 @@ function findNearestDistrictFromCoords(lat, lon) {
   return bestDist;
 }
 
-// Match string to canonical BD district (handles Chittagong -> Chattogram, Bangla names, etc.)
+// Match string to canonical BD district (handles Upazilas -> District, Brahmanbaria/Chattogram/Bangla names, and prevents Division names from overriding specific districts)
+var DIV_CAPITALS = {'Dhaka':1,'Chattogram':1,'Rajshahi':1,'Khulna':1,'Barishal':1,'Sylhet':1,'Rangpur':1,'Mymensingh':1};
+var SPECIFIC_ALIASES = {
+  'brahmanbaria':'Brahmanbaria','b.baria':'Brahmanbaria','b-baria':'Brahmanbaria','bbaria':'Brahmanbaria','brammonbaria':'Brahmanbaria','brahmanbaria sadar':'Brahmanbaria','ashuganj':'Brahmanbaria','sarail':'Brahmanbaria','kasba':'Brahmanbaria','akhaura':'Brahmanbaria','nabinagar':'Brahmanbaria','bancharampur':'Brahmanbaria','bijoynagar':'Brahmanbaria','nasirnagar':'Brahmanbaria',
+  'ব্রাহ্মণবাড়িয়া':'Brahmanbaria','ব্রাহ্মণবাড়িয়া':'Brahmanbaria','বি-বাড়িয়া':'Brahmanbaria','আশুগঞ্জ':'Brahmanbaria','সরাইল':'Brahmanbaria','কসবা':'Brahmanbaria','আখাউড়া':'Brahmanbaria','নবীনগর':'Brahmanbaria',
+  'comilla':'Cumilla','cumilla':'Cumilla','কুমিল্লা':'Cumilla',
+  'coxs bazar':"Cox's Bazar",'coxsbazar':"Cox's Bazar","cox's bazar":"Cox's Bazar",'কক্সবাজার':"Cox's Bazar",
+  'bogra':'Bogura','bogura':'Bogura','বগুড়া':'Bogura','বগুড়া':'Bogura',
+  'jessore':'Jashore','jashore':'Jashore','যশোর':'Jashore',
+  'barisal':'Barishal','barishal':'Barishal','বরিশাল':'Barishal',
+  'chapai nawabganj':'Chapainawabganj','chapainawabganj':'Chapainawabganj','nawabganj':'Chapainawabganj','চাঁপাইনবাবগঞ্জ':'Chapainawabganj',
+  'netrakona':'Netrokona','netrokona':'Netrokona','নেত্রকোনা':'Netrokona',
+  'jhalakathi':'Jhalokati','jhalokati':'Jhalokati','jhalokathi':'Jhalokati','ঝালকাঠি':'Jhalokati',
+  'moulvibazar':'Maulvibazar','maulvibazar':'Maulvibazar','মৌলভীবাজার':'Maulvibazar',
+  'habiganj':'Habiganj','hobiganj':'Habiganj','হবিগঞ্জ':'Habiganj',
+  'lakshmipur':'Lakshmipur','laxmipur':'Lakshmipur','লক্ষ্মীপুর':'Lakshmipur',
+  'panchagarh':'Panchagarh','panchagar':'Panchagarh','পঞ্চগড়':'Panchagarh',
+  'bandarban':'Bandarban','বান্দরবান':'Bandarban','rangamati':'Rangamati','রাঙ্গামাটি':'Rangamati','khagrachhari':'Khagrachhari','khagrachari':'Khagrachhari','খাগড়াছড়ি':'Khagrachhari',
+  'feni':'Feni','ফেনী':'Feni','noakhali':'Noakhali','নোয়াখালী':'Noakhali','chandpur':'Chandpur','চাঁদপুর':'Chandpur',
+  'jhenaidah':'Jhenaidah','jhenaidaha':'Jhenaidah','ঝিনাইদহ':'Jhenaidah','kustia':'Kushtia','kushtia':'Kushtia','কুষ্টিয়া':'Kushtia','magura':'Magura','মাগুরা':'Magura','chuadanga':'Chuadanga','চুয়াডাঙ্গা':'Chuadanga','meherpur':'Meherpur','মেহেরপুর':'Meherpur','satkhira':'Satkhira','সাতক্ষীরা':'Satkhira','bagerhat':'Bagerhat','বাগেরহাট':'Bagerhat','narail':'Narail','নড়াইল':'Narail',
+  'gazipur':'Gazipur','গাজীপুর':'Gazipur','tongi':'Gazipur','টঙ্গী':'Gazipur','narayanganj':'Narayanganj','নারায়ণগঞ্জ':'Narayanganj','tangail':'Tangail','টাঙ্গাইল':'Tangail','narsingdi':'Narsingdi','নরসিংদী':'Narsingdi','munshiganj':'Munshiganj','মুন্সীগঞ্জ':'Munshiganj','manikganj':'Manikganj','মানিকগঞ্জ':'Manikganj','kishoreganj':'Kishoreganj','কিশোরগঞ্জ':'Kishoreganj','bhairab':'Kishoreganj','ভৈরব':'Kishoreganj','faridpur':'Faridpur','ফরিদপুর':'Faridpur','gopalganj':'Gopalganj','গোপালগঞ্জ':'Gopalganj','madaripur':'Madaripur','মাদারীপুর':'Madaripur','rajbari':'Rajbari','রাজবাড়ী':'Rajbari','shariatpur':'Shariatpur','শরীয়তপুর':'Shariatpur',
+  'savar':'Dhaka','সাভার':'Dhaka','keraniganj':'Dhaka','dhamrai':'Dhaka','dohar':'Dhaka','nawabganj upazila':'Dhaka'
+};
 function mD(s){
   if(!s)return'';
-  var lo=s.toLowerCase().trim();
+  var raw=String(s).trim();
+  if(!raw)return'';
+  var lo=raw.toLowerCase()
+    .replace(/(dhaka|chittagong|chattogram|rajshahi|khulna|barisal|barishal|sylhet|rangpur|mymensingh)\s+division/gi,' ')
+    .replace(/(ঢাকা|চট্টগ্রাম|রাজশাহী|খুলনা|বরিশাল|সিলেট|রংপুর|ময়মনসিংহ|ময়মনসিংহ)\s*বিভাগ/g,' ')
+    .replace(/bangladesh/gi,' ')
+    .trim();
+  if(!lo) lo=raw.toLowerCase().trim();
+
+  // 1. Exact match on 64 districts
+  for(var i=0;i<BD.length;i++){
+    if(BD[i].toLowerCase()===lo) return BD[i];
+  }
+  // 2. Check specific aliases first (Brahmanbaria, Cumilla, Jhenaidah, Gazipur, etc. before Division names)
+  for(var ak in SPECIFIC_ALIASES){
+    if(lo.indexOf(ak)>=0) return SPECIFIC_ALIASES[ak];
+  }
+  // 3. Check all 56 non-division-capital districts in BD
+  for(var i=0;i<BD.length;i++){
+    var dName=BD[i];
+    if(!DIV_CAPITALS[dName] && lo.indexOf(dName.toLowerCase())>=0) return dName;
+  }
+  // 4. Check all 56 non-division-capital aliases in DIST_MAP
+  for(var k in DIST_MAP){
+    var mapped=DIST_MAP[k];
+    if(!DIV_CAPITALS[mapped] && lo.indexOf(k)>=0) return mapped;
+  }
+  // 5. Check all 495 Upazilas in UZ (English & Bangla) to map Upazila -> Parent District
+  if(typeof UZ==='object' && UZ){
+    for(var distKey in UZ){
+      var uList=UZ[distKey];
+      if(Array.isArray(uList)){
+        for(var u=0;u<uList.length;u++){
+          var uStr=String(uList[u]).toLowerCase();
+          var parts=uStr.split(/[()\/]/);
+          for(var p=0;p<parts.length;p++){
+            var cleanU=parts[p].replace(/sadar|সদর/g,'').trim();
+            if(cleanU.length>=4 && lo.indexOf(cleanU)>=0) return distKey;
+          }
+        }
+      }
+    }
+  }
+  // 6. Now check Division Capitals in DIST_MAP & BD
   for(var k in DIST_MAP){
     if(lo.indexOf(k)>=0) return DIST_MAP[k];
   }
-  for(var i=0;i<BD.length;i++)if(BD[i].toLowerCase()===lo)return BD[i];
-  for(var i=0;i<BD.length;i++)if(lo.indexOf(BD[i].toLowerCase())>=0)return BD[i];
-  for(var i=0;i<BD.length;i++)if(BD[i].toLowerCase().indexOf(lo)>=0)return BD[i];
+  for(var i=0;i<BD.length;i++){
+    if(lo.indexOf(BD[i].toLowerCase())>=0) return BD[i];
+  }
   return'';
 }
 
@@ -2467,8 +2532,15 @@ function nearest(la,lo){var b='',m=1e9,R=Math.PI/180;for(var k in C){var c=C[k],
 function matchTextToDistrict(txt){
   if(!txt)return '';
   try{if(typeof mD==='function'){var m=mD(txt);if(m&&C[m])return m}}catch(e){}
-  var low=String(txt).toLowerCase();
-  for(var k in C){if(low.indexOf(k.toLowerCase())!==-1)return k}
+  var low=String(txt).toLowerCase()
+    .replace(/\b(dhaka|chittagong|chattogram|rajshahi|khulna|barisal|barishal|sylhet|rangpur|mymensingh)\s+division\b/gi,' ')
+    .trim();
+  for(var k in C){
+    if(!DIV_CAPITALS[k] && low.indexOf(k.toLowerCase())!==-1) return k;
+  }
+  for(var k in C){
+    if(low.indexOf(k.toLowerCase())!==-1) return k;
+  }
   return '';
 }
 function save(d){try{sessionStorage.setItem(KD,d);if(typeof sv==='function')sv(d)}catch(e){}}
@@ -2476,8 +2548,26 @@ function saved(){try{var s=sessionStorage.getItem(KD);if(s&&C[s])return s}catch(
 function clearSaved(){try{sessionStorage.removeItem(KD);localStorage.removeItem('sbs_gps_d');localStorage.removeItem('sbs_d')}catch(e){}}
 function msg(h){lastMsg=h||'';var p=$('pdm');if(p)p.innerHTML=lastMsg}
 function btn(t,dis){var b=$('pok');if(b){b.textContent=t;b.disabled=!!dis}}
-function popShow(){$('pop').classList.remove('off')}
-function popHide(){$('pop').classList.add('off')}
+var _autoPopTimer = null;
+function popShow(){
+  $('pop').classList.remove('off');
+  if(_autoPopTimer) clearTimeout(_autoPopTimer);
+  // ৪ সেকেন্ডের মধ্যে যদি ইউজার কিছু না করে বা ব্রাউজারে পপআপ আটকে থাকে, তবে স্বয়ংক্রিয়ভাবে IP জেলা লোড করে ওয়েবসাইটে প্রবেশ করাবে
+  _autoPopTimer = setTimeout(function(){
+    if(!$('pop').classList.contains('off') && !busy){
+      if(ipDist && C[ipDist]){
+        ldN(ipDist, true);
+        popHide();
+      } else {
+        ipFallback(true);
+      }
+    }
+  }, 4000);
+}
+function popHide(){
+  if(_autoPopTimer){clearTimeout(_autoPopTimer);_autoPopTimer=null;}
+  $('pop').classList.add('off');
+}
 var FRAMEMSG='⚠️ এই পেজে (অনলাইন প্রিভিউ / iframe) লোকেশন ব্লক করা, তাই ব্রাউজার কোনো পারমিশন বক্স দেখাতে পারে না। সাইটটি সরাসরি HTTPS লিংকে (GitHub Pages / Netlify / Vercel) খুলে চেষ্টা করুন।';
 function geoBlockedByFrame(){try{var pp=document.permissionsPolicy||document.featurePolicy;if(pp&&pp.allowsFeature&&!pp.allowsFeature('geolocation'))return true}catch(e){}return false}
 function permState(cb){try{if(navigator.permissions&&navigator.permissions.query){navigator.permissions.query({name:'geolocation'}).then(function(r){cb(r.state)},function(){cb('')})}else{cb('')}}catch(e){cb('')}}
@@ -2487,7 +2577,6 @@ function hsk(){var s=$('tsk');if(s)s.style.display='none'}
 function sman(){hsk();$('tdt').classList.remove('show');$('tmsg').className='t-msg';$('tman').classList.add('show')}
 function stk(a,d,ap){
   hsk();$('tman').classList.remove('show');
-  // ডানপাশের ব্যাজে কখনোই '(আনুমানিক)' লেখা থাকবে না—শুধুমাত্র জেলার নাম থাকবে যাতে নোটিশ দেখার জন্য পর্যাপ্ত জায়গা থাকে:
   if(d){$('tdn').textContent=d;$('tdt').classList.add('show')}else{$('tdt').classList.remove('show')}
   var m=$('tmsg'),t=a.join('   🔴   '),sig=(d||'')+(ap?'~':'')+'::'+t;
   if(lastSig===sig&&m.classList.contains('on'))return;
@@ -2498,339 +2587,358 @@ function stk(a,d,ap){
 }
 function ldN(d,ap){
   if(!d){sman();return}
-  if(!ap){try{if(typeof autoSetDist==='function')autoSetDist(d)}catch(e){}}
-  var sel=$('mds');if(sel)sel.value=d;
-  stk(['📍 '+d+' জেলার জরুরি রক্তের নোটিশ লোড হচ্ছে...'],d,ap);
-  fetch(S+'?action=getNotices&district='+encodeURIComponent(d))
-  .then(function(r){return r.json()})
-  .then(function(j){
-    var l=(j&&j.notices&&j.notices.length)?j.notices.slice():['📍 '+d+' জেলায় এখন কোনো জরুরি রক্তের চাহিদা নেই। স্বেচ্ছায় রক্তদান করুন, জীবন বাঁচান! ❤️'];
-    if(ap)l.push('ℹ️ এটি নেটওয়ার্ক/IP থেকে আনুমানিক জেলা। শতভাগ সঠিক জেলার নোটিশের জন্য ফোনের GPS চালু করুন।');
-    stk(l,d,ap);
-  })
-  .catch(function(){stk(['📍 '+d+' — স্পন্দন ব্লাড সোসাইটি, ঝিনাইদহ টেক্সটাইল ইঞ্জিনিয়ারিং কলেজ। জরুরি রক্তদানে এগিয়ে আসুন! ❤️'],d,ap)});
+  window._sbsActiveDist=d;
+  var notices=null;
+  if(window._sbsNoticeCache&&window._sbsNoticeCache[d]&&window._sbsNoticeCache[d].length){
+    notices=window._sbsNoticeCache[d];
+  }
+  stk(notices||['🩸 বর্তমানে '+d+' জেলায় কোনো জরুরি রক্তের রিকোয়েস্ট পেন্ডিং নেই — রক্তদাতা হিসেবে যুক্ত হয়ে জীবন বাঁচাতে এগিয়ে আসুন ❤️'],d,ap);
+  if(typeof S==='string'&&S.indexOf('https://')===0){
+    fetch(S+'?action=getInitialBundle&district='+encodeURIComponent(d)+'&_t='+Date.now())
+    .then(function(r){return r.json()})
+    .then(function(res){
+      if(res&&res.status==='Success'&&Array.isArray(res.notices)){
+        window._sbsNoticeCache=window._sbsNoticeCache||{};
+        window._sbsNoticeCache[d]=res.notices;
+        if(window._sbsActiveDist===d){
+          if(res.notices.length>0){
+            stk(res.notices,d,ap);
+          }else{
+            stk(['🩸 বর্তমানে '+d+' জেলায় কোনো জরুরি রক্তের রিকোয়েস্ট পেন্ডিং নেই — রক্তদাতা হিসেবে যুক্ত হয়ে জীবন বাঁচাতে এগিয়ে আসুন ❤️'],d,ap);
+          }
+        }
+      }
+    }).catch(function(){});
+  }
 }
 
-/* Expose key ticker functions globally so website forms & live sync bundle work seamlessly */
-window.hsk=hsk;
-window.sman=sman;
-window.stk=stk;
-window.ldN=ldN;
-window.svGps=save;
-window.getSavedGpsDistrict=saved;
-
-/* ---------- GPS flow: Ultra-Fast 1-Click Cross-Browser (Chrome, Brave, Firefox, Safari) + Instant Device GPS & IP Fallback ---------- */
-var watchId=null;
-function stopWatch(){if(watchId!==null){try{navigator.geolocation.clearWatch(watchId)}catch(e){}watchId=null}}
-function stopPoll(){if(pollId){clearInterval(pollId);pollId=null}stopWatch()}
-function finish(d){
-  if(!d)return;
-  done=true;busy=false;clearTimeout(watchdog);stopPoll();disarm();
-  var pc=$('pclose');if(pc)pc.style.display='none';
-  popHide();btn(BTN,false);msg('');save(d);ldN(d,false);
-  try{if(typeof showToast==='function')showToast('📍 আপনার বর্তমান জেলা শনাক্ত হয়েছে: '+d)}catch(e){}
-}
-function gotPos(p){
-  if(!p||!p.coords)return;
-  var la=p.coords.latitude,lo=p.coords.longitude;
-  var r=nearest(la,lo);
-  if(r.km>180){busy=false;clearTimeout(watchdog);btn(BTN,false);popShow();msg('⚠️ আপনার লোকেশন বাংলাদেশের বাইরে মনে হচ্ছে (VPN চালু?)। নিচে ম্যানুয়ালি জেলা নির্বাচন করুন।');return}
-  finish(r.name);
-  // পাশাপাশি OpenStreetMap Nominatim থেকে নিখুঁত প্রশাসনিক সীমানা যাচাই:
-  fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat='+la+'&lon='+lo+'&addressdetails=1&accept-language=en')
-  .then(function(res){return res.json()})
-  .then(function(d){
-    var a=(d&&d.address)?d.address:{};
-    var exact=matchTextToDistrict((a.state_district||'')+' '+(a.county||'')+' '+(a.city||'')+' '+(a.town||''));
-    if(exact&&exact!==r.name){save(exact);ldN(exact,false)}
-  }).catch(function(){});
-}
-
-// ব্রাউজারে Allow চাপার পর ফোনের ডিভাইস GPS অন হওয়া মাত্র যাতে ০.৮ সেকেন্ডেই পপআপ বন্ধ হয়ে ওয়েবসাইটে ঢুকে যায় (busy ফ্ল্যাগে আটকে থাকবে না):
-function startDeviceGpsPoller(){
-  if(pollId)clearInterval(pollId);
-  var tries=0;
-  pollId=setInterval(function(){
-    if(done||manual||++tries>35){stopPoll();return}
-    try{
-      navigator.geolocation.getCurrentPosition(gotPos,function(){},{enableHighAccuracy:true,timeout:2500,maximumAge:60000});
-      navigator.geolocation.getCurrentPosition(gotPos,function(){},{enableHighAccuracy:false,timeout:2000,maximumAge:300000});
-    }catch(e){}
-  },900);
-}
-
-// ১ ক্লিকে প্যারালাল ফাস্ট-জিপিএস (Hardware GPS + Instant Network/OS Fix একসাথে ছুটবে, ফলে ১৪-২৬ সেকেন্ড অপেক্ষা করতে হবে না!)
-function ask(){
-  if(done)return;
-  if(!navigator.geolocation){popShow();msg('⚠️ আপনার ব্রাউজার GPS সাপোর্ট করে না। নিচে ম্যানুয়ালি জেলা নির্বাচন করুন।');ipFallback();return}
-  if(window.isSecureContext===false){popShow();msg('⚠️ লোকেশন শুধু HTTPS সাইটে কাজ করে।');ipFallback();return}
-  if(geoBlockedByFrame()){popShow();msg(FRAMEMSG);ipFallback();return}
-  busy=true;
-  arm();
-  startDeviceGpsPoller();
-  clearTimeout(watchdog);
-  watchdog=setTimeout(function(){
-    if(!done){busy=false;btn(BTN,false);fail({code:3})}
-  },4200);
-  btn('⏳ লোকেশন শনাক্ত হচ্ছে...',true);
-  msg('📡 ব্রাউজার বা ডিভাইসের লোকেশন পপআপে <b>Allow / Turn on (OK)</b> চাপুন—সাথে সাথে ওয়েবসাইটে প্রবেশ করবে।');
-
-  var errCount=0;
-  function onRaceErr(e){
-    if(done)return;
-    errCount++;
-    if(e&&e.code===1){
-      busy=false;clearTimeout(watchdog);fail(e);return;
-    }
-    if(errCount>=2){
-      busy=false;clearTimeout(watchdog);fail(e);
+/* ---------- MULTI-PROVIDER PRECISE IP GEOLOCATION ENGINE ---------- */
+// গুগল/ম্যাক্সমাইন্ড/আইপি-ডাটাবেস থেকে ব্রাহ্মণবাড়িয়া, কুমিল্লা, ঝিনাইদহ, চট্টগ্রামসহ ৬৪ জেলার নিখুঁত লোকেশন বের করার ইঞ্জিন:
+function resolveIpPayloadToDistrict(j){
+  if(!j || typeof j !== 'object') return '';
+  // 1. Check City / Upazila / Suburb first (most specific, e.g. "Brahmanbaria", "Ashuganj", "Cumilla", "Jhenaidah")
+  var cityRaw = String(j.city || j.cityName || j.town || j.suburb || j.district || '').trim();
+  if(cityRaw){
+    var mCity = matchTextToDistrict(cityRaw);
+    if(mCity && C[mCity]) return mCity;
+  }
+  // 2. Check precise Latitude / Longitude coordinates (if not generic country-center 23.8103, 90.4125 or 24.00, 90.00)
+  var la = +(j.latitude !== undefined ? j.latitude : (j.lat !== undefined ? j.lat : NaN));
+  var lo = +(j.longitude !== undefined ? j.longitude : (j.lon !== undefined ? j.lon : NaN));
+  if((isNaN(la) || isNaN(lo)) && typeof j.loc === 'string' && j.loc.indexOf(',') > 0){
+    var lp = j.loc.split(',');
+    la = +lp[0]; lo = +lp[1];
+  }
+  var coordDist = '';
+  if(!isNaN(la) && !isNaN(lo) && la > 20.5 && la < 26.7 && lo > 88.0 && lo < 92.8){
+    var isGenericCenter = (Math.abs(la - 23.685) < 0.05 && Math.abs(lo - 90.356) < 0.05) ||
+                          (Math.abs(la - 24.0) < 0.02 && Math.abs(lo - 90.0) < 0.02);
+    if(!isGenericCenter){
+      var n = nearest(la, lo);
+      if(n && n.name && n.km < 85) coordDist = n.name;
     }
   }
+  if(coordDist && coordDist !== 'Dhaka') return coordDist;
 
-  // ক) সরাসরি ডিভাইসের হার্ডওয়্যার GPS ডায়ালগ ট্রিগার (৪ সেকেন্ড টাইমআউট, ১ মিনিটের ক্যাশ গ্রহণযোগ্য)
-  try{
-    navigator.geolocation.getCurrentPosition(gotPos,onRaceErr,{enableHighAccuracy:true,timeout:4000,maximumAge:60000});
-  }catch(e1){onRaceErr(e1)}
+  // 3. Check Region / State (stripping "Division" so "Chittagong Division" doesn't override Brahmanbaria)
+  var regRaw = String(j.region || j.regionName || j.stateProv || '').trim();
+  var regClean = regRaw.replace(/\b(division|বিভাগ)\b/gi, '').trim();
+  if(regClean){
+    var mReg = matchTextToDistrict(regClean);
+    if(mReg && C[mReg] && !DIV_CAPITALS[mReg]) return mReg;
+    if(coordDist) return coordDist;
+    if(mReg && C[mReg]) return mReg;
+  }
+  return coordDist || '';
+}
 
-  // খ) সমান্তরালে দ্রুততম OS / Wi-Fi / Cell কোঅর্ডিনেট ফিক্স (০.৩ - ২.৫ সেকেন্ডেই লোকেশন দিয়ে পপআপ বন্ধ করবে!)
-  try{
-    navigator.geolocation.getCurrentPosition(gotPos,onRaceErr,{enableHighAccuracy:false,timeout:2600,maximumAge:600000});
-  }catch(e2){onRaceErr(e2)}
+var IPS=[
+  {u:'https://ipwho.is/?lang=en',p:resolveIpPayloadToDistrict},
+  {u:'https://ipapi.co/json/',p:resolveIpPayloadToDistrict},
+  {u:'https://freeipapi.com/api/json',p:resolveIpPayloadToDistrict},
+  {u:'https://ipinfo.io/json',p:resolveIpPayloadToDistrict},
+  {u:'https://get.geojs.io/v1/ip/geo.json',p:resolveIpPayloadToDistrict},
+  {u:'https://api.db-ip.com/v2/free/self',p:resolveIpPayloadToDistrict}
+];
 
-  // গ) লাইভ ওয়াচ পজিশন (ডিভাইস জিপিএস অন হওয়া মাত্র তাৎক্ষণিক ক্যাচ করার জন্য)
-  try{
-    stopWatch();
-    watchId=navigator.geolocation.watchPosition(gotPos,function(){},{enableHighAccuracy:true,timeout:4500,maximumAge:60000});
-  }catch(e3){}
+function fTO(u,ms){
+  return new Promise(function(res,rej){
+    var ctrl=window.AbortController?new AbortController():null;
+    var t=setTimeout(function(){if(ctrl)ctrl.abort();rej()},ms);
+    fetch(u,{signal:ctrl?ctrl.signal:undefined,cache:'no-store'}).then(function(r){
+      clearTimeout(t);if(!r.ok)throw 0;return r.json();
+    }).then(res,function(e){clearTimeout(t);rej(e)});
+  });
+}
+
+// একাধিক IP API থেকে প্রাপ্ত রেজাল্ট বিশ্লেষণ করে সবচেয়ে নিখুঁত জেলা নির্বাচন (ব্রাহ্মণবাড়িয়া/চট্টগ্রাম/ঝিনাইদহ থাকলে জেনেরিক ISP 'Dhaka'-কে ওভাররাইড করবে):
+var _ipVotes = {};
+function pickBestIpDistrict(newCandidate){
+  if(newCandidate && C[newCandidate]){
+    _ipVotes[newCandidate] = (_ipVotes[newCandidate] || 0) + 1;
+  }
+  var bestNonDhaka = '', bestNonDhakaCount = 0;
+  var bestDivCap = '', bestDivCapCount = 0;
+  for(var d in _ipVotes){
+    var c = _ipVotes[d];
+    if(!DIV_CAPITALS[d]){
+      if(c > bestNonDhakaCount){ bestNonDhakaCount = c; bestNonDhaka = d; }
+    } else if(d !== 'Dhaka'){
+      if(c > bestDivCapCount){ bestDivCapCount = c; bestDivCap = d; }
+    }
+  }
+  // যদি ব্রাহ্মণবাড়িয়া, কুমিল্লা, ঝিনাইদহ ইত্যাদির মতো কোনো নির্দিষ্ট জেলা পাওয়া যায়, তবে সেটি সর্বোচ্চ অগ্রাধিকার পাবে:
+  if(bestNonDhaka) return bestNonDhaka;
+  // এরপর চট্টগ্রাম, রাজশাহী, খুলনা, সিলেট ইত্যাদি বিভাগীয় জেলা:
+  if(bestDivCap) return bestDivCap;
+  // সবশেষে ঢাকা (যদি ইউজার আসলেই ঢাকায় থাকেন):
+  if(_ipVotes['Dhaka']) return 'Dhaka';
+  return newCandidate || ipDist || '';
+}
+
+function prefetchIpSilently(){
+  IPS.forEach(function(s){
+    fTO(s.u, 2400).then(function(j){
+      var d = s.p(j);
+      if(d && C[d]){
+        var best = pickBestIpDistrict(d);
+        if(best && best !== ipDist){
+          ipDist = best;
+          if(!done && !manual){
+            ldN(ipDist, true);
+          }
+        }
+      }
+    }).catch(function(){});
+  });
+}
+
+function ipFallback(autoClosePopup){
+  if(done || manual) return;
+  if(ipDist && C[ipDist]){
+    ldN(ipDist, true);
+    if(autoClosePopup){
+      setTimeout(function(){ if(!done) popHide(); }, 350);
+    }
+    return;
+  }
+  if(ipBusy) return;
+  ipBusy = true;
+  var settled = false;
+  var pending = IPS.length;
+  var fallbackTimer = setTimeout(function(){
+    if(!settled){
+      settled = true;
+      ipBusy = false;
+      if(!done && !manual){
+        var d = ipDist || 'Jhenaidah';
+        ldN(d, true);
+        if(autoClosePopup) popHide();
+      }
+    }
+  }, 1800);
+
+  IPS.forEach(function(s){
+    fTO(s.u, 1700).then(function(j){
+      var d = s.p(j);
+      if(d && C[d]){
+        ipDist = pickBestIpDistrict(d);
+        if(!settled && (!DIV_CAPITALS[ipDist] || ipDist !== 'Dhaka')){
+          settled = true;
+          clearTimeout(fallbackTimer);
+          ipBusy = false;
+          if(!done && !manual){
+            ldN(ipDist, true);
+            if(autoClosePopup){
+              setTimeout(function(){ if(!done) popHide(); }, 300);
+            }
+          }
+        }
+      }
+    }).catch(function(){}).then(function(){
+      pending--;
+      if(pending <= 0 && !settled){
+        settled = true;
+        clearTimeout(fallbackTimer);
+        ipBusy = false;
+        if(!done && !manual){
+          if(ipDist && C[ipDist]){
+            ldN(ipDist, true);
+          } else {
+            sman();
+          }
+          if(autoClosePopup){
+            setTimeout(function(){ if(!done) popHide(); }, 300);
+          }
+        }
+      }
+    });
+  });
+}
+
+/* ---------- 1-CLICK ULTRA-FAST NATIVE GPS ENGINE ---------- */
+var watchId=null;
+function stopWatch(){
+  if(watchId!==null&&navigator.geolocation){
+    try{navigator.geolocation.clearWatch(watchId)}catch(e){}
+    watchId=null;
+  }
+}
+function stopPoll(){if(pollId){clearInterval(pollId);pollId=null}stopWatch();}
+
+function gotPos(pos){
+  if(!pos||!pos.coords)return;
+  var la=pos.coords.latitude,lo=pos.coords.longitude;
+  var n=nearest(la,lo);
+  clearTimeout(watchdog);busy=false;stopPoll();
+  btn(BTN,false);msg('');
+  if(!n.name||n.km>260){
+    popHide();
+    if(ipDist&&C[ipDist]) ldN(ipDist,true); else ipFallback(true);
+    return;
+  }
+  done=true;manual=false;
+  save(n.name);
+  popHide();
+  ldN(n.name,false);
+
+  // ব্যাকগ্রাউন্ডে রিভার্স-জিওকোডিংয়ের মাধ্যমে সীমান্ত এলাকার জেলা আরও নিখুঁত করা (ইউজারকে ১ মিলিসেকেন্ডও অপেক্ষা না করিয়ে):
+  fTO('https://api.bigdatacloud.net/data/reverse-geocode-client?latitude='+la+'&longitude='+lo+'&localityLanguage=en',2200)
+    .then(function(g){
+      var blobs=[g.locality,g.city,g.principalSubdivision];
+      if(g.localityInfo&&Array.isArray(g.localityInfo.administrative)){
+        g.localityInfo.administrative.forEach(function(x){if(x&&x.name)blobs.push(x.name)});
+      }
+      for(var i=0;i<blobs.length;i++){
+        var m=matchTextToDistrict(blobs[i]);
+        if(m&&C[m]&&m!==n.name){
+          save(m);
+          ldN(m,false);
+          break;
+        }
+      }
+    }).catch(function(){});
 }
 
 function fail(e){
-  if(done)return;
+  clearTimeout(watchdog);busy=false;stopWatch();
   btn(BTN,false);
-  if(!manual)popShow();
-  var code=e&&e.code;
-  startDeviceGpsPoller();
-  permState(function(st){
-    if(code===1&&(geoBlockedByFrame()||/permissions? policy|disabled in this/i.test((e&&e.message)||''))){
-      msg(FRAMEMSG);
-    }else if(INAPP){
-      msg(INAPPMSG);
-    }else if(code===1&&st==='denied'){
-      msg('🚫 এই ব্রাউজারে লোকেশন <b>Block</b> করা আছে।<br>অ্যাড্রেস বারের বাম পাশের <b>🔒 / ⚙️ (Site Settings)</b> আইকনে ট্যাপ করে Location <b>Allow</b> দিন অথবা নিচের আনুমানিক জেলা দিয়ে প্রবেশ করুন।');
-    }else if(code===1&&st==='prompt'){
-      msg('📍 লোকেশন পারমিশন বক্সে <b>Allow</b> চাপা হয়নি। উপরের বাটনে ট্যাপ করে <b>Allow</b> দিন অথবা নিচের আনুমানিক জেলা দিয়ে প্রবেশ করুন।');
-    }else if(code===1){
-      msg('📲 আপনার ফোনের <b>Device Location (GPS)</b> বন্ধ আছে। ফোনের <b>Location (GPS) অন</b> করলে স্বয়ংক্রিয়ভাবে প্রবেশ করবে, অথবা নিচের আনুমানিক জেলা দিয়ে প্রবেশ করুন।');
-    }else{
-      msg('📡 ব্রাউজার বা ডিভাইসের GPS সিগন্যাল পাওয়া যায়নি (যেমন Brave Browser বা GPS অফ)। ফোনের <b>GPS অন</b> করুন অথবা নিচের <b>আনুমানিক জেলা</b> বাটনে ক্লিক করে সরাসরি প্রবেশ করুন।');
-    }
-    if(ipDist)ipShow();else ipFallback();
-    arm();
-  });
-}
-
-/* ---------- PRECISE MULTI-SOURCE IP GEOLOCATION ENGINE (যখন GPS ব্লক বা Brave ব্রাউজারে অফ থাকে — সেকেন্ডারি অপশন) ---------- */
-var IPS=[
-  ['https://ipwho.is/',function(txt){
-    var j=JSON.parse(txt);
-    if(!j||j.success===false||j.country_code!=='BD')return null;
-    var cityDist=matchTextToDistrict(j.city||'');
-    var regDist=matchTextToDistrict(j.region||'');
-    var coordDist='';
-    if(!isNaN(parseFloat(j.latitude))&&!isNaN(parseFloat(j.longitude))){
-      var nr=nearest(parseFloat(j.latitude),parseFloat(j.longitude));
-      if(nr.km<=160)coordDist=nr.name;
-    }
-    return cityDist||coordDist||regDist||'';
-  }],
-  ['https://ipapi.co/json/',function(txt){
-    var j=JSON.parse(txt);
-    if(!j||j.country_code!=='BD')return null;
-    var cityDist=matchTextToDistrict(j.city||'');
-    var regDist=matchTextToDistrict(j.region||'');
-    var coordDist='';
-    if(!isNaN(parseFloat(j.latitude))&&!isNaN(parseFloat(j.longitude))){
-      var nr=nearest(parseFloat(j.latitude),parseFloat(j.longitude));
-      if(nr.km<=160)coordDist=nr.name;
-    }
-    return cityDist||coordDist||regDist||'';
-  }],
-  ['https://freeipapi.com/api/json',function(txt){
-    var j=JSON.parse(txt);
-    if(!j||j.countryCode!=='BD')return null;
-    var cityDist=matchTextToDistrict(j.cityName||'');
-    var regDist=matchTextToDistrict(j.regionName||'');
-    var coordDist='';
-    if(!isNaN(parseFloat(j.latitude))&&!isNaN(parseFloat(j.longitude))){
-      var nr=nearest(parseFloat(j.latitude),parseFloat(j.longitude));
-      if(nr.km<=160)coordDist=nr.name;
-    }
-    return cityDist||coordDist||regDist||'';
-  }],
-  ['https://get.geojs.io/v1/ip/geo.json',function(txt){
-    var j=JSON.parse(txt);
-    if(!j||j.country_code!=='BD')return null;
-    var cityDist=matchTextToDistrict((j.city||'')+' '+(j.region||''));
-    var coordDist='';
-    if(!isNaN(parseFloat(j.latitude))&&!isNaN(parseFloat(j.longitude))){
-      var nr=nearest(parseFloat(j.latitude),parseFloat(j.longitude));
-      if(nr.km<=160)coordDist=nr.name;
-    }
-    return cityDist||coordDist||'';
-  }],
-  ['https://api.db-ip.com/v2/free/self',function(txt){
-    var j=JSON.parse(txt);
-    if(!j||j.countryCode!=='BD')return null;
-    return matchTextToDistrict((j.city||'')+' '+(j.stateProv||''))||'';
-  }],
-  ['https://www.cloudflare.com/cdn-cgi/trace',function(txt){
-    if(!txt||txt.indexOf('loc=BD')===-1)return null;
-    var m=txt.match(/colo=([A-Z]{3})/);
-    if(m){
-      if(m[1]==='CGP')return 'Chattogram';
-      if(m[1]==='ZYL')return 'Sylhet';
-      if(m[1]==='JSR')return 'Jashore';
-      if(m[1]==='RJH')return 'Rajshahi';
-      if(m[1]==='SPD')return 'Rangpur';
-      if(m[1]==='BZL')return 'Barishal';
-      if(m[1]==='CXB')return "Cox's Bazar";
-      if(m[1]==='DAC')return 'Dhaka';
-    }
-    return '';
-  }]
-];
-
-function ipNote(){
-  if(!ipDist) {
-    return '<br><div style="margin-top:8px;padding:8px 10px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;color:#92400e;font-size:12px;">⏳ <b>সেকেন্ডারি অপশন (IP Tracking):</b> জিপিএস পারমিশন না পাওয়ায় আপনার ইন্টারনেট আইপি অ্যাড্রেস থেকে বর্তমান জেলা অনুমান করা হচ্ছে...</div>';
-  }
-  return '<br><div style="margin-top:8px;padding:8px 10px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;color:#92400e;font-size:12px;">ℹ️ <b>সেকেন্ডারি অপশন (IP Tracking):</b> জিপিএস বন্ধ/ব্লক থাকায় আপনার ইন্টারনেট আইপি অ্যাড্রেস থেকে আনুমানিক <b>'+ipDist+'</b> জেলা শনাক্ত হয়েছে। শতভাগ নিখুঁত লোকেশনের জন্য <b>ফোনের GPS অন করুন</b> অথবা উপরের <b>"বন্ধ করে আনুমানিক জেলার নোটিশ দেখুন"</b> বাটনে ক্লিক করুন।</div>';
-}
-
-function ipShow(){
-  var p=$('pdm');
-  if(p) p.innerHTML=lastMsg+ipNote();
-  var c=$('pclose');
-  if(c) {
-    c.style.display='block';
-    c.textContent = ipDist
-      ? ('📍 বন্ধ করে আনুমানিক জেলা (' + ipDist + ')-এর নোটিশ দেখুন')
-      : '📍 বন্ধ করে আনুমানিক জেলার নোটিশ দেখুন';
+  var c=e&&e.code;
+  // কন্ডিশন অনুযায়ী: যদি GPS ব্লক থাকে (Brave Browser বা Denied) কিংবা ব্যর্থ হয়, তবে পপআপ কখনোই স্ক্রিনে আটকে থাকবে না—
+  // সাথে সাথে নির্ভুল IP লোকেশন ডিটেক্ট করে সেই জেলার নোটিশ লোড করবে এবং স্বয়ংক্রিয়ভাবে পপআপ বন্ধ করে ওয়েবসাইটে প্রবেশ করাবে!
+  if(ipDist && C[ipDist]){
+    ldN(ipDist, true);
+    setTimeout(function(){ popHide(); }, 350);
+  } else {
+    ipFallback(true);
   }
 }
 
-function fetchWithTimeout(url, ms) {
-  return new Promise(function(resolve, reject){
-    var timer = setTimeout(function(){ reject(new Error('timeout')); }, ms || 2000);
-    fetch(url, {cache:'no-store'}).then(function(r){
-      clearTimeout(timer);
-      return r.text();
-    }).then(resolve).catch(function(err){
-      clearTimeout(timer);
-      reject(err);
-    });
-  });
+function startPermissionWatch(){
+  try{
+    if(navigator.permissions&&navigator.permissions.query){
+      navigator.permissions.query({name:'geolocation'}).then(function(p){
+        p.onchange=function(){
+          if(p.state==='granted'&&!done){
+            busy=false;msg('');btn(BTN,false);ask();
+          } else if(p.state==='denied'&&!done){
+            fail({code:1});
+          }
+        };
+      }).catch(function(){});
+    }
+  }catch(e){}
 }
+startPermissionWatch();
 
-// পেজ লোডের সময় ব্যাকগ্রাউন্ডে নীরবে আইপি জেলা প্রি-ফেচ করে রাখবে (UI বা টিকার পরিবর্তন না করে), যাতে GPS ব্যর্থ হলে ০ সেকেন্ডেই আনুমানিক জেলা প্রস্তুত থাকে!
-function prefetchIpSilently(){
-  if(ipDist||ipBusy)return;
-  ipBusy=true;
-  var completed=0;
-  IPS.forEach(function(item){
-    fetchWithTimeout(item[0], 1800).then(function(txt){
-      var dName='';
-      try{ dName=item[1](txt); }catch(e){}
-      if(dName&&C[dName]){
-        if(!ipDist || (dName!=='Dhaka' && ipDist==='Dhaka')){
-          ipDist=dName;
-        }
-      }
-    }).catch(function(){}).finally(function(){
-      completed++;
-      if(completed===IPS.length) ipBusy=false;
-    });
-  });
-}
-
-function ipFallback(){
-  ipShow();
-  if(done||manual)return;
-  if(ipDist){
-    ldN(ipDist,true);
-    ipShow();
+// ১ ক্লিকে সাথে সাথে ব্রাউজারের নেটিভ লোকেশন পারমিশন বক্স ওপেন করা এবং ০.৩ - ২ সেকেন্ডে জিপিএস লোকেশন ডিটেক্ট করা:
+function ask(){
+  if(busy)return;
+  if(!navigator.geolocation){
+    fail({code:0});
     return;
   }
-  ipBusy=true;
-  var votes={},order=[],completed=0;
-  IPS.forEach(function(item){
-    fetchWithTimeout(item[0], 1800).then(function(txt){
-      var dName='';
-      try{ dName=item[1](txt); }catch(e){}
-      if(dName&&C[dName]){
-        votes[dName]=(votes[dName]||0)+1;
-        order.push(dName);
-        if(!ipDist || (dName!=='Dhaka' && ipDist==='Dhaka')) {
-          ipDist=dName;
-          if(!done&&!manual){ldN(dName,true);ipShow();}
+  if(geoBlockedByFrame()){
+    fail({code:1});
+    return;
+  }
+  busy=true;
+  btn('লোকেশন নির্ণয় হচ্ছে…',true);
+  msg('📍 ব্রাউজারের ওপরের বা নিচের পপআপে <b>Allow / অনুমতি দিন</b> চাপুন…');
+
+  clearTimeout(watchdog);
+  // সর্বোচ্চ ২.৮ সেকেন্ড অপেক্ষা করবে; এর মধ্যে GPS না পেলে বা ব্লক থাকলে স্বয়ংক্রিয়ভাবে IP জেলা লোড করে পপআপ বন্ধ করে দেবে:
+  watchdog=setTimeout(function(){
+    if(!busy||done)return;
+    fail({code:3});
+  },2800);
+
+  var resolved=false;
+  function onFastPos(p){
+    if(resolved||done)return;
+    resolved=true;
+    gotPos(p);
+  }
+  function onFastErr(err){
+    if(resolved||done)return;
+    // যদি ইউজার বা ব্রাউজার (যেমন Brave) সাথে সাথে পারমিশন ডিনাই করে (code === 1), তবে ১ মুহূর্তও দেরি না করে IP ফলব্যাক ও পপআপ ক্লোজ করবে:
+    if(err && err.code === 1){
+      resolved=true;
+      fail(err);
+    }
+  }
+
+  try{
+    // ১ম কল (সিনক্রোনাস ইউজার-জেসচার): নেটওয়ার্ক/ক্যাশড জিপিএস থেকে ০.২ সেকেন্ডে তাৎক্ষণিক রেসপন্স পাওয়ার জন্য
+    navigator.geolocation.getCurrentPosition(
+      onFastPos,
+      onFastErr,
+      {enableHighAccuracy:false,timeout:2500,maximumAge:600000}
+    );
+    // ২য় কল (হাই-অ্যাকুরেসি জিপিএস): নিখুঁত হার্ডওয়্যার জিপিএস কোঅর্ডিনেট পাওয়ার জন্য
+    navigator.geolocation.getCurrentPosition(
+      onFastPos,
+      function(err){
+        if(!resolved && !done){
+          resolved=true;
+          fail(err);
         }
-      }
-    }).catch(function(){}).finally(function(){
-      completed++;
-      if(completed===IPS.length) ipBusy=false;
-    });
-  });
+      },
+      {enableHighAccuracy:true,timeout:2700,maximumAge:300000}
+    );
+  }catch(ex){
+    fail({code:0});
+  }
 }
 
-/* ---------- auto-resume the exact millisecond browser permission is granted or user returns from system GPS dialog ---------- */
-function onBack(){
-  if(done||manual)return;
-  if(document.visibilityState&&document.visibilityState!=='visible')return;
-  try{
-    navigator.geolocation.getCurrentPosition(gotPos,function(){},{enableHighAccuracy:true,timeout:3500,maximumAge:60000});
-    navigator.geolocation.getCurrentPosition(gotPos,function(){},{enableHighAccuracy:false,timeout:2200,maximumAge:300000});
-  }catch(e){}
-}
+/* ---------- first user gesture anywhere -> native prompt ---------- */
 function arm(){
-  if(armed||done)return;armed=true;
-  document.addEventListener('visibilitychange',onBack);
-  window.addEventListener('focus',onBack);
-  window.addEventListener('pageshow',onBack);
-  try{
-    navigator.permissions.query({name:'geolocation'}).then(function(r){
-      r.onchange=function(){
-        if(r.state==='granted' && !done){
-          // ব্রাউজার পপআপে Allow চাপার সাথে সাথেই ২য় ক্লিক ছাড়াই ডিভাইসের GPS ডায়ালগ ট্রিগার হবে!
-          onBack();
-          startDeviceGpsPoller();
-        } else if(r.state==='denied' && !done){
-          fail({code:1});
-        }
-      };
-    });
-  }catch(e){}
-}
-function disarm(){
-  armed=false;
-  document.removeEventListener('visibilitychange',onBack);
-  window.removeEventListener('focus',onBack);
-  window.removeEventListener('pageshow',onBack);
+  if(armed)return;armed=true;
+  var h=function(ev){
+    var t=ev&&ev.target;
+    if(t&&t.closest&&(t.closest('#pskip')||t.closest('#pclose')||t.closest('#pok')||t.closest('#tman')))return;
+    off();
+    if(!done&&!manual)ask();
+  };
+  function off(){
+    document.removeEventListener('click',h,true);
+  }
+  document.addEventListener('click',h,true);
 }
 
-/* ---------- UI wiring ---------- */
+/* ---------- events ---------- */
 $('pok').addEventListener('click',function(ev){
-  ev.stopPropagation();
-  manual=false;
-  done=false;
-  busy=false;
+  if(ev&&ev.stopPropagation)ev.stopPropagation();
+  manual=false;done=false;busy=false;
   ask();
 });
 $('pclose').addEventListener('click',function(){
+  stopPoll();
   popHide();
-  if(ipDist) {
+  if(ipDist && C[ipDist]){
     ldN(ipDist, true);
   } else {
-    ipFallback();
+    ipFallback(true);
   }
 });
 $('pskip').addEventListener('click',function(){manual=true;stopPoll();popHide();sman()});
@@ -2860,9 +2968,11 @@ window.requestDeviceGpsDirect=function(ev){
   permState(function(st){
     if(st==='granted'){
       ask();
+    } else if(st==='denied'){
+      // যদি ব্রাউজারে আগে থেকেই GPS ব্লক করা থাকে (যেমন Brave বা সাইট সেটিংসে Block), তবে পপআপ দেখিয়ে ভিজিটরকে আটকে না রেখে সরাসরি IP জেলা লোড করবে:
+      ipFallback(true);
     } else {
       popShow();
-      if(st==='denied')fail({code:1});
     }
   });
 })();
@@ -2938,12 +3048,7 @@ function fetchStats(forceNow) {
       window.setServerGalleryItems(d.gallery);
     }
     if (Array.isArray(d.feedbacks) && typeof renderFeedbackCards === 'function') {
-      var localFb = [];
-      try { localFb = JSON.parse(localStorage.getItem('sbs_real_fbk') || '[]'); } catch(e){}
-      var serverKeys = {};
-      d.feedbacks.forEach(function(f){ serverKeys[(f.name || '') + '_' + (f.message || '')] = true; });
-      var unsynced = localFb.filter(function(l){ return !serverKeys[(l.name || '') + '_' + (l.message || '')]; });
-      var merged = unsynced.concat(d.feedbacks);
+      var merged = d.feedbacks;
       var fbSig = merged.length + '_' + (merged[0] ? (merged[0].id || merged[0].name) : '');
       if (fbSig !== _lastFbSig) {
         _lastFbSig = fbSig;
@@ -2952,11 +3057,8 @@ function fetchStats(forceNow) {
       }
     }
     if (Array.isArray(d.reports) && typeof rebuildFraudMap === 'function' && typeof renderFraudCards === 'function') {
-      var localEx = [];
-      try { localEx = JSON.parse(localStorage.getItem('sbs_own_fraud_reports') || '[]'); } catch(e){}
-      var sKey = {};
-      d.reports.forEach(function(r){ sKey[normPhone(r.phone) + '_' + (r.details || '')] = true; });
-      var comb = d.reports.concat(localEx.filter(function(l){ return !sKey[normPhone(l.phone) + '_' + (l.details || '')]; }));
+      var comb = d.reports;
+      try { localStorage.setItem('sbs_own_fraud_reports', JSON.stringify(comb)); } catch(e){}
       var frSig = comb.length + '_' + (comb[0] ? comb[0].phone : '');
       window.allFraudReports = comb;
       rebuildFraudMap(comb);
@@ -3304,10 +3406,7 @@ function loadFeedbacks() {
   .then(function(r){ return r.json(); })
   .then(function(d){
     if(d && d.status === 'Success' && Array.isArray(d.feedbacks)){
-      var serverKeys = {};
-      d.feedbacks.forEach(function(f){ serverKeys[(f.name || '') + '_' + (f.message || '')] = true; });
-      var unsyncedLocal = localFb.filter(function(l){ return !serverKeys[(l.name || '') + '_' + (l.message || '')]; });
-      var merged = unsyncedLocal.concat(d.feedbacks);
+      var merged = d.feedbacks;
       try { localStorage.setItem('sbs_real_fbk', JSON.stringify(merged)); } catch(e){}
       renderFeedbackCards(merged);
     }
@@ -4474,11 +4573,8 @@ function loadFraudDonors(forceRefresh) {
   .then(function(d){
     if(d && d.status === 'Success' && Array.isArray(d.reports)){
       // Merge server sheet reports with any unsynced local report
-      var serverKey = {};
-      d.reports.forEach(function(r){ serverKey[normPhone(r.phone) + '_' + (r.details || '')] = true; });
-      var combined = d.reports.concat(localExtra.filter(function(l){
-        return !serverKey[normPhone(l.phone) + '_' + (l.details || '')];
-      }));
+      var combined = d.reports;
+      try { localStorage.setItem('sbs_own_fraud_reports', JSON.stringify(combined)); } catch(e){}
       window.allFraudReports = combined;
       rebuildFraudMap(combined);
       renderFraudCards(document.getElementById('fr-search-input') ? document.getElementById('fr-search-input').value : '');
@@ -8494,11 +8590,15 @@ function updateLb() {
       });
   }
 
+  // গুগল শিট (Gallery_DB) হলো ১০০% মূল ডাটাবেজ (Single Source of Truth):
+  // শিট থেকে বা অ্যাডমিন প্যানেল থেকে কোনো ছবি ডিলিট করা হলে তা সব ব্রাউজার (Brave, Chrome, Edge) ও মোবাইল থেকে সাথে সাথে মুছে যাবে!
   window.setServerGalleryItems = function(serverArr) {
     var delMap = getDeletedGalleryKeys();
     var localArr = getLocalGalleryCache();
     var map = {};
     var merged = [];
+    var nowMs = Date.now();
+
     (serverArr || []).forEach(function(it) {
       if (!it || !it.name) return;
       var k = makeGalKey(it.name, it.bg, it.date);
@@ -8509,27 +8609,20 @@ function updateLb() {
       it.fileId = it.fileId || 'sheet_synced';
       merged.push(it);
     });
+
+    // শুধুমাত্র এইমাত্র (গত ১৫ সেকেন্ডের মধ্যে) ফর্ম সাবমিট করা পেন্ডিং আইটেমটি ইন-ফ্লাইট অবস্থায় থাকবে; পুরনো বা ডিলিট হওয়া কোনো লোকাল ক্যাশ কখনোই ফিরে আসবে না!
     localArr.forEach(function(loc) {
       if (!loc || !loc.name) return;
       var k = makeGalKey(loc.name, loc.bg, loc.date);
       if (delMap[k] || delMap[String(loc.id)]) return;
-      if (!map[k]) {
+      var isJustSubmitted = loc._pendingUploadTs && ((nowMs - loc._pendingUploadTs) < 15000);
+      if (!map[k] && isJustSubmitted) {
         map[k] = true;
         merged.unshift(loc);
-        if (!_autoSyncedKeys[k] && loc.image && loc.image.indexOf('data:image') === 0) {
-          _autoSyncedKeys[k] = true;
-          uploadGalleryItemToSheet(loc.id || Date.now().toString(), loc.name, loc.district || '', loc.bg || '', loc.date || '', loc.image, function(syncedItem){
-            if (syncedItem) {
-              loc.fileId = syncedItem.fileId || 'drive_synced';
-              if (syncedItem.image) loc.image = syncedItem.image;
-              _serverKnownKeys[k] = true;
-              saveLocalGalleryCache(allGalleryItems);
-            }
-          });
-        }
       }
     });
-    var newHash = merged.map(function(x){ return (x.id||'')+(x.name||'')+(x.bg||'')+(x.image||'').length; }).join('|');
+
+    var newHash = 'len:' + merged.length + '|' + merged.map(function(x){ return (x.id||'')+(x.name||'')+(x.bg||'')+(x.image||'').length; }).join('|');
     allGalleryItems = merged;
     saveLocalGalleryCache(merged);
     if (newHash !== _lastGalleryHash) {
@@ -8651,29 +8744,16 @@ function updateLb() {
       transitItems.reverse();
 
       var combined = transitItems.concat(items);
-      if (combined.length > 0) {
+      if (obj && obj.table) {
+        window.setServerGalleryItems(combined);
+      } else if (combined.length > 0) {
         window.setServerGalleryItems(combined);
       }
     }).catch(function(){});
   }
 
   window.syncUnsyncedLocalGallery = function() {
-    var localArr = getLocalGalleryCache();
-    localArr.forEach(function(loc) {
-      if (!loc || !loc.name) return;
-      var k = makeGalKey(loc.name, loc.bg, loc.date);
-      if (!_autoSyncedKeys[k] && !_serverKnownKeys[k] && loc.image && loc.image.indexOf('data:image') === 0) {
-        _autoSyncedKeys[k] = true;
-        uploadGalleryItemToSheet(loc.id || Date.now().toString(), loc.name, loc.district || '', loc.bg || '', loc.date || '', loc.image, function(syncedItem){
-          if (syncedItem) {
-            loc.fileId = syncedItem.fileId || 'drive_synced';
-            if (syncedItem.image) loc.image = syncedItem.image;
-            _serverKnownKeys[k] = true;
-            saveLocalGalleryCache(allGalleryItems);
-          }
-        });
-      }
-    });
+    // গুগল শিট থেকে ডিলিট করা ছবি যাতে লোকাল ক্যাশ থেকে পুনরায় শিটে আপলোড না হয়, তাই অটো-রিআপলোড বন্ধ রাখা হলো
   };
 
   window.fetchGalleryDirect = function() {
@@ -8722,14 +8802,22 @@ function updateLb() {
     fd.append('rowId', id);
     fd.append('name', targetName);
     showToast('🗑️ গ্যালারি পোস্ট মুছে ফেলা হচ্ছে...');
+    var delUrl = S + '?action=deleteGalleryPhoto&email=' + encodeURIComponent(admEmail) + '&pin=' + encodeURIComponent(admPin) + '&rowId=' + encodeURIComponent(id) + '&name=' + encodeURIComponent(targetName) + '&_t=' + Date.now();
     fetch(S, { method: 'POST', body: fd })
       .then(function(r){ return r.json(); })
+      .then(function(res){
+        if (!res || res.status !== 'Success') {
+          return fetch(delUrl).then(function(r2){ return r2.json(); });
+        }
+        return res;
+      })
       .then(function(){
-        showToast('✅ গ্যালারি পোস্ট গুগল শিট (Gallery_DB) ও ওয়েবসাইট থেকে মুছে ফেলা হয়েছে!');
+        showToast('✅ গ্যালারি পোস্ট গুগল শিট (Gallery_DB) ও সব ব্রাউজার থেকে স্থায়ীভাবে মুছে ফেলা হয়েছে!');
         if (typeof window.renderAdminControlHub === 'function') window.renderAdminControlHub();
+        setTimeout(window.fetchGalleryDirect, 1200);
       })
       .catch(function(){
-        fetch(S + '?action=deleteGalleryPhoto&email=' + encodeURIComponent(admEmail) + '&pin=' + encodeURIComponent(admPin) + '&rowId=' + encodeURIComponent(id) + '&name=' + encodeURIComponent(targetName)).catch(function(){});
+        fetch(delUrl).catch(function(){});
       });
   };
 
@@ -8874,6 +8962,7 @@ function updateLb() {
       if (btn) btn.disabled = false;
       if (btnTxt) btnTxt.textContent = 'গ্যালারিতে পোস্ট করুন';
       if (!itemObj.image) itemObj.image = savedPhotoCopy;
+      itemObj._pendingUploadTs = Date.now();
       allGalleryItems = allGalleryItems.filter(function(x){
         return !((x.name === itemObj.name) && (x.date === itemObj.date) && (x.bg === itemObj.bg));
       });
@@ -8927,7 +9016,15 @@ function updateLb() {
 
   allGalleryItems = getLocalGalleryCache();
   window.renderSpondonGallery(false);
-  setTimeout(window.fetchGalleryDirect, 700);
+  setTimeout(window.fetchGalleryDirect, 400);
+  window.addEventListener('focus', function(){ window.fetchGalleryDirect(); });
+  setInterval(function(){
+    var pcPage = document.getElementById('p-photocard');
+    var admPanel = document.getElementById('admin-panel');
+    if ((pcPage && pcPage.classList.contains('on')) || (admPanel && admPanel.style.display === 'block')) {
+      window.fetchGalleryDirect();
+    }
+  }, 10000);
 })();
 
 </script>
