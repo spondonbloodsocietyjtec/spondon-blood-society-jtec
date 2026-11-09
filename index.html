@@ -1192,6 +1192,152 @@ img, video, iframe, canvas { max-width: 100%; }
   transform: translate3d(0, 0, 0) !important;
 }
 
+
+/* ═══ SMART BLOOD REQUEST MINI-PROFILE & DONOR FOLLOW-UP TRACKER ═══ */
+.sbs-req-profile-box {
+  background: linear-gradient(135deg, #fff5f5 0%, #ffffff 100%);
+  border: 1.5px solid #fecdd3;
+  border-left: 5px solid #b71c1c;
+  border-radius: 16px;
+  padding: 16px 18px;
+  margin-bottom: 16px;
+  box-shadow: 0 6px 18px rgba(183, 28, 28, 0.08);
+}
+.sbs-req-prof-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.sbs-req-prof-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #b71c1c;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+.sbs-req-prof-time {
+  font-size: 11.5px;
+  color: #64748b;
+  font-weight: 700;
+}
+.sbs-req-prof-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px 12px;
+  background: #ffffff;
+  border: 1px solid #f1f5f9;
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  font-size: 13px;
+}
+.sbs-req-prof-item {
+  color: #334155;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.sbs-req-prof-item b {
+  color: #0f172a;
+  font-weight: 800;
+}
+.sbs-req-stats-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.sbs-req-stat-pill {
+  flex: 1;
+  min-width: 110px;
+  text-align: center;
+  padding: 7px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 800;
+}
+.sbs-req-stat-pill.total { background: #f8fafc; color: #0f172a; border: 1px solid #e2e8f0; }
+.sbs-req-stat-pill.done { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+.sbs-req-stat-pill.rem { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
+.sbs-req-prof-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.sbs-req-act-btn {
+  flex: 1;
+  min-width: 160px;
+  padding: 9px 12px;
+  border-radius: 10px;
+  font-size: 12.5px;
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.sbs-req-act-btn:active { transform: scale(0.98); }
+.sbs-req-act-btn.refresh {
+  background: #0f172a;
+  color: #ffffff;
+}
+.sbs-req-act-btn.newform {
+  background: #fff1f2;
+  color: #b71c1c;
+  border: 1px solid #fecdd3;
+}
+.dc-v2.contacted-card {
+  border: 2px solid #16a34a !important;
+  background: linear-gradient(180deg, #f0fdf4 0%, #ffffff 38%) !important;
+}
+.dc-followup-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 11.5px;
+  font-weight: 800;
+  margin: 6px 0;
+}
+.dc-followup-bar.pending {
+  background: #fffbeb;
+  color: #b45309;
+  border: 1px dashed #fcd34d;
+}
+.dc-followup-bar.done {
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #86efac;
+}
+.dc-quick-sec-btn {
+  width: 100%;
+  margin-top: 6px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  border: 1px solid #bbf7d0;
+  background: #f0fdf4;
+  color: #15803d;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+.dc-quick-sec-btn:hover { background: #dcfce7; }
+
 </style>
 </head>
 <body>
@@ -1379,6 +1525,7 @@ img, video, iframe, canvas { max-width: 100%; }
 <button class="qa" onclick="go('photocard')"><span class="qa-i">🪪</span><div class="qa-t">রক্তদান ফটোকার্ড</div><div class="qa-d">নিজের রক্তদানের আকর্ষণীয় ফটোকার্ড বানান</div></button>
 <button class="qa" onclick="go('complaint')"><span class="qa-i">🛡️</span><div class="qa-t">প্রতারক ডোনার তালিকা</div><div class="qa-d">প্রতারকদের নাম্বার যাচাই ও অভিযোগ করুন</div></button>
 </div>
+<div id="sbs-home-req-resume" style="display:none;margin-bottom:16px;"></div>
 
 <!-- LIVE STATS -->
 <div class="sc">
@@ -1546,6 +1693,7 @@ img, video, iframe, canvas { max-width: 100%; }
   <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-gh-src="request-banner.jpg" data-alt-srcs="blood request banner.jpg,request banner.jpg,request_banner.jpg" data-b64-key="request" alt="Spondon Blood Request Banner">
 </div>
 <div class="fc">
+<div id="sbs-br-form-saved-bar" style="display:none;padding:12px 16px;background:#fff5f5;border-bottom:1.5px solid #fecdd3;"></div>
 <div id="brfs">
 <div class="fh"><span class="fi" style="animation:heartbeat 1.5s ease-in-out infinite">🆘</span><div class="ft">Blood Request</div><div class="fs" style="color:#d32f2f;font-weight:700">জরুরি রক্তের প্রয়োজনে ফর্মটি পূরণ করুন</div></div>
 <div class="fb">
@@ -2507,6 +2655,8 @@ function go(n, push = true){
   window.scrollTo({top:0, behavior: 'smooth'});
   if(n === 'photocard') { if(typeof drawPhotoCard === 'function') setTimeout(drawPhotoCard, 50); if(typeof window.fetchGalleryDirect === 'function') setTimeout(window.fetchGalleryDirect, 80); }
   if(n === 'complaint' && typeof loadFraudDonors === 'function') loadFraudDonors(false);
+  if(n === 'blood-request' && typeof window.checkAndRestoreBloodRequestSession === 'function') window.checkAndRestoreBloodRequestSession(false);
+  if(n === 'home' && typeof window.renderHomeReqResumeBanner === 'function') window.renderHomeReqResumeBanner();
   if(push) {
     try {
       if(history.state === null) history.replaceState({page: n}, '', '?page=' + n);
@@ -3553,10 +3703,114 @@ document.getElementById('drb').addEventListener('click',function(){
   });
 });
 
-// DIRECT PHONE DIALER HELPER
+// ═══════════════════════════════════════════════════════════════════════
+// 📋 SMART BLOOD REQUEST MINI-PROFILE, FOLLOW-UP TRACKER & ANTI-DUPLICATE ENGINE
+// - ব্লাড রিকোয়েস্ট সাবমিট করলে রোগীর মিনি-প্রোফাইল ও প্রস্তুত ডোনার তালিকা ১২ ঘণ্টার জন্য ব্রাউজারে সেভ থাকে।
+// - ডায়ালার (📞 কল) বা WhatsApp-এ গেলে কম র‍্যামের মোবাইলে ব্রাউজার রিলোড হলেও ডোনার তালিকা হারাবে না!
+// - কোন ডোনারকে কল বা WhatsApp করা হয়েছে তা কার্ডের গায়ে সময়সহ সবুজ ব্যাজে মার্ক হয়ে থাকবে।
+// - ৩০ মিনিটের মধ্যে একই রোগীর জন্য ভুলবশত ২য় বার ফর্ম সাবমিট করলেও শিটে ডুপ্লিকেট রিকোয়েস্ট যাবে না!
+// ═══════════════════════════════════════════════════════════════════════
+var SBS_REQ_SESSION_KEY = 'sbs_active_req_session_v1';
+var SBS_REQ_TTL_MS = 12 * 60 * 60 * 1000; // ১২ ঘণ্টা পর্যন্ত ফলোআপ প্রোফাইল সংরক্ষিত থাকবে
+var _sbsForceBlankReqForm = false;
+
+function formatNowBnTime() {
+  var d = new Date();
+  var h = d.getHours();
+  var m = d.getMinutes();
+  var period = (h >= 5 && h < 12) ? 'সকাল' : (h >= 12 && h < 15) ? 'দুপুর' : (h >= 15 && h < 18) ? 'বিকাল' : (h >= 18 && h < 20) ? 'সন্ধ্যা' : 'রাত';
+  var h12 = h % 12 || 12;
+  var mStr = (m < 10 ? '0' : '') + m;
+  return period + ' ' + toBn(h12) + ':' + toBn(mStr);
+}
+
+window.getSavedBloodReqSession = function() {
+  try {
+    var raw = localStorage.getItem(SBS_REQ_SESSION_KEY);
+    if (!raw) return null;
+    var sess = JSON.parse(raw);
+    if (!sess || !sess.createdAt) return null;
+    if ((Date.now() - sess.createdAt) > SBS_REQ_TTL_MS) {
+      localStorage.removeItem(SBS_REQ_SESSION_KEY);
+      return null;
+    }
+    if (!sess.contactLog) sess.contactLog = {};
+    if (!Array.isArray(sess.matchedDonors)) sess.matchedDonors = [];
+    return sess;
+  } catch (e) {
+    return null;
+  }
+};
+
+window.saveBloodReqSession = function(sessObj) {
+  try {
+    if (!sessObj) return;
+    sessObj.lastActiveAt = Date.now();
+    localStorage.setItem(SBS_REQ_SESSION_KEY, JSON.stringify(sessObj));
+    window.renderHomeReqResumeBanner();
+  } catch (e) {}
+};
+
+// ডোনারকে কল বা WhatsApp করলে তাৎক্ষণিক ফলোআপ লগে সেভ করা:
+window.markDonorContacted = function(rawPhone, actionType) {
+  var p = normPhone(rawPhone);
+  if (!p) return;
+  try {
+    localStorage.setItem('sbs_resume_br_ts', String(Date.now()));
+  } catch (e) {}
+  var sess = window.getSavedBloodReqSession();
+  if (!sess) return;
+  if (!sess.contactLog) sess.contactLog = {};
+  var entry = sess.contactLog[p] || { called: false, wa: false, calledAt: '', waAt: '' };
+  var nowTxt = formatNowBnTime();
+  if (actionType === 'call') {
+    entry.called = true;
+    entry.calledAt = nowTxt;
+  } else if (actionType === 'wa') {
+    entry.wa = true;
+    entry.waAt = nowTxt;
+  } else if (actionType === 'reset') {
+    delete sess.contactLog[p];
+    window.saveBloodReqSession(sess);
+    window.renderSavedBloodRequestView();
+    return;
+  }
+  entry.lastTime = nowTxt;
+  sess.contactLog[p] = entry;
+  window.saveBloodReqSession(sess);
+  setTimeout(function() {
+    window.renderSavedBloodRequestView();
+  }, 150);
+};
+
+// ১-ক্লিকে নির্দিষ্ট ডোনারকে Match Secured পেজে নিয়ে যাওয়া:
+window.quickConfirmDonorMatch = function(donorPhone, donorName) {
+  var cleanD = normPhone(donorPhone);
+  var sess = window.getSavedBloodReqSession();
+  var reqP = (sess && sess.reqPhone) ? sess.reqPhone : '';
+  if (!reqP) {
+    try {
+      var lr = JSON.parse(localStorage.getItem('sbs_last_req') || '{}');
+      reqP = lr.reqPhone || '';
+    } catch (e) {}
+  }
+  go('match-secured');
+  setTimeout(function() {
+    var rInp = document.getElementById('ms_req_p');
+    var dInp = document.getElementById('msdp');
+    if (rInp && reqP) rInp.value = reqP;
+    if (dInp && cleanD) dInp.value = cleanD;
+    if (typeof showToast === 'function') {
+      showToast('🤝 ডোনার ' + (donorName || '') + '-এর নাম্বার বসানো হয়েছে। এখন কনফার্ম বাটনে ক্লিক করুন!');
+    }
+  }, 80);
+};
+
+// DIRECT PHONE DIALER HELPER (কল করার সাথে সাথে ডোনার কার্ডে "কল করা হয়েছে ✅" মার্ক করবে)
 window.dialDonorPhone = function(rawPhone, ev) {
   var p = normPhone(rawPhone);
   if (!p) return true;
+  window.markDonorContacted(p, 'call');
   var telUri = 'tel:' + p;
   try {
     if (ev) ev.stopPropagation();
@@ -3567,15 +3821,270 @@ window.dialDonorPhone = function(rawPhone, ev) {
   return true;
 };
 
-// নতুন করে ব্লাড রিকোয়েস্ট করার রিসেট ফাংশন:
+// ফর্ম পূরণ ছাড়াই ১ ক্লিকে লাইভ ডোনার তালিকা রিফ্রেশ করা:
+window.refreshSavedReqDonorsLive = function() {
+  var sess = window.getSavedBloodReqSession();
+  if (!sess || !sess.bg || !sess.district) return;
+  if (typeof showToast === 'function') showToast('🔄 গুগল শিট থেকে সর্বশেষ প্রস্তুত ডোনার তালিকা আপডেট করা হচ্ছে...');
+  window.findMatchingDonorsLive(sess.bg, sess.district, function(liveList) {
+    var s2 = window.getSavedBloodReqSession();
+    if (!s2) return;
+    var merged = (liveList || []).concat(s2.matchedDonors || []);
+    var seen = {};
+    var unique = [];
+    merged.forEach(function(m) {
+      if (!m || !m.phone) return;
+      var cp = normPhone(m.phone);
+      if (!cp || seen[cp]) return;
+      if (window.fraudPhoneMap && window.fraudPhoneMap[cp]) return;
+      seen[cp] = true;
+      unique.push(m);
+    });
+    s2.matchedDonors = unique;
+    window.saveBloodReqSession(s2);
+    window.renderSavedBloodRequestView();
+    if (typeof showToast === 'function') showToast('✅ ডোনার তালিকা আপডেট হয়েছে (' + toBn(unique.length) + ' জন প্রস্তুত ডোনার)!');
+  });
+};
+
+// নতুন অন্য রোগীর জন্য ফাঁকা ফর্ম খোলা (আগের ফলোআপ প্রোফাইল উপরে ব্যানারে সংরক্ষিত রেখে):
 window.resetBloodRequestForm = function() {
+  _sbsForceBlankReqForm = true;
   document.getElementById('brr').style.display = 'none';
   document.getElementById('brfs').style.display = 'block';
   setL('brb','brt','brs',false,'ডোনার খুঁজুন 🔍');
   hE('bre');
+  window.updateBrFormSavedBar();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
-// BLOOD REQUEST (০.২ সেকেন্ডে সরাসরি লাইভ গুগল শিট Donor_DB থেকে প্রস্তুত ডোনার প্রদর্শন + Request_DB-তে সেভ)
+window.clearSavedBloodReqSession = function() {
+  try {
+    localStorage.removeItem(SBS_REQ_SESSION_KEY);
+    localStorage.removeItem('sbs_resume_br_ts');
+  } catch (e) {}
+  _sbsForceBlankReqForm = true;
+  var bar = document.getElementById('sbs-br-form-saved-bar');
+  if (bar) bar.style.display = 'none';
+  window.renderHomeReqResumeBanner();
+  document.getElementById('brr').style.display = 'none';
+  document.getElementById('brfs').style.display = 'block';
+  if (typeof showToast === 'function') showToast('🗑️ পূর্ববর্তী ফলোআপ লিস্ট মুছে নতুন ফর্ম খোলা হয়েছে।');
+};
+
+window.updateBrFormSavedBar = function() {
+  var bar = document.getElementById('sbs-br-form-saved-bar');
+  if (!bar) return;
+  var sess = window.getSavedBloodReqSession();
+  if (!sess) {
+    bar.style.display = 'none';
+    return;
+  }
+  var cCount = Object.keys(sess.contactLog || {}).length;
+  bar.style.display = 'block';
+  bar.innerHTML =
+    '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">' +
+      '<div style="font-size:13px;color:#881337;font-weight:700;line-height:1.45;">' +
+        '📋 <b>চলমান আবেদন সংরক্ষিত আছে:</b> রোগী <b>' + escapeHtml(sess.patientName || '') + '</b> (<span style="color:#b71c1c;font-weight:800;">' + escapeHtml(sess.bg || '') + '</span>, ' + escapeHtml(sess.district || '') + ') • ' +
+        '<b>' + toBn((sess.matchedDonors || []).length) + ' জন</b> ডোনার (' + toBn(cCount) + ' জনকে কল/মেসেজ করেছেন)' +
+      '</div>' +
+      '<div style="display:flex;gap:6px;">' +
+        '<button type="button" onclick="_sbsForceBlankReqForm=false;window.renderSavedBloodRequestView();" style="background:#b71c1c;color:#fff;border:none;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;">📋 সংরক্ষিত ডোনার লিস্ট দেখুন ➔</button>' +
+        '<button type="button" onclick="window.clearSavedBloodReqSession()" style="background:#fff;color:#64748b;border:1px solid #cbd5e1;padding:7px 10px;border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer;" title="সংরক্ষিত প্রোফাইল মুছুন">✕</button>' +
+      '</div>' +
+    '</div>';
+};
+
+// হোমপেজে চলমান রক্তের আবেদনের ১-ক্লিক ফলোআপ রিজিউম কার্ড:
+window.renderHomeReqResumeBanner = function() {
+  var box = document.getElementById('sbs-home-req-resume');
+  if (!box) return;
+  var sess = window.getSavedBloodReqSession();
+  if (!sess) {
+    box.style.display = 'none';
+    box.innerHTML = '';
+    return;
+  }
+  var totalD = (sess.matchedDonors || []).length;
+  var contactedD = Object.keys(sess.contactLog || {}).length;
+  box.style.display = 'block';
+  box.innerHTML =
+    '<div style="background:linear-gradient(135deg,#fff1f2 0%,#ffffff 100%);border:1.5px solid #fecdd3;border-left:5px solid #b71c1c;border-radius:18px;padding:14px 16px;box-shadow:0 6px 18px rgba(183,28,28,0.08);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">' +
+      '<div style="min-width:220px;flex:1;">' +
+        '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">' +
+          '<span style="background:#b71c1c;color:#fff;font-size:11px;font-weight:800;padding:2px 9px;border-radius:12px;">🩸 আপনার চলমান ব্লাড রিকোয়েস্ট ফলোআপ</span>' +
+          '<span style="font-size:11.5px;color:#64748b;font-weight:700;">' + escapeHtml(sess.savedTimeBn || '') + '</span>' +
+        '</div>' +
+        '<div style="font-size:14px;font-weight:800;color:#0f172a;line-height:1.4;">' +
+          'রোগী: ' + escapeHtml(sess.patientName || '') + ' • গ্রুপ: <span style="color:#b71c1c;">' + escapeHtml(sess.bg || '') + '</span> (' + escapeHtml(sess.district || '') + ')' +
+        '</div>' +
+        '<div style="font-size:12.5px;color:#15803d;font-weight:700;margin-top:2px;">' +
+          '👥 মোট প্রস্তুত ডোনার: ' + toBn(totalD) + ' জন • ✅ যোগাযোগ করেছেন: ' + toBn(contactedD) + ' জন • ⏳ বাকি: ' + toBn(Math.max(0, totalD - contactedD)) + ' জন' +
+        '</div>' +
+      '</div>' +
+      '<div style="display:flex;align-items:center;gap:8px;width:100%;max-width:280px;">' +
+        '<button type="button" onclick="_sbsForceBlankReqForm=false;go(\'blood-request\');" style="flex:1;background:linear-gradient(135deg,#d32f2f,#b71c1c);color:#fff;border:none;padding:10px 14px;border-radius:12px;font-size:13px;font-weight:800;cursor:pointer;box-shadow:0 4px 12px rgba(183,28,28,0.25);">📋 ডোনার লিস্ট ও ফলোআপ দেখুন ➔</button>' +
+      '</div>' +
+    '</div>';
+};
+
+// সংরক্ষিত সেশন থেকে সম্পূর্ণ মিনি-প্রোফাইল ও ডোনার ফলোআপ কার্ড রেন্ডার করা:
+window.renderSavedBloodRequestView = function() {
+  var sess = window.getSavedBloodReqSession();
+  if (!sess) return false;
+  var brfs = document.getElementById('brfs');
+  var brr = document.getElementById('brr');
+  var bar = document.getElementById('sbs-br-form-saved-bar');
+  if (bar) bar.style.display = 'none';
+  if (brfs) brfs.style.display = 'none';
+  if (brr) brr.style.display = 'block';
+  setL('brb','brt','brs',false,'ডোনার খুঁজুন 🔍');
+
+  var dl = document.getElementById('brdl'), intro = document.getElementById('bri'), cs = document.getElementById('brcs');
+  var seenP = {};
+  var safeDonors = (sess.matchedDonors || []).filter(function(m){
+    if (!m || !m.phone) return false;
+    var cp = normPhone(m.phone);
+    if (!cp || seenP[cp]) return false;
+    if (window.fraudPhoneMap && window.fraudPhoneMap[cp]) return false;
+    seenP[cp] = true;
+    return true;
+  });
+
+  var contactLog = sess.contactLog || {};
+  var contactedCount = 0;
+  safeDonors.forEach(function(m) {
+    var cp = normPhone(m.phone);
+    if (contactLog[cp] && (contactLog[cp].called || contactLog[cp].wa)) contactedCount++;
+  });
+  var remCount = Math.max(0, safeDonors.length - contactedCount);
+
+  // মিনি-প্রোফাইল ও ফলোআপ ড্যাশবোর্ড HTML:
+  var profHtml =
+    '<div class="sbs-req-profile-box">' +
+      '<div class="sbs-req-prof-top">' +
+        '<span class="sbs-req-prof-badge">📋 আপনার রক্তের আবেদন ও ফলোআপ প্রোফাইল</span>' +
+        '<span class="sbs-req-prof-time">🕒 আবেদন: ' + escapeHtml(sess.savedTimeBn || 'চলমান') + '</span>' +
+      '</div>' +
+      '<div class="sbs-req-prof-grid">' +
+        '<div class="sbs-req-prof-item">👤 রোগীর নাম: <b>' + escapeHtml(sess.patientName || 'উল্লেখ নেই') + '</b></div>' +
+        '<div class="sbs-req-prof-item">🩸 গ্রুপ ও ব্যাগ: <b style="color:#b71c1c;">' + escapeHtml(sess.bg || '') + ' (' + toBn(sess.units || '১') + ' ব্যাগ)</b></div>' +
+        '<div class="sbs-req-prof-item">🏥 হাসপাতাল: <b>' + escapeHtml(sess.hospital || '') + '</b></div>' +
+        '<div class="sbs-req-prof-item">📍 জেলা: <b>' + escapeHtml(sess.district || '') + '</b></div>' +
+      '</div>' +
+      '<div class="sbs-req-stats-row">' +
+        '<div class="sbs-req-stat-pill total">👥 মোট ডোনার: ' + toBn(safeDonors.length) + ' জন</div>' +
+        '<div class="sbs-req-stat-pill done">✅ যোগাযোগ হয়েছে: ' + toBn(contactedCount) + ' জন</div>' +
+        '<div class="sbs-req-stat-pill rem">⏳ যোগাযোগ বাকি: ' + toBn(remCount) + ' জন</div>' +
+      '</div>' +
+      '<div class="sbs-req-prof-actions">' +
+        '<button type="button" class="sbs-req-act-btn refresh" onclick="window.refreshSavedReqDonorsLive()">🔄 ফর্ম পূরণ ছাড়াই ডোনার লিস্ট আপডেট করুন</button>' +
+        '<button type="button" class="sbs-req-act-btn newform" onclick="window.resetBloodRequestForm()">➕ অন্য রোগীর জন্য নতুন ফর্ম খুলুন</button>' +
+      '</div>' +
+    '</div>';
+
+  if (safeDonors.length > 0) {
+    intro.innerHTML = profHtml +
+      '<div style="margin-top:6px;">প্রিয় স্বজন, <b>' + escapeHtml(sess.district) + '</b> জেলায় <b>' + escapeHtml(sess.bg) + '</b> গ্রুপের জন্য <b style="color:#1b5e20">' + toBn(safeDonors.length) + ' জন</b> প্রস্তুত ডোনার নিচে দেওয়া হলো। আপনি যাকে কল বা WhatsApp করবেন, তার কার্ডে স্বয়ংক্রিয়ভাবে <b>"যোগাযোগ করা হয়েছে ✅"</b> চিহ্ন যুক্ত থাকবে:</div>';
+    var h = '<div class="br-grid-cards">';
+    safeDonors.forEach(function(m) {
+      var cleanP = normPhone(m.phone);
+      var bgTxt = m.bg || sess.bg || '';
+      var distTxt = m.district || sess.district || '';
+      var upzTxt = m.upazilla || '';
+      var locFull = distTxt + (upzTxt ? ', ' + upzTxt : '');
+      var lastD = m.lastDate ? String(m.lastDate).substring(0, 10) : 'তথ্য নেই (প্রস্তুত)';
+      var cInfo = contactLog[cleanP] || null;
+      var isContacted = Boolean(cInfo && (cInfo.called || cInfo.wa));
+
+      var statusBarHtml = '';
+      if (isContacted) {
+        var parts = [];
+        if (cInfo.called) parts.push('📞 কল করা হয়েছে' + (cInfo.calledAt ? ' (' + cInfo.calledAt + ')' : ''));
+        if (cInfo.wa) parts.push('💬 WhatsApp করা হয়েছে' + (cInfo.waAt && !cInfo.called ? ' (' + cInfo.waAt + ')' : ''));
+        statusBarHtml =
+          '<div class="dc-followup-bar done">' +
+            '<span>✅ ' + escapeHtml(parts.join(' • ')) + '</span>' +
+            '<span onclick="window.markDonorContacted(\'' + escapeHtml(cleanP) + '\', \'reset\')" style="cursor:pointer;font-size:11px;color:#475569;text-decoration:underline;" title="ফলোআপ মার্ক রিসেট করুন">↺ আনমার্ক</span>' +
+          '</div>';
+      } else {
+        statusBarHtml =
+          '<div class="dc-followup-bar pending">' +
+            '<span>⏳ এখনো যোগাযোগ করা হয়নি</span>' +
+            '<span style="font-size:11px;">কল বা মেসেজ দিন</span>' +
+          '</div>';
+      }
+
+      var waMsgText =
+        'আসসালামু আলাইকুম শ্রদ্ধেয় ' + (m.name || 'রক্তদাতা') + ',\n\n' +
+        'স্পন্দন ব্লাড সোসাইটি (JTEC) ওয়েবসাইট থেকে আপনার নাম্বারটি পেয়েছি। আমাদের একজন মুমূর্ষু রোগীর জন্য জরুরি *' + bgTxt + '* রক্তের প্রয়োজন।\n\n' +
+        '*রোগীর তথ্য:*\n' +
+        '• রোগীর নাম: *' + (sess.patientName || '') + '*\n' +
+        '• রক্তের গ্রুপ: *' + bgTxt + ' (' + toBn(sess.units || '১') + ' ব্যাগ)*\n' +
+        '• হাসপাতাল: *' + (sess.hospital || '') + '*\n' +
+        '• জেলা ও এলাকা: *' + locFull + '*\n\n' +
+        'আপনি কি রক্তদান করে একজন মুমূর্ষু রোগীর জীবন বাঁচাতে এগিয়ে আসতে পারবেন? অনুগ্রহ করে দ্রুত জানালে আমরা চিরকৃতজ্ঞ থাকব।\n\n' +
+        '*স্পন্দন ব্লাড সোসাইটি, ঝিনাইদহ টেক্সটাইল ইঞ্জিনিয়ারিং কলেজ*';
+      var waMsg = encodeURIComponent(waMsgText);
+      var safeNameAttr = String(m.name || '').replace(/'/g, "\\'").replace(/"/g, "&quot;");
+
+      h += '<div class="dc-v2' + (isContacted ? ' contacted-card' : '') + '">';
+      h += '<div class="dc-v2-top">';
+      h += '<span class="dc-v2-bg">' + escapeHtml(bgTxt) + '</span>';
+      h += '<span class="dc-v2-loc"><span style="color:#dc2626;">📍</span> ' + escapeHtml(locFull) + '</span>';
+      h += '</div>';
+      h += '<div class="dc-v2-name">' + escapeHtml(m.name) + '</div>';
+      h += '<div class="dc-v2-last"><span>🗓️</span> <span>শেষ রক্তদান:</span> <b>' + escapeHtml(lastD) + '</b></div>';
+      h += statusBarHtml;
+      h += '<div class="dc-v2-div"></div>';
+      h += '<div class="dc-v2-phone"><span style="color:#059669;">📞</span> <a href="tel:' + escapeHtml(cleanP) + '" onclick="return window.dialDonorPhone(\'' + escapeHtml(cleanP) + '\', event)" style="color:inherit;text-decoration:none;">' + escapeHtml(cleanP) + '</a></div>';
+      h += '<div class="dc-v2-actions">';
+      h += '<button type="button" class="dc-btn-rep" onclick="reportDonorFromCard(\'' + escapeHtml(cleanP) + '\', \'' + safeNameAttr + '\')">🏳️ অভিযোগ</button>';
+      h += '<a href="https://wa.me/88' + escapeHtml(cleanP) + '?text=' + waMsg + '" target="_blank" onclick="window.markDonorContacted(\'' + escapeHtml(cleanP) + '\', \'wa\')" class="dc-btn-wa">💬 WhatsApp</a>';
+      h += '<a href="tel:' + escapeHtml(cleanP) + '" target="_top" onclick="return window.dialDonorPhone(\'' + escapeHtml(cleanP) + '\', event)" class="dc-btn-call">📞 কল করুন</a>';
+      h += '</div>';
+      h += '<button type="button" class="dc-quick-sec-btn" onclick="window.quickConfirmDonorMatch(\'' + escapeHtml(cleanP) + '\', \'' + safeNameAttr + '\')">🤝 এই ডোনার রাজি হলে ১-ক্লিকে কনফার্ম করুন ➔</button>';
+      h += '</div>';
+    });
+    h += '</div>';
+    dl.innerHTML = h;
+    cs.style.display = 'block';
+  } else {
+    intro.innerHTML = profHtml +
+      'প্রিয় স্বজন, <b>' + escapeHtml(sess.district) + '</b> জেলায় <b>' + escapeHtml(sess.bg) + '</b> গ্রুপের কোনো প্রস্তুত ডোনার এই মুহূর্তে ডাটাবেসে পাওয়া যায়নি। আপনার রিকোয়েস্টটি জরুরি নোটিশ বোর্ডে যুক্ত করা হয়েছে।';
+    dl.innerHTML = '<div class="nd"><div style="font-size:34px;margin-bottom:8px">😔</div><b style="font-size:15px">এই মুহূর্তে প্রস্তুত ডোনার পাওয়া যায়নি</b><br><span style="font-size:13px;line-height:1.7;display:block;margin-top:5px">আপনার আবেদনটি আমাদের ইমার্জেন্সি নোটিশ বোর্ডে প্রকাশ করা হয়েছে। উপরের <b>"🔄 ফর্ম পূরণ ছাড়াই ডোনার লিস্ট আপডেট করুন"</b> বাটনে ক্লিক করে কিছুক্ষণ পর পর চেক করতে পারেন।</span></div>';
+    cs.style.display = 'block';
+  }
+  return true;
+};
+
+window.checkAndRestoreBloodRequestSession = function(isInitialPageLoad) {
+  var sess = window.getSavedBloodReqSession();
+  window.renderHomeReqResumeBanner();
+  if (!sess) return false;
+  if (_sbsForceBlankReqForm && !isInitialPageLoad) {
+    window.updateBrFormSavedBar();
+    return false;
+  }
+  return window.renderSavedBloodRequestView();
+};
+
+// মোবাইল ব্রাউজারে কল/WhatsApp থেকে ফিরে আসার পর ট্যাব রিলোড হলে স্বয়ংক্রিয়ভাবে ব্লাড রিকোয়েস্ট ডোনার লিস্টে ফিরিয়ে নেওয়া:
+setTimeout(function() {
+  window.renderHomeReqResumeBanner();
+  try {
+    var lastCallTs = parseInt(localStorage.getItem('sbs_resume_br_ts') || '0', 10) || 0;
+    var sess = window.getSavedBloodReqSession();
+    var uParams = new URLSearchParams(window.location.search);
+    var pParam = uParams.get('page');
+    if (sess && (pParam === 'blood-request' || (lastCallTs > 0 && (Date.now() - lastCallTs) < 45 * 60 * 1000 && !pParam))) {
+      go('blood-request', false);
+      window.renderSavedBloodRequestView();
+    }
+  } catch (e) {}
+}, 250);
+
+// BLOOD REQUEST (০.২ সেকেন্ডে সরাসরি লাইভ গুগল শিট Donor_DB থেকে প্রস্তুত ডোনার প্রদর্শন + ৩০ মিনিট অ্যান্টি-ডুপ্লিকেট গার্ড)
 document.getElementById('brb').addEventListener('click', function(){
   var f = document.getElementById('brf');
   if(!f.checkValidity()){ f.reportValidity(); return; }
@@ -3584,36 +4093,50 @@ document.getElementById('brb').addEventListener('click', function(){
   fd.delete('prescriptionFile');
   fd.set('action', 'addRequest');
   fd.set('formType', 'bloodRequest');
-  fd.set('phone', normPhone(fd.get('phone') || ''));
+  var cleanReqP = normPhone(fd.get('phone') || '');
+  fd.set('phone', cleanReqP);
   fd.set('siteUrl', window.location.origin + window.location.pathname);
 
   var reqBg = fd.get('bg') || '';
   var reqDist = fd.get('district') || '';
+  var patNameVal = (fd.get('patientName') || '').trim();
 
-  // রক্তগ্রহীতার ফর্মের তথ্য লোকাল স্টোরেজে সেভ করে রাখা হচ্ছে যাতে Match Secured করার পর WhatsApp মেসেজে হুবহু পাঠানো যায়
+  // 🛡️ ৩০ মিনিটের ডুপ্লিকেট রিকোয়েস্ট চেক (যাতে ১০-১৫ মিনিট পর পর একই রোগীর জন্য ২টা রিকোয়েস্ট না পড়ে):
+  var prevSess = window.getSavedBloodReqSession();
+  var isDuplicateWithin30Min = false;
+  if (prevSess && (Date.now() - (prevSess.createdAt || 0)) < 30 * 60 * 1000) {
+    var samePhoneOrPat = (prevSess.reqPhone === cleanReqP) || (String(prevSess.patientName || '').toLowerCase() === patNameVal.toLowerCase());
+    if (samePhoneOrPat && String(prevSess.bg || '').toUpperCase() === String(reqBg).toUpperCase() && (mD(prevSess.district)||prevSess.district) === (mD(reqDist)||reqDist)) {
+      isDuplicateWithin30Min = true;
+    }
+  }
+
+  var reqCache = {
+    patientName: patNameVal,
+    reqPhone: cleanReqP,
+    email: fd.get('email') || '',
+    bg: reqBg,
+    units: fd.get('units') || '১',
+    district: reqDist,
+    hospital: fd.get('hospital') || '',
+    problem: fd.get('problem') || '',
+    dateTime: fd.get('dateTime') || '',
+    createdAt: isDuplicateWithin30Min ? prevSess.createdAt : Date.now(),
+    savedTimeBn: isDuplicateWithin30Min ? (prevSess.savedTimeBn || formatNowBnTime()) : formatNowBnTime(),
+    contactLog: (isDuplicateWithin30Min && prevSess.contactLog) ? prevSess.contactLog : {},
+    matchedDonors: (isDuplicateWithin30Min && prevSess.matchedDonors) ? prevSess.matchedDonors : []
+  };
+
   try {
-    var reqCache = {
-      patientName: fd.get('patientName') || '',
-      reqPhone: normPhone(fd.get('phone') || ''),
-      bg: reqBg,
-      units: fd.get('units') || '১',
-      district: reqDist,
-      hospital: fd.get('hospital') || '',
-      problem: fd.get('problem') || '',
-      dateTime: fd.get('dateTime') || ''
-    };
     localStorage.setItem('sbs_last_req', JSON.stringify(reqCache));
     var msReqInp = document.getElementById('ms_req_p');
     if (msReqInp && reqCache.reqPhone) msReqInp.value = reqCache.reqPhone;
   } catch(e){}
 
+  _sbsForceBlankReqForm = false;
   var _renderedMatchedOnce = false;
   function renderMatchedDonorCards(donorArray) {
     _renderedMatchedOnce = true;
-    setL('brb','brt','brs',false,'ডোনার খুঁজুন 🔍');
-    document.getElementById('brfs').style.display = 'none';
-    document.getElementById('brr').style.display = 'block';
-    var dl = document.getElementById('brdl'), intro = document.getElementById('bri'), cs = document.getElementById('brcs');
     var seenP = {};
     var safeDonors = (donorArray || []).filter(function(m){
       if (!m || !m.phone) return false;
@@ -3623,70 +4146,23 @@ document.getElementById('brb').addEventListener('click', function(){
       seenP[cp] = true;
       return true;
     });
-
-    if (safeDonors.length > 0) {
-      intro.innerHTML = 'প্রিয় স্বজন, <b>' + escapeHtml(reqDist) + '</b> জেলায় <b>' + escapeHtml(reqBg) + '</b> গ্রুপের জন্য <b style="color:#1b5e20">' + toBn(safeDonors.length) + ' জন</b> প্রস্তুত ডোনার পাওয়া গেছে। নিচের তালিকা থেকে সরাসরি কল বা WhatsApp করুন:';
-      var h = '<div class="br-grid-cards">';
-      safeDonors.forEach(function(m) {
-        var cleanP = normPhone(m.phone);
-        var bgTxt = m.bg || reqBg || '';
-        var distTxt = m.district || reqDist || '';
-        var upzTxt = m.upazilla || '';
-        var locFull = distTxt + (upzTxt ? ', ' + upzTxt : '');
-        var lastD = m.lastDate ? String(m.lastDate).substring(0, 10) : 'তথ্য নেই (প্রস্তুত)';
-        var waMsgText =
-          'আসসালামু আলাইকুম শ্রদ্ধেয় ' + (m.name || 'রক্তদাতা') + ',\n\n' +
-          'স্পন্দন ব্লাড সোসাইটি (JTEC) ওয়েবসাইট থেকে আপনার নাম্বারটি পেয়েছি। আমাদের একজন মুমূর্ষু রোগীর জন্য জরুরি *' + bgTxt + '* রক্তের প্রয়োজন।\n\n' +
-          '*রোগীর তথ্য:*\n' +
-          '• রোগীর নাম: *' + (fd.get('patientName') || '') + '*\n' +
-          '• রক্তের গ্রুপ: *' + bgTxt + ' (' + toBn(fd.get('units') || '১') + ' ব্যাগ)*\n' +
-          '• হাসপাতাল: *' + (fd.get('hospital') || '') + '*\n' +
-          '• জেলা ও এলাকা: *' + locFull + '*\n\n' +
-          'আপনি কি রক্তদান করে একজন মুমূর্ষু রোগীর জীবন বাঁচাতে এগিয়ে আসতে পারবেন? অনুগ্রহ করে দ্রুত জানালে আমরা চিরকৃতজ্ঞ থাকব।\n\n' +
-          '*স্পন্দন ব্লাড সোসাইটি, ঝিনাইদহ টেক্সটাইল ইঞ্জিনিয়ারিং কলেজ*';
-        var waMsg = encodeURIComponent(waMsgText);
-        var safeNameAttr = String(m.name || '').replace(/'/g, "\\'").replace(/"/g, "&quot;");
-        h += '<div class="dc-v2">';
-        h += '<div class="dc-v2-top">';
-        h += '<span class="dc-v2-bg">' + escapeHtml(bgTxt) + '</span>';
-        h += '<span class="dc-v2-loc"><span style="color:#dc2626;">📍</span> ' + escapeHtml(locFull) + '</span>';
-        h += '</div>';
-        h += '<div class="dc-v2-name">' + escapeHtml(m.name) + '</div>';
-        h += '<div class="dc-v2-last"><span>🗓️</span> <span>শেষ রক্তদান:</span> <b>' + escapeHtml(lastD) + '</b></div>';
-        h += '<div class="dc-v2-ready">রক্ত দিতে প্রস্তুত</div>';
-        h += '<div class="dc-v2-div"></div>';
-        h += '<div class="dc-v2-phone"><span style="color:#059669;">📞</span> <a href="tel:' + escapeHtml(cleanP) + '" onclick="return window.dialDonorPhone(\'' + escapeHtml(cleanP) + '\', event)" style="color:inherit;text-decoration:none;">' + escapeHtml(cleanP) + '</a></div>';
-        h += '<div class="dc-v2-actions">';
-        h += '<button type="button" class="dc-btn-rep" onclick="reportDonorFromCard(\'' + escapeHtml(cleanP) + '\', \'' + safeNameAttr + '\')">🏳️ অভিযোগ</button>';
-        h += '<a href="https://wa.me/88' + escapeHtml(cleanP) + '?text=' + waMsg + '" target="_blank" class="dc-btn-wa">💬 WhatsApp</a>';
-        h += '<a href="tel:' + escapeHtml(cleanP) + '" target="_top" onclick="return window.dialDonorPhone(\'' + escapeHtml(cleanP) + '\', event)" class="dc-btn-call">📞 কল করুন</a>';
-        h += '</div>';
-        h += '</div>';
-      });
-      h += '</div>';
-      dl.innerHTML = h;
-      cs.style.display = 'block';
-    } else {
-      intro.innerHTML = 'প্রিয় স্বজন, <b>' + escapeHtml(reqDist) + '</b> জেলায় <b>' + escapeHtml(reqBg) + '</b> গ্রুপের কোনো প্রস্তুত ডোনার এই মুহূর্তে ডাটাবেসে পাওয়া যায়নি। আপনার রিকোয়েস্টটি জরুরি নোটিশ বোর্ডে যুক্ত করা হয়েছে।';
-      dl.innerHTML = '<div class="nd"><div style="font-size:34px;margin-bottom:8px">😔</div><b style="font-size:15px">এই মুহূর্তে প্রস্তুত ডোনার পাওয়া যায়নি</b><br><span style="font-size:13px;line-height:1.7;display:block;margin-top:5px">আপনার আবেদনটি আমাদের ইমার্জেন্সি নোটিশ বোর্ডে প্রকাশ করা হয়েছে। অনুগ্রহ করে অন্যান্য মাধ্যমেও খোঁজ নিন।</span></div>';
-      cs.style.display = 'block';
-    }
-    if (!document.getElementById('br-again-btn')) {
-      var againBtn = document.createElement('button');
-      againBtn.id = 'br-again-btn';
-      againBtn.type = 'button';
-      againBtn.className = 'adb';
-      againBtn.style.marginTop = '12px';
-      againBtn.textContent = '🔄 নতুন রক্তের আবেদন / অন্য জেলা বা গ্রুপ খুঁজুন';
-      againBtn.onclick = window.resetBloodRequestForm;
-      cs.appendChild(againBtn);
-    }
+    reqCache.matchedDonors = safeDonors;
+    window.saveBloodReqSession(reqCache);
+    window.renderSavedBloodRequestView();
   }
 
-  // ১. তাৎক্ষণিক (০.২ সেকেন্ডে) সরাসরি লাইভ গুগল শিট (Donor_DB) থেকে প্রস্তুত ডোনার খুঁজে দেখানো হচ্ছে (যাতে প্রেসক্রিপশন আপলোডের জন্য ভিজিটরকে ১ সেকেন্ডও অপেক্ষা করতে না হয়!):
+  // ১. তাৎক্ষণিক (০.২ সেকেন্ডে) সরাসরি লাইভ গুগল শিট (Donor_DB) থেকে প্রস্তুত ডোনার খুঁজে দেখানো হচ্ছে:
   window.findMatchingDonorsLive(reqBg, reqDist, function(liveMatched) {
     renderMatchedDonorCards(liveMatched);
   });
+
+  // যদি ৩০ মিনিটের মধ্যে একই রিকোয়েস্ট আগে থেকেই করা থাকে, তবে গুগল শিটে ডুপ্লিকেট সারি না পাঠিয়ে সরাসরি ডোনার লিস্ট দেখানো হবে:
+  if (isDuplicateWithin30Min) {
+    if (typeof showToast === 'function') {
+      showToast('ℹ️ আপনার এই আবেদনটি ইতোমধ্যে চলমান আছে! ডুপ্লিকেট রিকোয়েস্ট না পাঠিয়ে সরাসরি ডোনার তালিকা আপডেট করা হলো।');
+    }
+    return;
+  }
 
   // ২. সমান্তরালে প্রেসক্রিপশন ফাইল অপ্টিমাইজ করে Request_DB-তে সেভ করা হচ্ছে:
   var fi = document.getElementById('rfi');
@@ -3694,7 +4170,6 @@ document.getElementById('brb').addEventListener('click', function(){
     var file = fi.files[0];
     if(file.size > 10485760){ sE('bre','ফাইল ১০MB এর বেশি।'); return; }
     if (file.type && file.type.indexOf('image/') === 0) {
-      // ছবির সাইজ দ্রুত আপলোডের জন্য অপ্টিমাইজ করা হচ্ছে (১০ গুণ দ্রুত গুগল ড্রাইভে আপলোড হবে):
       var reader = new FileReader();
       reader.onload = function(ev) {
         var img = new Image();
@@ -3710,7 +4185,7 @@ document.getElementById('brb').addEventListener('click', function(){
           var compDataUri = cnv.toDataURL('image/jpeg', 0.78);
           fd.set('prescriptionFile', compDataUri.split(',')[1]);
           fd.set('mimeType', 'image/jpeg');
-          fd.set('fileName', (file.name || 'prescription').replace(/\.[^.]+$/, '') + '.jpg');
+          fd.set('fileName', (file.name || 'prescription').replace(/\\.[^.]+$/, '') + '.jpg');
           sendReq(fd);
         };
         img.onerror = function() {
@@ -3783,6 +4258,7 @@ document.getElementById('msb').addEventListener('click',function(){
   })
   .then(function(d){
     if(d.status==='Success'){
+      try { localStorage.removeItem('sbs_resume_br_ts'); } catch(e){}
       document.getElementById('msfs').style.display='none';
       document.getElementById('msok').style.display='block';
       var donorName = d.donorName || 'সম্মানিত রক্তযোদ্ধা';
