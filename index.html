@@ -2695,6 +2695,41 @@ if (urlReqPhone) {
 }
 if(requestedPage && pm[requestedPage]) {
   go(requestedPage);
+  if (requestedPage === 'photocard') {
+    setTimeout(function() {
+      try {
+        var uName = urlParams.get('name');
+        var uBg = urlParams.get('bg');
+        var uDist = urlParams.get('district');
+        var uDate = urlParams.get('date');
+        if (uName) {
+          var pcN = document.getElementById('pc-name');
+          var galN = document.getElementById('gal-name');
+          if (pcN) { pcN.value = uName; if (typeof pcState === 'object') pcState.name = uName; }
+          if (galN) galN.value = uName;
+        }
+        if (uBg) {
+          var pcB = document.getElementById('pc-bg');
+          var galB = document.getElementById('gal-bg');
+          if (pcB) { pcB.value = uBg; if (typeof pcState === 'object') pcState.bg = uBg; }
+          if (galB) galB.value = uBg;
+        }
+        if (uDist) {
+          var pcD = document.getElementById('pc-dist');
+          var galD = document.getElementById('gal-district');
+          if (pcD) { pcD.value = uDist; if (typeof pcState === 'object') pcState.dist = uDist; }
+          if (galD) galD.value = uDist;
+        }
+        if (uDate) {
+          var pcDt = document.getElementById('pc-date');
+          var galDt = document.getElementById('gal-date');
+          if (pcDt) { pcDt.value = uDate; if (typeof pcState === 'object') pcState.lastDate = uDate; }
+          if (galDt) galDt.value = uDate;
+        }
+        if (typeof drawPhotoCard === 'function') drawPhotoCard();
+      } catch (e) {}
+    }, 350);
+  }
 } else {
   go('home');
 }
