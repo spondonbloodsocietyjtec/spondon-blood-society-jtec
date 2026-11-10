@@ -2804,7 +2804,7 @@ function hsk(){var s=$('tsk');if(s)s.style.display='none'}
 function sman(){hsk();$('tdt').classList.remove('show');$('tmsg').className='t-msg';$('tman').classList.add('show')}
 function stk(a,d,ap){
   hsk();$('tman').classList.remove('show');
-  if(d){$('tdn').textContent=ap?(d+' (আনুমানিক ▾)'):(d+' ▾');$('tdt').classList.add('show')}else{$('tdt').classList.remove('show')}
+  if(d){$('tdn').textContent=d;$('tdt').classList.add('show')}else{$('tdt').classList.remove('show')}
   var m=$('tmsg'),t=a.join('   🔴   '),sig=(d||'')+(ap?'~':'')+'::'+t;
   if(lastSig===sig&&m.classList.contains('on'))return;
   lastSig=sig;
@@ -3052,22 +3052,12 @@ function fail(e){
   btn(BTN,false);
   var c=e&&e.code;
   // কন্ডিশন অনুযায়ী: যদি GPS ব্লক থাকে (Brave Browser বা Denied) কিংবা ব্যর্থ হয়, তবে পপআপ কখনোই স্ক্রিনে আটকে থাকবে না—
-  // সাথে সাথে নির্ভুল IP লোকেশন অনুমান (Approximate) করে সেই জেলার নোটিশ লোড করবে এবং ইউজার চাইলে ১ ক্লিকে ম্যানুয়ালি জেলা পরিবর্তন করতে পারবেন!
+  // সাথে সাথে নির্ভুল IP লোকেশন ডিটেক্ট করে সেই জেলার নোটিশ লোড করবে এবং স্বয়ংক্রিয়ভাবে পপআপ বন্ধ করে ওয়েবসাইটে প্রবেশ করাবে!
   if(ipDist && C[ipDist]){
     ldN(ipDist, true);
-    setTimeout(function(){
-      popHide();
-      if(typeof showToast === 'function') {
-        showToast('📍 জিপিএস (GPS) না পাওয়ায় আনুমানিক জেলা "' + ipDist + '" সেট করা হয়েছে। পরিবর্তন করতে উপরে জেলার নামে ট্যাপ করুন।');
-      }
-    }, 350);
+    setTimeout(function(){ popHide(); }, 350);
   } else {
     ipFallback(true);
-    setTimeout(function(){
-      if(typeof showToast === 'function' && window._sbsActiveDist) {
-        showToast('📍 আনুমানিক জেলা "' + window._sbsActiveDist + '" সেট করা হয়েছে। পরিবর্তন করতে উপরে জেলার নামে ট্যাপ করুন।');
-      }
-    }, 1900);
   }
 }
 
@@ -4262,6 +4252,14 @@ document.getElementById('brb').addEventListener('click', function(){
     .then(function(r){ return r.text(); })
     .then(function(txt){
       var d = null; try { d = JSON.parse(txt); } catch(e){}
+      if (d && d.prescriptionUrl) {
+        try {
+          reqCache.prescriptionUrl = d.prescriptionUrl;
+          localStorage.setItem('sbs_last_req', JSON.stringify(reqCache));
+          var curS = window.getSavedBloodReqSession();
+          if (curS) { curS.prescriptionUrl = d.prescriptionUrl; window.saveBloodReqSession(curS); }
+        } catch(e){}
+      }
       if (d && d.status === 'Success' && Array.isArray(d.matchedDonors)) {
         if (!_renderedMatchedOnce || d.matchedDonors.length > 0) {
           var combined = (d.matchedDonors || []).concat(window._sbsLiveDonorsCache ? window._sbsLiveDonorsCache.filter(function(x){
@@ -4319,6 +4317,7 @@ document.getElementById('msb').addEventListener('click',function(){
       var patDist = d.district || cachedReq.district || '';
       var patHosp = d.hospital || cachedReq.hospital || 'উল্লেখ নেই';
       var patProb = d.problem || cachedReq.problem || 'জরুরি রক্তের প্রয়োজন';
+      var patPresUrl = d.prescriptionUrl || cachedReq.prescriptionUrl || '';
       var patTime = d.dateTime || cachedReq.dateTime || 'জরুরি';
       var finalReqPhone = d.reqPhone || reqP || cachedReq.reqPhone || '';
 
@@ -4335,6 +4334,7 @@ document.getElementById('msb').addEventListener('click',function(){
         '• রক্তের গ্রুপ ও পরিমাণ: *' + patBg + ' (' + toBn(patUnits) + ' ব্যাগ)*\n' +
         '• হাসপাতাল ও ঠিকানা: *' + patHosp + (patDist ? ' (' + patDist + ')' : '') + '*\n' +
         '• রোগীর সমস্যা: ' + patProb + '\n' +
+        (patPresUrl ? '• রোগীর প্রেসক্রিপশন লিংক: ' + patPresUrl + '\n' : '') +
         '• রক্তদানের তারিখ ও সময়: *' + patTime + '*\n' +
         '• স্বজনের মোবাইল নাম্বার: *' + finalReqPhone + '*\n\n' +
         '--------------------------------------------\n' +
@@ -8932,27 +8932,23 @@ window.askSpondonAi = function(questionText) {
   aiBody.scrollTop = aiBody.scrollHeight;
 
   var startTime = Date.now();
-  var AI_MIN_THINK_MS = 2200; // প্রতিটি প্রশ্নের উত্তরে ন্যাচারাল ২.২ থেকে ২.৮ সেকেন্ড (২-৩ সেকেন্ড) সময় নেবে
-  var _aiAnswerRevealed = false;
-  var _aiHardCapTimer = null;
+  var INBUILT_THINK_DURATION_MS = 2000; // ইন-বিল্ট প্রশ্নের জন্য ঠিক ২ সেকেন্ড (2000ms) চিন্তা করার সময় নেবে
+  var _aiStatRecordedForTurn = false;
 
   var thinkTimer1 = setTimeout(function(){
     var tSpan = bDiv.querySelector('#ai-think-txt');
     if(tSpan) tSpan.textContent = thinkMsg2;
-  }, 750);
+  }, 700);
 
   var thinkTimer2 = setTimeout(function(){
     var tSpan = bDiv.querySelector('#ai-think-txt');
     if(tSpan) tSpan.textContent = thinkMsg3;
-  }, 1500);
+  }, 1400);
 
   function revealFinalAnswer(htmlContent, isFromGeminiApi) {
-    if (_aiAnswerRevealed) return;
-    _aiAnswerRevealed = true;
-    if (_aiHardCapTimer) { clearTimeout(_aiHardCapTimer); _aiHardCapTimer = null; }
     var elapsed = Date.now() - startTime;
-    // সব প্রশ্নের ক্ষেত্রেই ২.২ সেকেন্ড থেকে সর্বোচ্চ ২.৮ সেকেন্ডের (২-৩ সেকেন্ড) মধ্যে উত্তর প্রদর্শন নিশ্চিত করা হচ্ছে:
-    var targetDuration = AI_MIN_THINK_MS;
+    // ইন-বিল্ট হলে ঠিক ২ সেকেন্ড (2000ms) অপেক্ষা করবে, আর Gemini API হলে যতটুকু সময় এপিআই নেয় ঠিক ততটুকুই নেবে!
+    var targetDuration = isFromGeminiApi ? 0 : INBUILT_THINK_DURATION_MS;
     var remainingDelay = Math.max(0, targetDuration - elapsed);
     setTimeout(function(){
       clearTimeout(thinkTimer1);
@@ -8963,6 +8959,8 @@ window.askSpondonAi = function(questionText) {
   }
 
   function recordLocalAndSheetAiStat(sourceType, qStr, metaTopic) {
+    if (_aiStatRecordedForTurn) return;
+    _aiStatRecordedForTurn = true;
     try {
       var todayKey = new Date().toISOString().split('T')[0];
       var st = JSON.parse(localStorage.getItem('sbs_ai_stats_v1') || '{}');
@@ -9135,15 +9133,6 @@ window.askSpondonAi = function(questionText) {
     tryModelIndex(0);
   }
 
-  // ⏱️ ২.৮ সেকেন্ডের হার্ড-টাইমআউট গার্ড: সার্ভার বা এপিআই ২.৮ সেকেন্ডের বেশি নিলে সাথে সাথে ক্লিনিক্যাল সিন্থেসাইজার থেকে ২.৮ সেকেন্ডেই উত্তর দেখাবে!
-  _aiHardCapTimer = setTimeout(function(){
-    if (!_aiAnswerRevealed) {
-      var fastSynth = runDeepClinicalSynthesizer(questionText, isEn);
-      recordLocalAndSheetAiStat('Gemini API', questionText, 'gemini-fast-2.8s');
-      revealFinalAnswer(formatGeminiMarkdown(fastSynth), true);
-    }
-  }, 2750);
-  runMultiTierGeminiEngine(questionText);
   fetch(S + '?action=askAiAgent&question=' + encodeURIComponent(questionText) + '&_t=' + Date.now())
   .then(function(r){ return r.json(); })
   .then(function(d){
