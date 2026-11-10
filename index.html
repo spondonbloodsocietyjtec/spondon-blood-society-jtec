@@ -3512,6 +3512,7 @@ window.syncCoreSheetsLive = function(onDoneCallback) {
         lastDate: lastDt,
         nextDate: nextDt,
         status: st,
+        otpPin: String(r[10] || '').trim(),
         isFraud: !!fraudMap[ph]
       });
     });
@@ -3678,7 +3679,9 @@ window.sendV6EmailActionWithBridge = function(v6Action, fallbackOldAction, paylo
 
     fetch(S, { method: 'POST', body: fdBridge })
       .then(function(){
-        fetch(S + '?action=getGallery&_t=' + Date.now(), { cache: 'no-store' }).catch(function(){});
+        return fetch(S + '?action=getGallery&_t=' + Date.now(), { cache: 'no-store' }).catch(function(){});
+      })
+      .then(function(){
         if (onDone) onDone({ status: 'Success', bridged: true });
       })
       .catch(function(){
@@ -6270,6 +6273,7 @@ document.getElementById('dp-form1').addEventListener('submit', function(e) {
       return;
     }
     _sbsClientGeneratedOtp = String(Math.floor(1000 + Math.random() * 9000));
+    if (matchedDonor) matchedDonor.otpPin = _sbsClientGeneratedOtp;
     window.sendV6EmailActionWithBridge('requestOtpV6', 'requestOtp', { email: email, clientOtp: _sbsClientGeneratedOtp }, function(d){
       b.disabled = false;
       b.textContent = "🔑 ইমেইলে ৪-ডিজিটের OTP পাঠান";
@@ -6279,6 +6283,9 @@ document.getElementById('dp-form1').addEventListener('submit', function(e) {
         if(sentLbl) sentLbl.textContent = email;
         setDpStepUI(2);
         showToast('📧 আপনার ইমেইলে ৪-ডিজিটের OTP পিন পাঠানো হয়েছে!');
+        setTimeout(function(){
+          if(typeof window.syncCoreSheetsLive === 'function') window.syncCoreSheetsLive();
+        }, 1200);
       } else {
         sE('dp-err1', (d && d.message) ? d.message : 'ইমেইল খুঁজে পাওয়া যায়নি।');
       }
@@ -6292,74 +6299,168 @@ document.getElementById('dp-form1').addEventListener('submit', function(e) {
   }
 });
 
+window.openVerifiedProfileStep3 = function(donorObj) {
+  try {
+    setDpStepUI(3);
+    var distClean = mD(donorObj.district) || donorObj.district || '';
+    document.getElementById('dp-name').value = donorObj.name || '';
+    document.getElementById('dp-phone').value = String(donorObj.phone || '').replace(/^'/, '');
+    document.getElementById('dp-district').value = distClean;
+    populateDpUpazillaList(distClean);
+    document.getElementById('dp-upazilla').value = donorObj.upazilla || '';
+    document.getElementById('dp-bg').value = donorObj.bg || '';
+
+    var sumBg = document.getElementById('dp-sum-bg');
+    var sumName = document.getElementById('dp-sum-name');
+    var sumEmail = document.getElementById('dp-sum-email');
+    if(sumBg) sumBg.textContent = donorObj.bg || '🩸';
+    if(sumName) sumName.textContent = donorObj.name || 'সম্মানিত ডোনার';
+    if(sumEmail) sumEmail.textContent = curProfileEmail;
+
+    var stEl = document.getElementById('dp-status');
+    if(stEl) {
+      stEl.value = (donorObj.status === 'Resting') ? 'Resting' : 'Active';
+    }
+    if(donorObj.lastDate) {
+      var ldStr = String(donorObj.lastDate).trim();
+      if(/^\d{4}-\d{2}-\d{2}$/.test(ldStr)) {
+        document.getElementById('dp-lastdate').value = ldStr;
+      } else {
+        var ld = new Date(ldStr);
+        if(!isNaN(ld.getTime())) {
+          document.getElementById('dp-lastdate').value = ld.toISOString().split('T')[0];
+        } else {
+          document.getElementById('dp-lastdate').value = '';
+        }
+      }
+    } else {
+      document.getElementById('dp-lastdate').value = '';
+    }
+    if(typeof window.updateDpNextDatePreview === 'function') window.updateDpNextDatePreview();
+    showToast('✅ OTP ভেরিফিকেশন সফল হয়েছে!');
+  } catch(domErr) {}
+};
+
 document.getElementById('dp-form2').addEventListener('submit', function(e) {
   e.preventDefault();
   hE('dp-err2');
   var b = document.getElementById('dp-b2');
   b.textContent = "⏳ ভেরিফাই হচ্ছে...";
   b.disabled = true;
-  var otp = document.getElementById('dp-otp').value.trim();
-  var fd = new FormData();
-  fd.append('action', 'verifyOtpV6');
-  fd.append('formType', 'verifyOtp');
-  fd.append('email', curProfileEmail);
-  fd.append('otp', otp);
-  fetch(S, {method:'POST', body:fd})
-  .then(function(r){ return r.text(); })
-  .then(function(txt){
-    var d = null; try { d = JSON.parse(txt); } catch(e){}
-    if ((!d || d.status !== 'Success') && _sbsClientGeneratedOtp && otp === _sbsClientGeneratedOtp) {
-      var locDonor = (window._sbsLiveDonorsCache || []).find(function(x){
-        return String(x.email || '').trim().toLowerCase() === String(curProfileEmail || '').trim().toLowerCase();
-      });
-      if (locDonor) {
-        d = { status: 'Success', donor: locDonor };
-      }
+  var rawOtp = document.getElementById('dp-otp').value.trim();
+  var otp = rawOtp.replace(/[০-৯]/g, function(d){ return String('০১২৩৪৫৬৭৮৯'.indexOf(d)); }).replace(/\s+/g, '');
+  var targetEmailLow = String(curProfileEmail || document.getElementById('dp-email').value || '').trim().toLowerCase();
+
+  // ধাপ ১: লাইভ Donor_DB শিট (JSONP) ও সার্ভার (POST/GET) উভয় মাধ্যম থেকে সমান্তরালভাবে ভেরিফিকেশন (কোনো CORS বা নেটওয়ার্ক এরর হবে না)
+  var DONOR_HEADERS = ['Timestamp','Name','Phone','Email','District','Upazilla','Blood Group','Last Date','Next Date','Status','Login Pin','Pin Generate Time'];
+
+  var liveSheetPromise = new Promise(function(resolve) {
+    if (typeof window.sbsReadSheetLive !== 'function') {
+      resolve(null);
+      return;
     }
-    return d || { status: 'Error', message: 'ভুল OTP পিন দিয়েছেন।' };
-  })
-  .then(function(d){
-    b.disabled = false;
-    b.textContent = "✅ OTP ভেরিফাই ও প্রোফাইল খুলুন";
-    if(d.status === 'Success' && d.donor) {
-      setDpStepUI(3);
-      var distClean = mD(d.donor.district) || d.donor.district || '';
-      document.getElementById('dp-name').value = d.donor.name || '';
-      document.getElementById('dp-phone').value = String(d.donor.phone || '').replace(/^'/, '');
-      document.getElementById('dp-district').value = distClean;
-      populateDpUpazillaList(distClean);
-      document.getElementById('dp-upazilla').value = d.donor.upazilla || '';
-      document.getElementById('dp-bg').value = d.donor.bg || '';
-
-      var sumBg = document.getElementById('dp-sum-bg');
-      var sumName = document.getElementById('dp-sum-name');
-      var sumEmail = document.getElementById('dp-sum-email');
-      if(sumBg) sumBg.textContent = d.donor.bg || '🩸';
-      if(sumName) sumName.textContent = d.donor.name || 'সম্মানিত ডোনার';
-      if(sumEmail) sumEmail.textContent = curProfileEmail;
-
-      var stEl = document.getElementById('dp-status');
-      if(stEl) {
-        stEl.value = (d.donor.status === 'Resting') ? 'Resting' : 'Active';
+    window.sbsReadSheetLive('Donor_DB', function(donorObj) {
+      if (!donorObj || !donorObj.table) {
+        resolve(null);
+        return;
       }
-      if(d.donor.lastDate) {
-        let ld = new Date(d.donor.lastDate);
-        if(!isNaN(ld.getTime())) {
-          document.getElementById('dp-lastdate').value = ld.toISOString().split('T')[0];
-        } else {
-          document.getElementById('dp-lastdate').value = '';
+      try {
+        var rows = window.sbsExtractSheetRows(donorObj, DONOR_HEADERS, 1);
+        var matchedRow = null;
+        for (var i = rows.length - 1; i >= 0; i--) {
+          var rEmail = String(rows[i][3] || '').trim().toLowerCase();
+          if (rEmail && rEmail === targetEmailLow) {
+            matchedRow = rows[i];
+            break;
+          }
         }
-      } else {
-        document.getElementById('dp-lastdate').value = '';
+        if (matchedRow) {
+          var rowPin = String(matchedRow[10] || '').trim().replace(/[০-৯]/g, function(d){ return String('০১২৩৪৫৬৭৮৯'.indexOf(d)); });
+          var donorData = {
+            name: String(matchedRow[1] || 'সম্মানিত রক্তদাতা').trim(),
+            phone: normPhone(matchedRow[2]),
+            email: String(matchedRow[3] || '').trim(),
+            district: mD(matchedRow[4]) || String(matchedRow[4] || '').trim(),
+            upazilla: String(matchedRow[5] || '').trim(),
+            bg: String(matchedRow[6] || '').trim().toUpperCase().replace(/\s+/g, ''),
+            lastDate: window.sbsFormatIsoDate(matchedRow[7]),
+            nextDate: window.sbsFormatIsoDate(matchedRow[8]),
+            status: String(matchedRow[9] || 'Active').trim(),
+            otpPin: rowPin
+          };
+          resolve({ donor: donorData, sheetPin: rowPin });
+        } else {
+          resolve(null);
+        }
+      } catch (parseErr) {
+        resolve(null);
       }
-      window.updateDpNextDatePreview();
-    } else {
-      sE('dp-err2', d.message || 'ভুল OTP পিন দিয়েছেন।');
-    }
-  }).catch(err=>{
+    });
+  });
+
+  var serverVerifyPromise = new Promise(function(resolve) {
+    var fd = new FormData();
+    fd.append('action', 'verifyOtpV6');
+    fd.append('formType', 'verifyOtp');
+    fd.append('email', curProfileEmail);
+    fd.append('otp', otp);
+    fetch(S, {method:'POST', body:fd})
+      .then(function(r){ return r.text(); })
+      .then(function(txt){
+        var d = null; try { d = JSON.parse(txt); } catch(e){}
+        if (d && (d.status === 'Success' || d.status === 'Error')) {
+          resolve(d);
+        } else {
+          return fetch(S + '?action=verifyOtpV6&email=' + encodeURIComponent(curProfileEmail) + '&otp=' + encodeURIComponent(otp) + '&_t=' + Date.now(), { cache: 'no-store' })
+            .then(function(r2){ return r2.text(); })
+            .then(function(t2){ var d2 = null; try { d2 = JSON.parse(t2); } catch(e2){} resolve(d2); })
+            .catch(function(){ resolve(null); });
+        }
+      })
+      .catch(function(){
+        fetch(S + '?action=verifyOtpV6&email=' + encodeURIComponent(curProfileEmail) + '&otp=' + encodeURIComponent(otp) + '&_t=' + Date.now(), { cache: 'no-store' })
+          .then(function(r2){ return r2.text(); })
+          .then(function(t2){ var d2 = null; try { d2 = JSON.parse(t2); } catch(e2){} resolve(d2); })
+          .catch(function(){ resolve(null); });
+      });
+  });
+
+  Promise.all([liveSheetPromise, serverVerifyPromise]).then(function(results) {
     b.disabled = false;
     b.textContent = "✅ OTP ভেরিফাই ও প্রোফাইল খুলুন";
-    sE('dp-err2', 'ইন্টারনেট সমস্যা।');
+    var sheetRes = results[0];
+    var srvRes = results[1];
+    var cachedDonor = (window._sbsLiveDonorsCache || []).find(function(x){
+      return String(x.email || '').trim().toLowerCase() === targetEmailLow;
+    });
+
+    // ১. যদি সার্ভার থেকে সরাসরি Success ও ডোনার অবজেক্ট আসে:
+    if (srvRes && srvRes.status === 'Success' && srvRes.donor) {
+      window.openVerifiedProfileStep3(srvRes.donor);
+      return;
+    }
+
+    // ২. যদি লাইভ গুগল শিট (Donor_DB কলাম K - Login Pin) এর ওটিপি পিনের সাথে মিলে যায়:
+    if (sheetRes && sheetRes.donor && sheetRes.sheetPin && otp && sheetRes.sheetPin === otp) {
+      window.openVerifiedProfileStep3(sheetRes.donor);
+      return;
+    }
+
+    // ৩. যদি ক্লায়েন্ট জেনারেটেড ওটিপি বা ক্যাশড ওটিপি পিনের সাথে মিলে যায়:
+    var fallbackDonor = (sheetRes && sheetRes.donor) ? sheetRes.donor : cachedDonor;
+    if (fallbackDonor && otp && ((_sbsClientGeneratedOtp && otp === _sbsClientGeneratedOtp) || (fallbackDonor.otpPin && otp === String(fallbackDonor.otpPin).trim()))) {
+      window.openVerifiedProfileStep3(fallbackDonor);
+      return;
+    }
+
+    // ৪. যদি ভুল পিন দেওয়া হয়ে থাকে:
+    if (sheetRes && sheetRes.donor) {
+      sE('dp-err2', 'ভুল OTP পিন প্রদান করেছেন। অনুগ্রহ করে আপনার ইমেইলে পাঠানো সঠিক ৪-ডিজিটের পিনটি দিন।');
+    } else if (srvRes && srvRes.message) {
+      sE('dp-err2', srvRes.message);
+    } else {
+      sE('dp-err2', 'ভুল OTP পিন দিয়েছেন অথবা পিনটির মেয়াদ শেষ হয়েছে।');
+    }
   });
 });
 
@@ -6382,21 +6483,36 @@ document.getElementById('dp-form3').addEventListener('submit', function(e) {
   };
   new Promise(function(resolve){
     window.sendV6EmailActionWithBridge('updateProfileV6', 'updateProfile', upPayload, resolve);
-  }).then(d=>{
+  }).then(function(d){
     b.disabled = false;
     b.textContent = "💾 পরিবর্তন ও কনফিগারেশন সেভ করুন";
-    if(d.status === 'Success') {
-      document.getElementById('dp-ok3').style.display = 'block';
-      document.getElementById('dp-sum-bg').textContent = document.getElementById('dp-bg').value || '🩸';
-      document.getElementById('dp-sum-name').textContent = document.getElementById('dp-name').value.trim();
-      window.updateDpNextDatePreview();
-      fetchStats(true);
-      if(typeof window.syncCoreSheetsLive==='function') window.syncCoreSheetsLive();
-      showToast('✅ প্রোফাইল ও স্ট্যাটাস সফলভাবে সেভ হয়েছে!');
+    if(d && d.status === 'Success') {
+      try {
+        document.getElementById('dp-ok3').style.display = 'block';
+        document.getElementById('dp-sum-bg').textContent = upPayload.bg || '🩸';
+        document.getElementById('dp-sum-name').textContent = upPayload.name;
+        if (window._sbsLiveDonorsCache && Array.isArray(window._sbsLiveDonorsCache)) {
+          window._sbsLiveDonorsCache.forEach(function(dn){
+            if (String(dn.email || '').trim().toLowerCase() === String(upPayload.email || '').trim().toLowerCase()) {
+              dn.name = upPayload.name;
+              dn.phone = upPayload.phone;
+              dn.district = upPayload.district;
+              dn.upazilla = upPayload.upazilla;
+              dn.bg = upPayload.bg;
+              dn.status = upPayload.status;
+              dn.lastDate = upPayload.lastDate;
+            }
+          });
+        }
+        if(typeof window.updateDpNextDatePreview === 'function') window.updateDpNextDatePreview();
+        if(typeof fetchStats === 'function') fetchStats(true);
+        if(typeof window.syncCoreSheetsLive === 'function') window.syncCoreSheetsLive();
+        showToast('✅ প্রোফাইল ও স্ট্যাটাস সফলভাবে সেভ হয়েছে!');
+      } catch(uiErr) {}
     } else {
-      sE('dp-err3', d.message || 'আপডেট করতে সমস্যা হয়েছে।');
+      sE('dp-err3', (d && d.message) ? d.message : 'আপডেট করতে সমস্যা হয়েছে।');
     }
-  }).catch(err=>{
+  }).catch(function(){
     b.disabled = false;
     b.textContent = "💾 পরিবর্তন ও কনফিগারেশন সেভ করুন";
     sE('dp-err3', 'ইন্টারনেট সমস্যা।');
